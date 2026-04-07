@@ -3,8 +3,10 @@
 namespace Webkul\DAM\DataGrids\Asset;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Webkul\DAM\Helpers\AssetHelper;
 use Webkul\DAM\Http\Controllers\FileController;
+use Webkul\DAM\Models\Directory;
 use Webkul\DataGrid\DataGrid;
 use Webkul\DataGrid\Enums\ColumnTypeEnum;
 
@@ -135,7 +137,23 @@ class AssetDataGrid extends DataGrid
             'filterable' => false,
             'sortable'   => true,
             'closure'    => function ($row) {
-                return isset($row->path) ? route('admin.dam.file.thumbnail', ['path' => urlencode($row->path)]) : '';
+                if (! isset($row->path)) {
+                    return '';
+                }
+
+                $disk = Directory::getAssetDisk();
+                $thumbnailPath = 'thumbnails/'.ltrim($row->path, '/');
+
+                // If thumbnail exists in S3 and is public, return direct S3 URL
+                if (Storage::disk($disk)->exists($thumbnailPath)) {
+                    $visibility = Storage::disk($disk)->getVisibility($thumbnailPath);
+                    if ($visibility === 'public') {
+                        return Storage::disk($disk)->url($thumbnailPath);
+                    }
+                }
+
+                // Fallback to route URL for on-demand generation
+                return route('admin.dam.file.thumbnail', ['path' => urlencode($row->path)]);
             },
         ]);
 
