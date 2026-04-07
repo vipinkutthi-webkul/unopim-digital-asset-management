@@ -173,6 +173,8 @@
                     
                     @elseif ($activeTab === 'linked-resources')    
                         {{$linked_resources}}
+                    @elseif ($activeTab === 'meta-data')    
+                        {{$meta_data}}
                     @endif
 
                     {!! view_render_event('unopim.admin.layouts.tabs.after') !!}

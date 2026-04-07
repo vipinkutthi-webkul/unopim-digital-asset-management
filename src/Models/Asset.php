@@ -21,7 +21,7 @@ class Asset extends Model implements AssetContract, HistoryAuditable
 
     protected $table = 'dam_assets';
 
-    protected $fillable = ['file_name', 'file_type', 'file_size', 'path', 'mime_type', 'extension'];
+    protected $fillable = ['file_name', 'file_type', 'file_size', 'path', 'mime_type', 'extension', 'meta_data'];
 
     /**
      * These columns history will not be generated

@@ -32,6 +32,7 @@
     </x-slot>
 
     @php
+
         $items = [
             [
                 'url' => '?',
@@ -39,6 +40,13 @@
                 'name' => 'dam::app.admin.dam.asset.edit.tab.preview',
                 'icon' => 'icon-dam-preview',
             ],
+        ];
+
+        $items[] = [
+            'url' => '?meta-data',
+            'code' => 'meta-data',
+            'name' =>  'dam::app.admin.dam.asset.edit.embedded_meta_info',
+            'icon' => 'icon-manage-column',
         ];
 
         if (bouncer()->hasPermission('dam.asset.property')) {
@@ -102,6 +110,10 @@
             @include('dam::asset.linked-resources.index', ['assetId' => $asset->id])
         @endif
     </x-slot:linked_resources>
+
+    <x-slot:meta_data>
+        @include('dam::asset.meta-data.index')
+    </x-slot:meta_data>
 
     {!! view_render_event('unopim.dam.admin.asset.edit.after') !!}
 
@@ -366,16 +378,57 @@
             type="text/x-template"
             id="v-custom-download-template"
         >
+
+         <!-- ****  previous and next buttons **** -->
+            @php
+                $queryParams = request()->query();
+                $queryString = '';
+                if (!empty($queryParams)) {
+                    $queryString = '?' . implode('&', array_map(fn($key) => $key, array_keys($queryParams)));
+                }
+            @endphp
+
+            @if($asset->previousAssetId)
+                <button class="secondary-button" title="Previous"
+                 @click="goToPreviousAsset('{{ route('admin.dam.assets.edit', $asset->previousAssetId) }}{{ $queryString }}')">
+                    <span class="text-2xl">&larr;</span>
+                </button>
+            @endif
+            @if($asset->nextAssetId)
+                <button class="secondary-button"  title="Next"
+                    @click="goToNextAsset('{{ route('admin.dam.assets.edit', $asset->nextAssetId) }}{{ $queryString }}')">
+
+                    <span class="text-2xl">&rarr;</span>
+                </button>
+            @endif
+
+
             @if (bouncer()->hasPermission('dam.asset.download'))
-                
+
                 @if($asset->extension ==='svg')
-                <button class="secondary-button" @click="svgDownloadModel">
-                    <span class="text-xl text-violet-700 icon-dam-download"></span>
+                <button class="secondary-button" @click="svgDownloadModel" :disabled="isLoadingSvgDownload" :class="isLoadingSvgDownload ? 'cursor-not-allowed opacity-50' : ''">
+                    <template v-if="!isLoadingSvgDownload">
+                        <span class="text-xl text-violet-700 icon-dam-download"></span>
+                    </template>
+                    <template v-else>
+                        <svg class="align-center inline-block animate-spin h-5 w-5 ml-2 text-violet-700" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                    </template>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>    
                 </button>
                 @elseif ($asset->file_type === 'image')
-                    <button class="secondary-button" @click="customDownloadModel">
-                        <span class="text-xl text-violet-700 icon-dam-download"></span>
+                    <button class="secondary-button" @click="customDownloadModel" :disabled="isLoadingCustomDownload" :class="isLoadingCustomDownload ? 'cursor-not-allowed opacity-50' : ''">
+                        <template v-if="!isLoadingCustomDownload">
+                            <span class="text-xl text-violet-700 icon-dam-download"></span>
+                        </template>
+                        <template v-else>
+                            <svg class="align-center inline-block animate-spin h-5 w-5 ml-2 text-violet-700" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                            </svg>
+                        </template>
                         <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>    
                     </button>
                 @else
@@ -596,20 +649,40 @@
                                 value: 'webp'
                             },
                         ],
-
                         selectedItemExtension: selectedItem?.extension,
-                        selectedItemWidth: selectedItem?.embeddedMetaInfo?.Width,
-                        selectedItemHeight: selectedItem?.embeddedMetaInfo?.Height,
+                        selectedItemWidth: selectedItem?.width ?? 0,
+                        selectedItemHeight: selectedItem?.height ?? 0,
+                        isLoadingCustomDownload: false,
+                        isLoadingSvgDownload: false,
+
                     };
                 },
+                mounted() {
+                    // Listen for the global event
+                    this.$emitter.on('asset-embedded-dimensions', this.setDimensions);
+                },
+                beforeUnmount() {
+                    this.$emitter.off('asset-embedded-dimensions', this.setDimensions);
+                },
                 methods: {
+
+                    goToPreviousAsset(url) {
+                        window.location.href = url;
+                    },
+
+                    goToNextAsset(url) {
+                        window.location.href = url;
+                    },
+
                     svgDownloadModel() {
+
                         this.$refs.svgCustomDownloadModal.toggle();
                     },
                     svgCustomDownload(params, {
                         resetForm,
                         setErrors
                     }) {
+                        this.isLoadingSvgDownload = true;
                         const format = (() => {
                             try {
                                 return JSON.parse(params.format).value;
@@ -618,13 +691,45 @@
                             }
                         })();
 
-                        let downloadLink = `{{ route('admin.dam.assets.custom_download', ':id') }}`.replace(':id', this.selectedItem.id) + `?format=${format}`;
+                        let downloadUrl =
+                            `{{ route('admin.dam.assets.custom_download', ':id') }}`.replace(':id', this.selectedItem.id) + `?format=${format}`;
 
                         this.selectedItemExtension = this.selectedItem?.extension;
 
                         this.$refs.svgCustomDownloadModal.close();
 
-                        window.open(downloadLink, '_self');
+                        fetch(downloadUrl, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/octet-stream'
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.blob();
+                            })
+                            .then(blob => {
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                const baseName = this.selectedItem.file_name ?
+                                    this.selectedItem.file_name.replace(/\.[^/.]+$/, "") :
+                                    "download";
+                                a.download = `${baseName}.${format}`;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(url);
+                            })
+                            .catch(error => {
+                                this.$emitter.emit('add-flash', {
+                                    type: 'error',
+                                    message: 'Download failed. ' + error.message
+                                });
+                            })
+                            .finally(() => {
+                                this.isLoadingSvgDownload = false;
+                            });
                     },
                     customDownloadModel() {
                         this.$refs.assetCustomDownloadModal.toggle();
@@ -633,35 +738,53 @@
                         resetForm,
                         setErrors
                     }) {
-                        const format = (() => {
-                            try {
-                                return JSON.parse(params.format).value;
-                            } catch (e) {
-                                return params.format;
-                            }
-                        })();
-
+                        this.isLoadingCustomDownload = true;
+                        const format = typeof params.format === 'object' ? params.format.value : params.format;
                         const formatHeight = params.height;
                         const formatWidth = params.width;
 
-                        let downloadLink =
+                        const downloadUrl =
                             `{{ route('admin.dam.assets.custom_download', ':id') }}`.replace(':id', this.selectedItem.id) + `?format=${format}&height=${formatHeight}&width=${formatWidth}`;
 
-                        this.selectedItemExtension = this.selectedItem?.extension;
-                        this.selectedItemWidth = this.selectedItem?.embeddedMetaInfo?.Width;
-                        this.selectedItemHeight = this.selectedItem?.embeddedMetaInfo?.Height;
+                        fetch(downloadUrl, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/octet-stream'
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.blob();
+                            })
+                            .then(blob => {
+
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = this.selectedItem.file_name;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(url);
+                            })
+                            .catch(error => {
+                                this.$emitter.emit('add-flash', {
+                                    type: 'error',
+                                    message: 'Download failed. ' + error.message
+                                });
+                            })
+                            .finally(() => {
+                                this.isLoadingCustomDownload = false;
+                            });
 
                         this.$refs.assetCustomDownloadModal.close();
-
-                        window.open(downloadLink, '_self');
                     },
                     downloadItem() {
                         let downloadLink = `{{ route('admin.dam.assets.download', ':id') }}`.replace(':id', this.selectedItem.id);
 
                         window.open(downloadLink, '_self');
                     },
-                },
-
+                }
             });
         </script>
 
@@ -672,7 +795,7 @@
         >
             @if (bouncer()->hasPermission('dam.asset.rename'))
                 <button class="secondary-button" @click="renameItem">
-                    <span class="text-xl text-violet-700 icon-dam-rename"></span>    
+                    <span class="text-xl text-violet-700 icon-dam-rename"></span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.rename')</span>
                 </button>
             @endif
@@ -735,11 +858,26 @@
                                 <button
                                     type="submit"
                                     class="primary-button"
+                                    :disabled="isLoading"
                                 >
+                                 <span v-if="isLoading">
+                                    <svg
+                                      class="align-center inline-block animate-spin h-5 w-5 ml-2 text-white-700"
+                                      xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"
+                                      viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4">
+                                      </circle>
+                                      <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                      </path>
+                                    </svg>
+                                </span>
+
                                     @lang('Save')
                                 </button>
                             </div>
-                        </x-slot>
+                        </x-slot:footer>
                     </x-admin::modal>
                 </form>
             </x-admin::form>
@@ -751,7 +889,8 @@
                 template: '#v-rename-asset-template',
                 data: function() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isLoading: false,
                     };
                 },
                 methods: {
@@ -770,7 +909,7 @@
                         setErrors
                     }) {
                         let formData = new FormData(this.$refs.assetRenameForm);
-
+                        this.isLoading = true;
                         this.$axios.post("{{ route('admin.dam.assets.rename') }}", formData)
                             .then((response) => {
                                 this.$refs.assetRenameModal.close();
@@ -791,6 +930,8 @@
                                     type: 'error',
                                     message: error.response.data.message
                                 });
+                            }).finally(() => {
+                                this.isLoading = false;
                             });
                     },
                 }
@@ -801,19 +942,33 @@
         <script
             type="text/x-template"
             id="v-reupload-asset-template"
-        >      
-            @if (bouncer()->hasPermission('dam.asset.re_upload'))    
+        >
+            @if (bouncer()->hasPermission('dam.asset.re_upload'))
                 <input type="file"
                     name="file"
                     id="file-upload"
                     class="hidden"
                     @change="onFileChange"
+                    :disabled="isLoadingReupload"
                 />
                 <label
                     for="file-upload"
                     class="secondary-button cursor-pointer"
                 >
-                    <span class="text-xl text-violet-700 icon-dam-upload"></span>
+                    <span v-if="!isLoadingReupload" class="text-xl text-violet-700 icon-dam-upload"></span>
+                    <span v-else>
+                        <svg
+                          class="align-center inline-block animate-spin h-5 w-5 ml-2 text-white-700"
+                          xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"
+                          viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4">
+                          </circle>
+                          <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                          </path>
+                        </svg>
+                    </span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.re_upload')</span>
                 </label>
             @endif
@@ -824,7 +979,8 @@
                 template: '#v-reupload-asset-template',
                 data() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isLoadingReupload: false,
                     };
                 },
                 methods: {
@@ -844,6 +1000,7 @@
                         }
                     },
                     handleFileUpload(formData) {
+                        this.isLoadingReupload = true;
                         this.$axios.post("{{ route('admin.dam.assets.re_upload') }}", formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
@@ -863,6 +1020,8 @@
                                 message: error.response.data.message
                             });
                             console.error('Upload failed:', error);
+                        }).finally(() => {
+                            this.isLoadingReupload = false;
                         });
                     }
                 }
@@ -875,8 +1034,21 @@
             id="v-delete-asset-template"
         >
             @if (bouncer()->hasPermission('dam.asset.delete'))
-                <button class="secondary-button" @click="deleteFile"> 
-                    <span class="text-xl text-violet-700 icon-dam-delete"></span>
+                <button class="secondary-button" @click="deleteFile" :disabled="isLoadingDelete">
+                    <span v-if="!isLoadingDelete" class="text-xl text-violet-700 icon-dam-delete"></span>
+                     <span v-else>
+                        <svg
+                          class="align-center inline-block animate-spin h-5 w-5 ml-2 text-white-700"
+                          xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"
+                          viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4">
+                          </circle>
+                          <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                          </path>
+                        </svg>
+                    </span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.delete')</span>
                 </button>
             @endif
@@ -887,13 +1059,15 @@
                 template: '#v-delete-asset-template',
                 data() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isLoadingDelete: false,
                     };
                 },
                 methods: {
                     deleteFile() {
                         this.$emitter.emit('open-delete-modal', {
                             agree: () => {
+                                this.isLoadingDelete = true;
                                 this.$axios.delete(
                                         `{{ route('admin.dam.assets.destroy', ':id') }}`.replace(':id', this.selectedItem.id)
                                     )
@@ -903,13 +1077,16 @@
                                             message: response.data.message
                                         });
 
-                                        window.location.assign("{{ route('admin.dam.assets.index') }}");
+                                        window.location.assign(
+                                            "{{ route('admin.dam.assets.index') }}");
                                     })
                                     .catch((error) => {
                                         this.$emitter.emit('add-flash', {
                                             type: 'error',
                                             message: error.response.data.message
                                         });
+                                    }).finally(() => {
+                                        this.isLoadingDelete = false;
                                     });
                             }
                         });

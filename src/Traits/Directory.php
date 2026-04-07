@@ -101,10 +101,14 @@ trait Directory
 
             $fileContent = $storage->get($path);
             $image = (new ImageManager(new Driver))->read($fileContent);
+            $exif = $image->exif();
+            if ($exif && ! is_array($exif)) {
+                $exif = $exif->toArray();
+            }
 
             return [
                 'success' => true,
-                'data'    => $image->exif(),
+                'data'    => $exif ?: [],
             ];
         } catch (\Exception $e) {
 
