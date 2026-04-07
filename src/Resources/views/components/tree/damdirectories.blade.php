@@ -3,92 +3,6 @@
 </v-tree-view>
 
 @pushOnce('scripts')
-<!-- asset name template -->
-<script type="text/x-template" id="v-asset-item-template">
-    <div 
-        class="tree-container-assets-details" 
-    >    
-        <div
-            class="flex gap-1 w-full p-1 cursor-pointer"
-            @click.stop="setFilters(item)"
-            @contextmenu.prevent.stop="showContextMenu($event, item)"
-        >
-            <span>
-                <i 
-                    class="text-xl transition-all group-hover:text-gray-800 dark:group-hover:text-white cursor-grab"
-                    :class="getFileTypeIcon(item)"
-                ></i>
-            </span>
-            <span 
-                class="text-sm dark:text-white"
-                :class="selectedItem && selectedItem.file_name && item.id == selectedItem.id ? 'text-violet-700' : 'text-zinc-600'"
-            >@{{ formatFileName(item.file_name) }}</span>
-        </div>
-    </div>
-</script>
-<script type="module">
-    app.component('v-asset-item', {
-        template: "#v-asset-item-template",
-        props: {
-            item: Object,
-            selectedItem: Object,
-        },
-        mounted() {
-            this.$emitter.on('update-current-item', (data) => {
-                if (data.id === this.item.id) {
-                    this.item = data;
-                }
-            });
-        },
-        methods: {
-            setFilters(item) {
-                this.$emit("set-filters", item, 'asset');
-            },
-
-            getFileTypeIcon(item) {
-                switch (item.file_type) {
-                    case 'image':
-                        return 'icon-dam-image';
-                    case 'video':
-                        return 'icon-dam-video';
-                    case 'audio':
-                        return 'icon-dam-audio';
-                    case 'document':
-                        return 'icon-dam-doc';
-                    default:
-                        return 'icon-dam-image';
-                }
-            },
-
-            formatFileName(fileName) {
-                if (fileName.length > 29) {
-                    fileName = fileName.substring(0, 20) + '...' + fileName.substring(fileName.lastIndexOf('.'));
-                }
-
-                return fileName
-            },
-
-            selectItem(item) {
-                this.$emit('select-item', item);
-            },
-
-            openContextMenu(event, item) {
-                event.stopPropagation();
-                this.$emit('open-context-menu', event, item);
-            },
-
-            showContextMenu(event, item) {
-                event.stopPropagation();
-                this.contextMenuPosition = {
-                    x: event.pageX,
-                    y: event.pageY
-                };
-                this.showContextMenuFlag = true;
-                this.$emit("right-click-item", event, item, 'asset'); // Emit event for parent handling
-            },
-        }
-    });
-</script>
 <!-- item template -->
 <script type="text/x-template" id="v-item-template">
     <div class="tree-container-details">
@@ -99,7 +13,7 @@
         >
             <span 
                 class="text-xl text-zinc-600 dark:text-white"
-                v-if="isDirectory || isAssets"
+                v-if="isDirectory"
                 :class="isOpen ? 'icon-dam-close' : 'icon-dam-open'"
             >
             </span>
@@ -112,8 +26,7 @@
             >@{{ item?.name }}   </span>
         </div>
         <div 
-            v-show="isOpen" 
-            v-if="isDirectory || isAssets"
+            v-if="isDirectory"
             class="flex flex flex-col pl-6"
         >
             <!-- Directories -->
@@ -145,33 +58,6 @@
                     </div>
                 </template>
             </draggable>
-
-            <!-- Asset -->
-            <draggable 
-                id="assets-items"
-                ghost-class="draggable-ghost"
-                handle=".tree-container-assets-details"
-                v-bind="{animation: 200}"
-                :list="item.assets"
-                item-key="id"
-                :sort='false'
-                group="itemsAssets"
-                @start="onDragStart"
-                @change="onMergeItems($event, item.id, 'asset')"
-            >
-                <template #item="{ element, index }">
-                    <div>
-                        <v-asset-item
-                            :item="element"
-                            @set-filters="setFilters"
-                            @right-click-item="showContextMenu"
-                            :selectedItem="selectedItem"
-                            @on-merge-items="onMergeItems"
-                            @on-drag-start="onDragStart"
-                        />
-                    </div>
-                </template>
-            </draggable>
         </div>
     </div>
     <!-- Directories -->
@@ -187,25 +73,6 @@
         :sort='false'
         group="directoryItems"
         @change="onMergeItems($event, item.id)"
-        @start="onDragStart"
-    >
-        <template #item="{ element, index }">
-            
-        </template>
-    </draggable>
-    <!-- Asset -->
-    <draggable 
-        v-if="!isAssets"
-        id="assets-items"
-        class="mb-1 itemsAssets ml-6"
-        ghost-class="draggable-ghost"
-        handle=".tree-container-assets-details"
-        v-bind="{animation: 200}"
-        :list="item.assets"
-        item-key="id"
-        :sort='false'
-        group="itemsAssets"
-        @change="onMergeItems($event, item.id, 'asset')"
         @start="onDragStart"
     >
         <template #item="{ element, index }">
@@ -338,32 +205,6 @@
                     </template>
                 </draggable>
 
-                <draggable 
-                    id="assets-items"
-                    ghost-class="draggable-ghost"
-                    handle=".tree-container-assets-details"
-                    v-bind="{animation: 200}"
-                    :list="formattedItems[0].assets"
-                    item-key="id"
-                    :sort="false"
-                    group="itemsAssets"
-                    @start="onDragStart"
-                    @change="onMergeItems($event, formattedItems[0].id, 'asset')"
-                >
-                    <template #item="{ element, index }">
-                        <div class="ml-6">
-                            <v-asset-item
-                                :item="element"
-                                @set-filters="setFilters"
-                                @on-merge-items="onMergeItems"
-                                @on-drag-start="onDragStart"
-                                @right-click-item="showContextMenu"
-                                :selectedItem="selectedItem"
-                            />
-                        </div>
-                        
-                    </template> 
-                </draggable>
             </div>
 
             <!-- Context Menu -->
