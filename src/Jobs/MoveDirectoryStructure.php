@@ -94,10 +94,10 @@ class MoveDirectoryStructure
     {
         $path = $directory->generatePath();
         $disk = ModelDirectory::getAssetDisk();
-        // On object stores like S3 there are no real directories, so the
-        // folder-level rename performed later is a no-op and assets would be
-        // orphaned. Move each file individually for those drivers.
-        $movePerFile = $disk === ModelDirectory::ASSETS_DISK_AWS;
+        // On object stores like S3/Azure there are no real directories, so
+        // the folder-level rename performed later is a no-op and assets
+        // would be orphaned. Move each file individually for those drivers.
+        $movePerFile = ModelDirectory::isCloudDisk($disk);
 
         foreach ($directory->assets()->get() as $asset) {
             $oldAssetPath = $asset->path;
@@ -109,11 +109,10 @@ class MoveDirectoryStructure
                 && $oldAssetPath !== $newAssetPath
             ) {
                 try {
-                    if (
-                        Storage::disk($disk)->exists($oldAssetPath)
-                        && ! Storage::disk($disk)->exists($newAssetPath)
-                    ) {
-                        Storage::disk($disk)->move($oldAssetPath, $newAssetPath);
+                    if (Storage::disk($disk)->exists($oldAssetPath)) {
+                        Storage::disk($disk)->exists($newAssetPath)
+                            ? Storage::disk($disk)->delete($oldAssetPath)
+                            : Storage::disk($disk)->move($oldAssetPath, $newAssetPath);
                     }
                 } catch (\Throwable $e) {
                     Log::error('DAM: failed to move asset file on storage', [

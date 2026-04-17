@@ -216,6 +216,18 @@ class FileController
             return redirect($url);
         }
 
+        if ($disk === Directory::ASSETS_DISK_AZURE) {
+            try {
+                $url = Storage::disk($disk)->url($path);
+
+                return redirect($url);
+            } catch (\Throwable $e) {
+                $url = Storage::disk($disk)->temporaryUrl($path, now()->addMinutes(5));
+
+                return redirect($url);
+            }
+        }
+
         $file = Storage::disk($disk)->get($path);
         $mimeType = Storage::disk($disk)->mimeType($path);
 

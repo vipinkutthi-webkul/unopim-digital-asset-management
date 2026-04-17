@@ -141,11 +141,11 @@ class DirectoryRepository extends Repository
 
             $oldDirectory = sprintf('%s/%s', Directory::ASSETS_DIRECTORY, $oldPath);
 
-            // On object stores like S3 there are no real directories; asset
-            // files are moved individually by the caller (see
+            // On object stores like S3/Azure there are no real directories;
+            // asset files are moved individually by the caller (see
             // MoveDirectoryStructure::moveAssets), so just clean up the old
             // prefix if anything is left and ensure the new one exists.
-            if ($disk === Directory::ASSETS_DISK_AWS) {
+            if (Directory::isCloudDisk($disk)) {
                 Storage::disk($disk)->deleteDirectory($oldDirectory);
                 Storage::disk($disk)->makeDirectory($newDirectory);
 

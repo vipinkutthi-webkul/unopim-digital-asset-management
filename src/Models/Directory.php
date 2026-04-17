@@ -22,6 +22,8 @@ class Directory extends Model implements DirectoryContract
 
     const ASSETS_DISK_AWS = 's3';
 
+    const ASSETS_DISK_AZURE = 'azure';
+
     const NON_DELETABLE_DRECTORIES = [1];
 
     protected $table = 'dam_directories';
@@ -99,11 +101,17 @@ class Directory extends Model implements DirectoryContract
     {
         $disk = config('filesystems.default');
 
-        if ($disk === self::ASSETS_DISK_AWS) {
-            return self::ASSETS_DISK_AWS;
-        }
+        return self::isCloudDisk($disk) ? $disk : self::ASSETS_DISK_PRIVATE;
+    }
 
-        return self::ASSETS_DISK_PRIVATE;
+    /**
+     * Check if the given disk is a cloud/object storage disk (S3 or Azure)
+     */
+    public static function isCloudDisk(?string $disk = null): bool
+    {
+        $disk = $disk ?? self::getAssetDisk();
+
+        return in_array($disk, [self::ASSETS_DISK_AWS, self::ASSETS_DISK_AZURE]);
     }
 
     /**
@@ -121,9 +129,9 @@ class Directory extends Model implements DirectoryContract
     }
 
     /**
-     * Check if the Configure Disk is s3
+     * Check if the configured cloud disk (S3/Azure) is writable
      */
-    public function awsSupport(string $path, string $disk): bool
+    public function cloudSupport(string $path, string $disk): bool
     {
         $uniqueFileName = uniqid('writetest_').'.txt';
         $fullPath = trim($path, '/').'/'.$uniqueFileName;
@@ -146,8 +154,8 @@ class Directory extends Model implements DirectoryContract
     {
         $disk = self::getAssetDisk();
 
-        if ($disk === self::ASSETS_DISK_AWS) {
-            return $this->awsSupport($path, $disk);
+        if (self::isCloudDisk($disk)) {
+            return $this->cloudSupport($path, $disk);
         }
 
         return $this->privateSupport($path, $disk);
