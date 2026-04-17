@@ -38,6 +38,8 @@ Route::group([
 
             Route::post('rename', 'rename')->name('admin.dam.assets.rename');
             Route::post('/moved', 'moved')->name('admin.dam.assets.moved');
+
+            Route::get('metadata/{id}', 'getMetadataById')->name('admin.dam.assets.metadata')->where('id', '[0-9]+');
         });
 
         Route::controller(TagController::class)->prefix('')->group(function () {

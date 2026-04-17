@@ -20,6 +20,7 @@ use Webkul\DAM\Repositories\AssetPropertyRepository;
 use Webkul\DAM\Repositories\AssetRepository;
 use Webkul\DAM\Repositories\AssetTagRepository;
 use Webkul\DAM\Repositories\DirectoryRepository;
+use Webkul\DAM\Services\MetadataExtractionService;
 use Webkul\DAM\Traits\Directory as DirectoryTrait;
 
 class AssetController extends Controller
@@ -34,7 +35,8 @@ class AssetController extends Controller
         protected AssetTagRepository $assetTagRepository,
         protected AssetPropertyRepository $assetPropertyRepository,
         protected FileStorer $fileStorer,
-        protected DirectoryRepository $directoryRepository
+        protected DirectoryRepository $directoryRepository,
+        protected MetadataExtractionService $metadataExtractionService
     ) {}
 
     /**
@@ -208,6 +210,9 @@ class AssetController extends Controller
                     options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
                 );
 
+                $localFilePath = $file->getRealPath();
+                $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
                 $asset = Asset::create([
                     'file_name' => $uniqueFileName,
                     'file_type' => AssetHelper::getFileType($file),
@@ -215,6 +220,7 @@ class AssetController extends Controller
                     'mime_type' => $mimeType,
                     'extension' => $extension,
                     'path'      => $filePath,
+                    'meta_data' => json_encode($metaData),
                 ]);
 
                 $assetIds[] = $asset->id;
@@ -306,6 +312,9 @@ class AssetController extends Controller
             $originalName = $file->getClientOriginalName();
             $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
 
+            $localFilePath = $file->getRealPath();
+            $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
             $filePath = $this->fileStorer->store(
                 path: $directoryPath,
                 file: $file,
@@ -320,6 +329,7 @@ class AssetController extends Controller
                 'mime_type' => $file->getMimeType(),
                 'extension' => $file->getClientOriginalExtension(),
                 'path'      => $filePath,
+                'meta_data' => $metaData,
             ]);
         }
 

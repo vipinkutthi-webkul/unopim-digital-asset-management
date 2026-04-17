@@ -41,6 +41,13 @@
             ],
         ];
 
+        $items[] = [
+            'url' => '?meta-data',
+            'code' => 'meta-data',
+            'name' => 'dam::app.admin.dam.asset.edit.embedded_meta_info',
+            'icon' => 'icon-manage-column',
+        ];
+
         if (bouncer()->hasPermission('dam.asset.property')) {
             $items[] = [
                 'url' => '?properties',
@@ -102,6 +109,10 @@
             @include('dam::asset.linked-resources.index', ['assetId' => $asset->id])
         @endif
     </x-slot:linked_resources>
+
+    <x-slot:meta_data>
+        @include('dam::asset.meta-data.index', ['asset' => $asset])
+    </x-slot:meta_data>
 
     {!! view_render_event('unopim.dam.admin.asset.edit.after') !!}
 
@@ -220,73 +231,6 @@
                             </x-admin::accordion>
 
                             {!! view_render_event('unopim.dam.asset.edit.card.accordian.directory_path.after', ['asset' => $asset]) !!}
-
-                            <!-- Embedded MetaInfo -->
-                            @if ($asset->embeddedMetaInfo)
-                                {!! view_render_event('unopim.dam.asset.edit.card.accordian.embedded_meta_info.before', ['asset' => $asset]) !!}
-
-                                <x-admin::accordion>
-                                    <x-slot:header>
-                                        <p class="p-2.5 text-gray-800 dark:text-white text-base font-semibold">
-                                            @lang('dam::app.admin.dam.asset.edit.embedded_meta_info')
-                                        </p>
-                                    </x-slot>
-        
-                                    <x-slot:content class="overflow-x-auto max-w-full !px-0 !pb-0">
-                                        <x-admin::table class="w-full text-sm text-left min-w-[400px]">
-                                            <x-admin::table.thead class="text-sm font-medium dark:bg-gray-800">
-                                                    <x-admin::table.thead.tr>
-                                                        <x-admin::table.th>
-                                                            @lang('dam::app.admin.dam.asset.edit.name')
-                                                        </x-admin::table.th>
-
-                                                        <x-admin::table.th>
-                                                            @lang('dam::app.admin.dam.asset.edit.value')
-                                                        </x-admin::table.th>
-                                                    </x-admin::table.thead.tr>
-                                            </x-admin::table.thead>
-                                            @foreach ($asset->embeddedMetaInfo as $metaInfoName => $metaInfoValue)
-                                                <x-admin::table.thead.tr
-                                                    class="hover:bg-violet-50 hover:bg-opacity-50 dark:hover:bg-cherry-800"
-                                                > 
-                                                    <x-admin::table.td>
-                                                        <p
-                                                            class="dark:text-white" 
-                                                        >
-                                                        {{$metaInfoName}}
-                                                        </p>
-
-                                                    </x-admin::table.td>
-
-                                                    <x-admin::table.td>
-                                                        <p class="dark:text-white">
-                                                            @if (is_array($metaInfoValue))
-                                                                <!-- You can add logic to display the array content if needed -->
-                                                                @foreach ($metaInfoValue as $label => $value)
-                                                                    <tr
-                                                                        class="hover:bg-violet-50 hover:bg-opacity-50 dark:hover:bg-cherry-800"
-                                                                    > 
-                                                                        <x-admin::table.td>{{ $label }}</x-admin::table.td>
-                                                                        <x-admin::table.td>{{ $value }}</x-admin::table.td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            @else
-                                                                @if ('FileDateTime' == $metaInfoName)
-                                                                    {{ date('Y-m-d H:i:s', $metaInfoValue) }}
-                                                                @else
-                                                                    {{ $metaInfoValue }}
-                                                                @endif
-                                                            @endif
-                                                        </p>
-                                                    </x-admin::table.td>
-                                                </x-admin::table.thead.tr>
-                                            @endforeach                                
-                                        </x-admin::table>
-                                    </x-slot>
-                                </x-admin::accordion>
-        
-                                {!! view_render_event('unopim.dam.asset.edit.card.accordian.embedded_meta_info.after', ['asset' => $asset]) !!}
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -366,6 +310,30 @@
             type="text/x-template"
             id="v-custom-download-template"
         >
+
+         <!-- ****  previous and next buttons **** -->
+            @php
+                $queryParams = request()->query();
+                $queryString = '';
+                if (!empty($queryParams)) {
+                    $queryString = '?' . implode('&', array_map(fn($key) => $key, array_keys($queryParams)));
+                }
+            @endphp
+
+            @if($asset->previousAssetId)
+                <button class="secondary-button" title="Previous"
+                 @click="goToPreviousAsset('{{ route('admin.dam.assets.edit', $asset->previousAssetId) }}{{ $queryString }}')">
+                    <span class="text-2xl">&larr;</span>
+                </button>
+            @endif
+            @if($asset->nextAssetId)
+                <button class="secondary-button"  title="Next"
+                    @click="goToNextAsset('{{ route('admin.dam.assets.edit', $asset->nextAssetId) }}{{ $queryString }}')">
+
+                    <span class="text-2xl">&rarr;</span>
+                </button>
+            @endif
+
             @if (bouncer()->hasPermission('dam.asset.download'))
                 
                 @if($asset->extension ==='svg')
@@ -598,11 +566,20 @@
                         ],
 
                         selectedItemExtension: selectedItem?.extension,
-                        selectedItemWidth: selectedItem?.embeddedMetaInfo?.Width,
-                        selectedItemHeight: selectedItem?.embeddedMetaInfo?.Height,
+                        selectedItemWidth: selectedItem?.width ?? 0,
+                        selectedItemHeight: selectedItem?.height ?? 0,
                     };
                 },
                 methods: {
+
+                    goToPreviousAsset(url) {
+                        window.location.href = url;
+                    },
+
+                    goToNextAsset(url) {
+                        window.location.href = url;
+                    },
+
                     svgDownloadModel() {
                         this.$refs.svgCustomDownloadModal.toggle();
                     },
@@ -648,8 +625,8 @@
                             `{{ route('admin.dam.assets.custom_download', ':id') }}`.replace(':id', this.selectedItem.id) + `?format=${format}&height=${formatHeight}&width=${formatWidth}`;
 
                         this.selectedItemExtension = this.selectedItem?.extension;
-                        this.selectedItemWidth = this.selectedItem?.embeddedMetaInfo?.Width;
-                        this.selectedItemHeight = this.selectedItem?.embeddedMetaInfo?.Height;
+                        this.selectedItemWidth = this.selectedItem?.width ?? 0;
+                        this.selectedItemHeight = this.selectedItem?.height ?? 0;
 
                         this.$refs.assetCustomDownloadModal.close();
 
