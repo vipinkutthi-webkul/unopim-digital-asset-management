@@ -101,6 +101,24 @@ it('should return s3 when configured as default disk', function () {
     expect(Directory::getAssetDisk())->toBe('s3');
 });
 
+it('identifies s3 as a cloud disk', function () {
+    expect(Directory::isCloudDisk('s3'))->toBeTrue();
+});
+
+it('identifies azure as a cloud disk', function () {
+    expect(Directory::isCloudDisk('azure'))->toBeTrue();
+});
+
+it('identifies private as not a cloud disk', function () {
+    expect(Directory::isCloudDisk('private'))->toBeFalse();
+});
+
+it('returns azure when configured as default disk', function () {
+    config(['filesystems.default' => 'azure']);
+
+    expect(Directory::getAssetDisk())->toBe('azure');
+});
+
 it('has the correct ASSETS_DIRECTORY constant', function () {
     expect(Directory::ASSETS_DIRECTORY)->toBe('assets');
 });
