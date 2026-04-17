@@ -21,6 +21,7 @@ use Webkul\DAM\Models\Directory;
 use Webkul\DAM\Repositories\AssetRepository;
 use Webkul\DAM\Repositories\AssetTagRepository;
 use Webkul\DAM\Repositories\DirectoryRepository;
+use Webkul\DAM\Services\MetadataExtractionService;
 use Webkul\DAM\Traits\Directory as DirectoryTrait;
 
 class AssetController extends Controller
@@ -34,7 +35,8 @@ class AssetController extends Controller
         protected AssetRepository $assetRepository,
         protected AssetTagRepository $assetTagRepository,
         protected FileStorer $fileStorer,
-        protected DirectoryRepository $directoryRepository
+        protected DirectoryRepository $directoryRepository,
+        protected MetadataExtractionService $metadataExtractionService
     ) {}
 
     /**
@@ -66,26 +68,113 @@ class AssetController extends Controller
 
         $asset->previewPath = route('admin.dam.file.preview', ['path' => urlencode($asset->path), 'size' => '1356']);
 
-        $disk = Directory::getAssetDisk();
+        $asset->width = '';
+        $asset->height = '';
+
         if ($asset->file_type === 'image') {
-            $metaData = $this->getMetadata($asset->path, $disk);
+            $metaData = is_array($asset->meta_data) ? $asset->meta_data : [];
 
-            if ($metaData['success']) {
-                // fix: Remove problematic metadata entries to prevent errors
-
-                if (isset($metaData['data']['UndefinedTag:0xEA1C'])) {
-                    unset($metaData['data']['UndefinedTag:0xEA1C']);
-                }
-
-                $asset->embeddedMetaInfo = $metaData['data'] ?? [];
-            }
+            $asset->width = $metaData['exif']['Width'] ?? $metaData['exif']['COMPUTED']['Width'] ?? '';
+            $asset->height = $metaData['exif']['Height'] ?? $metaData['exif']['COMPUTED']['Height'] ?? '';
         }
 
         $asset->comments = $asset->comments()->orderBy('created_at', 'desc')->get();
 
         $tags = $this->assetTagRepository->all();
 
+        $asset = $this->getNextAndPreviousAssets($asset, $id);
+
         return view('dam::asset.edit', compact('asset', 'id', 'tags'));
+    }
+
+    /**
+     * Get next and previous assets based on the current asset ID.
+     *
+     * @param  Asset  $asset
+     * @param  int  $id
+     * @return Asset
+     */
+    protected function getNextAndPreviousAssets($asset, $id)
+    {
+        $assetModel = $this->assetRepository->model();
+
+        $nextAsset = $assetModel::where('id', '>', $id)->orderBy('id', 'asc')->first();
+        $asset->nextAssetId = $nextAsset ? $nextAsset->id : null;
+
+        $previousAsset = $assetModel::where('id', '<', $id)->orderBy('id', 'desc')->first();
+        $asset->previousAssetId = $previousAsset ? $previousAsset->id : null;
+
+        return $asset;
+    }
+
+    /**
+     * Get metadata for a given by asset id
+     */
+    public function getMetadataById($id)
+    {
+        try {
+            $asset = $this->assetRepository->find($id);
+            $metaData = [];
+
+            if ($asset->meta_data) {
+                $metaData = is_array($asset->meta_data)
+                    ? $asset->meta_data
+                    : json_decode($asset->meta_data, true);
+
+                $metaData = $this->flattenExifMetadata($metaData);
+            } else {
+                $disk = Directory::getAssetDisk();
+
+                if (! Storage::disk($disk)->exists($asset->path)) {
+                    throw new \Exception(trans('dam::app.admin.dam.asset.edit.image-source-not-readable'));
+                }
+
+                $metaData = $this->flattenExifMetadata(
+                    $this->metadataExtractionService->extractMetadata($asset->path, $disk)
+                );
+
+                if ($asset->file_type === 'image') {
+                    unset($metaData['UndefinedTag:0xEA1C']);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data'    => $metaData,
+            ]);
+        } catch (\Exception $e) {
+            report($e);
+
+            return [
+                'success' => false,
+                'message' => trans('dam::app.admin.dam.asset.edit.failed-to-read', ['exception' => $e->getMessage()]),
+            ];
+        }
+    }
+
+    /**
+     * Flatten scalar EXIF entries into the top-level metadata array.
+     *
+     * The stored `meta_data` (and the shape returned by MetadataExtractionService) contains an
+     * `exif` key whose scalar children should be merged alongside the other top-level fields,
+     * while nested array children under `exif` are preserved. The returned array no longer
+     * contains the `exif` key when flattening succeeds.
+     */
+    private function flattenExifMetadata(array $metaData): array
+    {
+        if (! isset($metaData['exif']) || ! is_array($metaData['exif'])) {
+            return $metaData;
+        }
+
+        $flatExif = collect($metaData['exif'])
+            ->partition(fn ($v) => ! is_array($v))
+            ->pipe(function ($parts) {
+                return $parts[0]->all() + $parts[1]->all();
+            });
+
+        unset($metaData['exif']);
+
+        return array_merge($flatExif, $metaData);
     }
 
     /**
@@ -150,6 +239,9 @@ class AssetController extends Controller
                         options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
                     );
 
+                    $localFilePath = $file->getRealPath();
+                    $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
                     $asset = Asset::create([
                         'file_name' => $uniqueFileName,
                         'file_type' => AssetHelper::getFileType($file),
@@ -157,6 +249,7 @@ class AssetController extends Controller
                         'mime_type' => $file->getMimeType(),
                         'extension' => $file->getClientOriginalExtension(),
                         'path'      => $filePath,
+                        'meta_data' => json_encode($metaData),
                     ]);
                     $assetIds[] = $asset->id;
                     array_push($uploadFiles, $asset);
@@ -240,6 +333,9 @@ class AssetController extends Controller
                 ]));
             }
 
+            $localFilePath = $file->getRealPath();
+            $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
             $filePath = $this->fileStorer->store(
                 path: $directoryPath,
                 file: $file,
@@ -254,6 +350,7 @@ class AssetController extends Controller
                 'mime_type' => $file->getMimeType(),
                 'extension' => $file->getClientOriginalExtension(),
                 'path'      => $filePath,
+                'meta_data' => $metaData,
             ]);
         }
 
