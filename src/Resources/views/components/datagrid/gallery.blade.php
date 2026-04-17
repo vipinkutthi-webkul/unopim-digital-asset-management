@@ -50,12 +50,12 @@
                                 v-for="record in $parent.available.records"
                                 >
                                 <div class="grid image-card relative overflow-hidden transition-all hover:border-gray-400 group">
-                                    <img 
+                                    <img
                                         :src="record.path"
                                         :alt="record.file_name"
                                         class="w-full h-full object-cover object-center"
                                     >
-                                
+
                                     <!-- ################ -->
                                     <div class="flex flex-col justify-center invisible w-full p-3 bg-black dark:bg-cherry-800 absolute top-0 bottom-0 opacity-80 transition-all group-hover:visible">
                                         <!-- Actions -->

@@ -802,18 +802,43 @@
             type="text/x-template"
             id="v-reupload-asset-template"
         >      
-            @if (bouncer()->hasPermission('dam.asset.re_upload'))    
+            @if (bouncer()->hasPermission('dam.asset.re_upload'))
                 <input type="file"
                     name="file"
                     id="file-upload"
                     class="hidden"
+                    :disabled="isUploading"
                     @change="onFileChange"
                 />
                 <label
                     for="file-upload"
                     class="secondary-button cursor-pointer"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading }"
+                    :aria-disabled="isUploading"
                 >
-                    <span class="text-xl text-violet-700 icon-dam-upload"></span>
+                    <svg
+                        v-if="isUploading"
+                        class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="#8A2BE2"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    <span v-else class="text-xl text-violet-700 icon-dam-upload"></span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.re_upload')</span>
                 </label>
             @endif
@@ -824,11 +849,17 @@
                 template: '#v-reupload-asset-template',
                 data() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isUploading: false,
                     };
                 },
                 methods: {
                     onFileChange(e) {
+                        if (this.isUploading) {
+                            e.target.value = null;
+                            return;
+                        }
+
                         const fileInput = e.target.files;
 
                         if (fileInput.length > 0) {
@@ -842,8 +873,12 @@
 
                             this.handleFileUpload(formData);
                         }
+
+                        e.target.value = null;
                     },
                     handleFileUpload(formData) {
+                        this.isUploading = true;
+
                         this.$axios.post("{{ route('admin.dam.assets.re_upload') }}", formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
@@ -858,6 +893,7 @@
                             });
 
                         }).catch((error) => {
+                            this.isUploading = false;
                             this.$emitter.emit('add-flash', {
                                 type: 'error',
                                 message: error.response.data.message

@@ -98,13 +98,38 @@
                             name="files[]"
                             id="file-upload"
                             class="hidden"
+                            :disabled="isUploading"
                             @change="onFileChange"
                         />
                         <label
                             for="file-upload"
                             class="secondary-button cursor-pointer"
+                            :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading }"
+                            :aria-disabled="isUploading"
                         >
-                            <span class="icon-dam-upload" style="color: inherit;"></span>
+                            <svg
+                                v-if="isUploading"
+                                class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                aria-hidden="true"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                ></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="#8A2BE2"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            <span v-else class="icon-dam-upload" style="color: inherit;"></span>
                             @lang('dam::app.admin.dam.index.upload')
                         </label>
                     @endif
@@ -131,6 +156,7 @@
             data() {
                 return {
                     currentDirectory: null,
+                    isUploading: false,
                 }
             },
 
@@ -143,6 +169,12 @@
             methods: {
                 onFileChange(e) {
                     e.preventDefault();
+
+                    if (this.isUploading) {
+                        e.target.value = null;
+                        return;
+                    }
+
                     let fileInput = e.target.files;
 
                     if (fileInput.length > 0) {
@@ -162,6 +194,8 @@
                     e.target.value = null;
                 },
                 handleFileUpload(formData) {
+                    this.isUploading = true;
+
                     this.$axios.post("{{ route('admin.dam.assets.upload') }}", formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
@@ -178,6 +212,8 @@
                             type: 'error',
                             message: error.response.data.message
                         });
+                    }).finally(() => {
+                        this.isUploading = false;
                     });
                 }
             }

@@ -335,8 +335,6 @@ class FileController
     /**
      * Retrieve a default thumbnail image based on the file type.
      *
-     * This method uses the helper to fetch a thumbnail placeholder.
-     *
      * @param  string  $path
      * @return Response
      */
@@ -347,8 +345,6 @@ class FileController
 
     /**
      * Retrieve a default preview image based on the file extension.
-     *
-     * This method uses the helper to fetch a preview placeholder.
      *
      * @param  string  $path
      * @return Response
