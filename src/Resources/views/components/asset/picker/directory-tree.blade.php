@@ -119,7 +119,7 @@
 
             methods: {
                 get() {
-                    this.$axios.get("{{ route('admin.dam.directory.index') }}")
+                    this.$axios.get("{{ route('admin.dam.directory.index') }}", { params: { with_assets: 1 } })
                        .then((response) => {
                             this.isLoading = false;
 
