@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use Webkul\Attribute\Models\Attribute;
 use Webkul\Attribute\Models\AttributeTranslation;
 use Webkul\DAM\Console\Commands\DamInstaller;
+use Webkul\DAM\Console\Commands\DeleteLocalDamAssets;
+use Webkul\DAM\Console\Commands\MoveDamAssetsToAzure;
 use Webkul\DAM\Console\Commands\MoveDamAssetsToS3;
 use Webkul\DAM\Helpers\Normalizers\ProductValuesNormalizer;
 use Webkul\DAM\Http\Middleware\DAM;
@@ -99,6 +101,8 @@ class DAMServiceProvider extends ServiceProvider
 
         $this->commands([
             MoveDamAssetsToS3::class,
+            MoveDamAssetsToAzure::class,
+            DeleteLocalDamAssets::class,
         ]);
     }
 }
