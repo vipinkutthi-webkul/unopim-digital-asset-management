@@ -202,6 +202,18 @@ class DirectoryRepository extends Repository
     }
 
     /**
+     * Specify directory tree without asset nodes.
+     *
+     * Used by the main DAM directory tree which only needs folder nodes; asset
+     * listing is handled by the datagrid. Skipping the assets eager-load keeps
+     * the payload small and avoids shipping asset data the UI would discard.
+     */
+    public function getDirectoryTreeOnly()
+    {
+        return $this->model->get()->toTree();
+    }
+
+    /**
      * Check if a directory is writable in the file system.
      */
     public function isDirectoryWritable(Directory $directory, string $actionType = 'create', bool $hasParent = true): bool

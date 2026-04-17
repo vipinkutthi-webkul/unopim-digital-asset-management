@@ -25,9 +25,15 @@ class DirectoryController
     /**
      * Get the directory
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $directories = $this->directoryRepository->getDirectoryTree();
+        // Callers that need asset nodes in the tree (e.g. the asset picker)
+        // must pass `with_assets=1`. The main DAM directory tree only lists
+        // folders, so the default skips asset eager-loading for a lighter
+        // payload.
+        $directories = $request->boolean('with_assets')
+            ? $this->directoryRepository->getDirectoryTree()
+            : $this->directoryRepository->getDirectoryTreeOnly();
 
         return new JsonResponse([
             'data' => $directories,
