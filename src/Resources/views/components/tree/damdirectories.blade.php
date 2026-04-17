@@ -93,31 +93,55 @@
 <script type="text/x-template" id="v-item-template">
     <div class="tree-container-details">
         <div
-            class="flex gap-1 w-full pl-1 pt-1 text-nowrap cursor-pointer"
-            @click.stop="toggle(item)"
-            @contextmenu.prevent.stop="showContextMenu($event, item)"
+            class="flex gap-1 w-full pl-1 pt-1 text-nowrap"
+            :class="isBusy ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer'"
+            :aria-disabled="isBusy"
+            @click.stop="isBusy ? null : toggle(item)"
+            @contextmenu.prevent.stop="isBusy ? null : showContextMenu($event, item)"
         >
-            <span 
+            <span
                 class="text-xl text-zinc-600 dark:text-white"
                 v-if="isDirectory || isAssets"
                 :class="isOpen ? 'icon-dam-close' : 'icon-dam-open'"
             >
             </span>
             <span>
-                <i class="icon-dam-folder text-xl transition-all group-hover:text-gray-800 dark:group-hover:text-white cursor-grab"></i>
+                <svg
+                    v-if="isBusy"
+                    class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+                    <path
+                        class="opacity-75"
+                        fill="#8A2BE2"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                </svg>
+                <i v-else class="icon-dam-folder text-xl transition-all group-hover:text-gray-800 dark:group-hover:text-white cursor-grab"></i>
             </span>
             <span
                 class="text-sm"
                 :class="selectedItem && item.id == selectedItem.id ? 'text-violet-700 dark:text-violet-400 font-semibold' : 'text-zinc-600 dark:text-white'"
             >@{{ item?.name }}   </span>
         </div>
-        <div 
-            v-show="isOpen" 
+        <div
+            v-show="isOpen"
             v-if="isDirectory || isAssets"
             class="flex flex-col pl-6"
         >
             <!-- Directories -->
-            <draggable 
+            <draggable
                 id="child-tree-groups"
                 class="directoryItems"
                 ghost-class="draggable-ghost"
@@ -141,6 +165,9 @@
                             @on-merge-items="onMergeItems"
                             @on-drag-start="onDragStart"
                             :selectedItem="selectedItem"
+                            :movingDirectoryId="movingDirectoryId"
+                            :deletingDirectoryId="deletingDirectoryId"
+                            :copyingDirectoryId="copyingDirectoryId"
                         ></v-tree-item>
                     </div>
                 </template>
@@ -219,6 +246,18 @@
         props: {
             item: Object,
             selectedItem: Object,
+            movingDirectoryId: {
+                type: [String, Number],
+                default: null,
+            },
+            deletingDirectoryId: {
+                type: [String, Number],
+                default: null,
+            },
+            copyingDirectoryId: {
+                type: [String, Number],
+                default: null,
+            },
         },
         data: function() {
             return {
@@ -251,7 +290,29 @@
 
             isAssets: function() {
                 return this.item.assets && Object.keys(this.item.assets).length;
-            }
+            },
+
+            isMoving: function() {
+                return this.movingDirectoryId !== null
+                    && this.item
+                    && this.item.id == this.movingDirectoryId;
+            },
+
+            isDeleting: function() {
+                return this.deletingDirectoryId !== null
+                    && this.item
+                    && this.item.id == this.deletingDirectoryId;
+            },
+
+            isCopying: function() {
+                return this.copyingDirectoryId !== null
+                    && this.item
+                    && this.item.id == this.copyingDirectoryId;
+            },
+
+            isBusy: function() {
+                return this.isMoving || this.isDeleting || this.isCopying;
+            },
         },
         methods: {
             onDragStart(event) {
@@ -333,6 +394,9 @@
                                 @on-merge-items="onMergeItems"
                                 @on-drag-start="onDragStart"
                                 :selectedItem="selectedItem"
+                                :movingDirectoryId="movingDirectoryId"
+                                :deletingDirectoryId="deletingDirectoryId"
+                                :copyingDirectoryId="copyingDirectoryId"
                             ></v-tree-item>
                         </div>
                     </template>
@@ -493,33 +557,6 @@
                     @endif
                 </div>
             </div>
-
-            <!-- Show loader -->
-             <div 
-                v-if="isLoading" 
-                :style="{ top: `${contextMenuPosition.y}px`, left: `${contextMenuPosition.x}px` }"
-                class="absolute z-50 dark:text-white"
-            >
-                <!-- Spinner -->
-                <svg class="align-center inline-block animate-spin h-5 w-5 ml-2 text-white-700" xmlns="http://www.w3.org/2000/svg" fill="none"  aria-hidden="true" viewBox="0 0 24 24">
-                    <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    >
-                    </circle>
-
-                    <path
-                        class="opacity-75"
-                        fill="#8A2BE2"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    >
-                    </path>
-                </svg>
-             </div>
         </div>
         
 
@@ -718,6 +755,9 @@
                 isLoading: false,
                 actionStatus: null,
                 dragStart: false,
+                movingDirectoryId: null,
+                deletingDirectoryId: null,
+                copyingDirectoryId: null,
             };
         },
 
@@ -941,6 +981,7 @@
                     message: "@lang('dam::app.admin.components.modal.confirm.message')",
                     agree: () => {
                         this.isLoading = true;
+                        this.deletingDirectoryId = this.selectedItem.id;
                         this.$axios.delete(`{{ route('admin.dam.directory.destroy', ':id') }}`.replace(':id', this.selectedItem.id))
                             .then(response => {
                                 this.parentItem = response.data.data;
@@ -956,6 +997,7 @@
                             })
                             .catch((error) => {
                                 this.isLoading = false;
+                                this.deletingDirectoryId = null;
                                 this.$emitter.emit('add-flash', {
                                     type: 'error',
                                     message: error.response.data.message
@@ -1008,6 +1050,7 @@
 
             copyDirectory() {
                 this.isLoading = true;
+                this.copyingDirectoryId = this.selectedItem.id;
                 this.$axios.post("{{ route('admin.dam.directory.copy_structure') }}", this.selectedItem)
                     .then((response) => {
                         setTimeout(() => {
@@ -1021,6 +1064,7 @@
                     })
                     .catch(error => {
                         this.isLoading = false;
+                        this.copyingDirectoryId = null;
                         this.$emitter.emit('add-flash', {
                             type: 'error',
                             message: error.response.data.message
@@ -1111,11 +1155,11 @@
 
             findItemAssetById(items, targetId, parent = null) {
                 for (const item of items) {
-                    const assetItem = item.assets.find(obj => obj.id === targetId);
+                    const assetItem = (item.assets || []).find(obj => obj.id === targetId);
                     if (assetItem) {
                         return { item, parent };
                     }
-                    
+
                     if (item.children && item.children.length > 0) {
                         const found = this.findItemAssetById(item.children, targetId, item);
                         if (found) {
@@ -1124,12 +1168,16 @@
                     }
                 }
 
-                return null; 
+                return null;
             },
 
             addedItems(item, moveTodirectoryId, type = 'directory') {
                 this.isLoading = true;
                 this.actionStatus = 'pending';
+
+                if (type == 'directory') {
+                    this.movingDirectoryId = item.id;
+                }
 
                 this.$axios.post(type == 'directory' ? "{{ route('admin.dam.directory.moved') }}" : "{{ route('admin.dam.assets.moved') }}", {
                         new_parent_id: moveTodirectoryId,
@@ -1154,6 +1202,7 @@
                     .catch(error => {
                         this.isLoading = false;
                         this.actionStatus = null;
+                        this.movingDirectoryId = null;
                         this.$emitter.emit('add-flash', {
                             type: 'error',
                             message: error.response.data.message
@@ -1272,6 +1321,18 @@
                         this.selectedItem = this.parentItem
                         this.$emitter.emit('data-grid:reset-all-filters');
                         this.setFilters(this.parentItem);
+
+                        if (action == 'move_directory_structure') {
+                            this.movingDirectoryId = null;
+                        }
+
+                        if (action == 'delete_directory') {
+                            this.deletingDirectoryId = null;
+                        }
+
+                        if (action == 'copy_directory_structure') {
+                            this.copyingDirectoryId = null;
+                        }
                     }, 1000);
 
                     this.isLoading = false;
@@ -1291,6 +1352,17 @@
                         if (this.actionStatus == 'failed') {
                                 this.$emitter.emit('add-flash', { type: 'error', message: response.data.message });
                                 this.isLoading = false;
+                                if (action == 'move_directory_structure') {
+                                    this.movingDirectoryId = null;
+                                }
+
+                                if (action == 'delete_directory') {
+                                    this.deletingDirectoryId = null;
+                                }
+
+                                if (action == 'copy_directory_structure') {
+                                    this.copyingDirectoryId = null;
+                                }
 
                                 return;
                             }
@@ -1302,6 +1374,17 @@
                                 message: response.data.message
                             });
                             this.isLoading = false;
+                            if (action == 'move_directory_structure') {
+                                this.movingDirectoryId = null;
+                            }
+
+                            if (action == 'delete_directory') {
+                                this.deletingDirectoryId = null;
+                            }
+
+                            if (action == 'copy_directory_structure') {
+                                this.copyingDirectoryId = null;
+                            }
                             this.goForNextAction(action);
                             return;
                         }
@@ -1312,6 +1395,17 @@
                     })
                     .catch((error) => {
                         this.isLoading = false;
+                        if (action == 'move_directory_structure') {
+                            this.movingDirectoryId = null;
+                        }
+
+                        if (action == 'delete_directory') {
+                            this.deletingDirectoryId = null;
+                        }
+
+                        if (action == 'copy_directory_structure') {
+                            this.copyingDirectoryId = null;
+                        }
                     });
             },
 
