@@ -1258,23 +1258,32 @@
                     this.selectedItem.children = [];
                 }
 
-                this.selectedItem.assets = [...this.selectedItem.assets, ...data];
+                this.loadDirectories();
 
-
-                this.setFilters(this.selectedItem);
-
-                this.$emitter.emit('current-item-expanded', this.selectedItem);
+                this.$nextTick(() => {
+                    this.$emitter.emit('current-item-expanded', this.selectedItem);
+                    this.$emitter.emit('current-directory', this.selectedItem);
+                    this.setFilters(this.selectedItem);
+                });
             },
 
             loadDirectories() {
                 this.$axios.get("{{ route('admin.dam.directory.index') }}")
-                    .then((response) => {
-                        this.formattedItems = response.data.data;
-                        this.setDefaultSeletedItem();
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching directories:', error);
-                    });
+                        .then((response) => {
+                            this.formattedItems = response.data.data;
+
+                            this.$nextTick(() => {
+                                if (this.selectedItem) {
+                                    this.$emitter.emit('current-item-expanded', this.selectedItem);
+                                    this.setFilters(this.selectedItem);
+                                } else {
+                                    this.setDefaultSeletedItem();
+                                }
+                            });
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching directories:', error);
+                        });
             },
 
             loadDirectoryChildrens() {
