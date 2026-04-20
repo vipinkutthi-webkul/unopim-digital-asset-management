@@ -66,7 +66,10 @@ class AssetController extends Controller
             abort(404);
         }
 
-        $asset->previewPath = route('admin.dam.file.preview', ['path' => urlencode($asset->path), 'size' => '1356']);
+        $asset->previewPath = AssetHelper::getPreviewUrl(
+            $asset->path,
+            1356
+        );
 
         $asset->width = '';
         $asset->height = '';
