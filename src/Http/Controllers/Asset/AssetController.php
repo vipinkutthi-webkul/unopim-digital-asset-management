@@ -252,7 +252,7 @@ class AssetController extends Controller
                         'mime_type' => $file->getMimeType(),
                         'extension' => $file->getClientOriginalExtension(),
                         'path'      => $filePath,
-                        'meta_data' => json_encode($metaData),
+                        'meta_data' => $metaData,
                     ]);
                     $assetIds[] = $asset->id;
                     array_push($uploadFiles, $asset);
