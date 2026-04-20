@@ -5,6 +5,7 @@ namespace Webkul\DAM\ApiDataSource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Webkul\AdminApi\ApiDataSource;
 use Webkul\DAM\Database\Eloquent\Builder;
+use Webkul\DAM\Helpers\AssetHelper;
 use Webkul\DAM\Repositories\AssetRepository;
 
 class AssetDataSource extends ApiDataSource
@@ -135,10 +136,10 @@ class AssetDataSource extends ApiDataSource
     protected function normalizeAsset(array $asset): array
     {
         $previewPath = isset($asset['path'])
-            ? route('admin.dam.file.preview', [
-                'path' => urlencode($asset['path']),
-                'size' => $asset['file_size'] ?? null,
-            ])
+            ? AssetHelper::getPreviewUrl(
+                $asset['path'],
+                isset($asset['file_size']) ? (int) $asset['file_size'] : null
+            )
             : null;
 
         $responseData = [

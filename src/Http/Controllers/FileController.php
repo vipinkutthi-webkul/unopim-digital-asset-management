@@ -278,12 +278,12 @@ class FileController
 
                     Storage::disk($disk)->put($previewPath, $imageData);
 
-                    return response($imageData, 200)->header('Content-Type', $mimeType);
+                    return $this->getFileResponse($previewPath);
                 } catch (NotReadableException $e) {
                     Log::info('Failed Generating Image preview: '.json_encode($e));
                 }
             } elseif ($this->isSupportedMediaFile($mimeType)) {
-                return response(Storage::disk($disk)->get($path), 200)->header('Content-Type', $mimeType);
+                return $this->getFileResponse($path);
             }
         }
 

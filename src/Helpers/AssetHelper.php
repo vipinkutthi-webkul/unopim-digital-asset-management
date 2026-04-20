@@ -2,6 +2,10 @@
 
 namespace Webkul\DAM\Helpers;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Webkul\DAM\Models\Directory;
+
 class AssetHelper
 {
     /**
@@ -115,12 +119,72 @@ class AssetHelper
     }
 
     /**
+     * Resolve the most appropriate preview URL for an asset.
+     */
+    public static function getPreviewUrl(string $path, ?int $size = null): string
+    {
+        $previewUrl = route('admin.dam.file.preview', [
+            'path' => urlencode($path),
+            'size' => $size,
+        ]);
+
+        $disk = Directory::getAssetDisk();
+
+        if ($disk !== Directory::ASSETS_DISK_AWS) {
+            return $previewUrl;
+        }
+
+        $awsDisk = Storage::disk($disk);
+
+        if ($awsDisk->exists($path) && self::isSupportedMediaFile($awsDisk->mimeType($path))) {
+            try {
+                $visibility = $awsDisk->getVisibility($path);
+
+                if ($visibility === 'public') {
+                    return $awsDisk->url($path);
+                }
+
+                return $awsDisk->temporaryUrl($path, now()->addMinutes(10));
+            } catch (\Throwable $exception) {
+                return $previewUrl;
+            }
+        }
+
+        return $previewUrl;
+    }
+
+    /**
+     * Check if the MIME type corresponds to a supported media file
+     *
+     * Supported types include SVG images, PDF, video, and audio formats.
+     */
+    public static function isSupportedMediaFile($mimeType)
+    {
+        return Str::startsWith($mimeType, 'image/') ||
+            Str::startsWith($mimeType, 'application/pdf') ||
+            Str::startsWith($mimeType, 'video/') ||
+            Str::startsWith($mimeType, 'audio/');
+    }
+
+    /**
      * Check if given extension or mime type is forbidden for upload
      */
     public static function isForbiddenFile(?string $extension, ?string $mimeType): bool
     {
         $forbiddenExtensions = [
-            'php', 'js', 'py', 'sh', 'bat', 'pl', 'cgi', 'asp', 'aspx', 'jsp', 'exe', 'rb', 'jar',
+            'php',
+            'js',
+            'py',
+            'sh',
+            'bat',
+            'pl',
+            'cgi',
+            'asp',
+            'aspx',
+            'jsp',
+            'exe',
+            'rb',
+            'jar',
         ];
 
         $forbiddenMimeTypes = [
