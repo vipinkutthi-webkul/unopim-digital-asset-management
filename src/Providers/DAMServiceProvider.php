@@ -9,9 +9,15 @@ use Illuminate\Support\ServiceProvider;
 use Webkul\Attribute\Models\Attribute;
 use Webkul\Attribute\Models\AttributeTranslation;
 use Webkul\DAM\Console\Commands\DamInstaller;
+use Webkul\DAM\Console\Commands\IndexAssets;
+use Webkul\DAM\Console\Commands\IndexDirectories;
 use Webkul\DAM\Console\Commands\MoveDamAssetsToS3;
 use Webkul\DAM\Helpers\Normalizers\ProductValuesNormalizer;
 use Webkul\DAM\Http\Middleware\DAM;
+use Webkul\DAM\Models\Asset;
+use Webkul\DAM\Models\Directory;
+use Webkul\DAM\Observers\Asset as AssetObserver;
+use Webkul\DAM\Observers\Directory as DirectoryObserver;
 use Webkul\DataTransfer\Helpers\Exporters\Product\Exporter;
 use Webkul\DataTransfer\Helpers\Importers\Product\Importer;
 use Webkul\Product\Normalizer\ProductAttributeValuesNormalizer;
@@ -50,9 +56,17 @@ class DAMServiceProvider extends ServiceProvider
 
         $this->app->register(EventServiceProvider::class);
 
+        // Register the Asset and Directory Elasticsearch observers when ES is enabled.
+        if (config('elasticsearch.enabled')) {
+            Asset::observe(AssetObserver::class);
+            Directory::observe(DirectoryObserver::class);
+        }
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 DamInstaller::class,
+                IndexAssets::class,
+                IndexDirectories::class,
             ]);
         }
 
