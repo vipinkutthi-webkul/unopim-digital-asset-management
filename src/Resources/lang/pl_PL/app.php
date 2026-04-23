@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Przesyłanie plików skryptów jest niedozwolone.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Narzędzie pomoże Ci uporządkować, przechowywać i zarządzać wszystkimi zasobami medialnymi w jednym miejscu',
-                'root'        => 'Katalog główny',
-                'upload'      => 'Prześlij',
+                'title'            => 'DAM',
+                'description'      => 'Narzędzie pomoże Ci uporządkować, przechowywać i zarządzać wszystkimi zasobami medialnymi w jednym miejscu',
+                'root'             => 'Katalog główny',
+                'upload'           => 'Prześlij',
+                'uploading'        => 'Przesyłanie...',
+                'cancel'           => 'Anuluj',
+                'upload-cancelled' => 'Przesyłanie anulowane.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historia',
                     ],
                     'button' => [
-                        'download'        => 'Pobierz',
-                        'custom_download' => 'Niestandardowe pobieranie',
-                        'rename'          => 'Zmień nazwę',
-                        're_upload'       => 'Prześlij ponownie',
-                        'delete'          => 'Usuń',
+                        'download'            => 'Pobierz',
+                        'custom_download'     => 'Niestandardowe pobieranie',
+                        'rename'              => 'Zmień nazwę',
+                        're_upload'           => 'Prześlij ponownie',
+                        're_uploading'        => 'Ponowne przesyłanie...',
+                        'cancel'              => 'Anuluj',
+                        're-upload-cancelled' => 'Ponowne przesyłanie anulowane.',
+                        'delete'              => 'Usuń',
+                        'preview'             => 'Podgląd',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Podgląd niedostępny dla tego typu pliku.',
+                        'download-file'   => 'Pobierz Plik',
                     ],
 
                     'custom-download' => [

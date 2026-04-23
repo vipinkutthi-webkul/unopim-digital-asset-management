@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => '스크립트 파일 업로드는 허용되지 않습니다.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => '이 도구는 모든 미디어 자산을 한 곳에서 정리, 저장 및 관리하는 데 도움이 됩니다',
-                'root'        => '루트',
-                'upload'      => '업로드',
+                'title'            => 'DAM',
+                'description'      => '이 도구는 모든 미디어 자산을 한 곳에서 정리, 저장 및 관리하는 데 도움이 됩니다',
+                'root'             => '루트',
+                'upload'           => '업로드',
+                'uploading'        => '업로드 중...',
+                'cancel'           => '취소',
+                'upload-cancelled' => '업로드가 취소되었습니다.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => '기록',
                     ],
                     'button' => [
-                        'download'        => '다운로드',
-                        'custom_download' => '사용자 정의 다운로드',
-                        'rename'          => '이름 바꾸기',
-                        're_upload'       => '재업로드',
-                        'delete'          => '삭제',
+                        'download'            => '다운로드',
+                        'custom_download'     => '사용자 정의 다운로드',
+                        'rename'              => '이름 바꾸기',
+                        're_upload'           => '재업로드',
+                        're_uploading'        => '재업로드 중...',
+                        'cancel'              => '취소',
+                        're-upload-cancelled' => '재업로드가 취소되었습니다.',
+                        'delete'              => '삭제',
+                        'preview'             => '미리보기',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => '이 파일 유형은 미리보기를 지원하지 않습니다.',
+                        'download-file'   => '파일 다운로드',
                     ],
 
                     'custom-download' => [

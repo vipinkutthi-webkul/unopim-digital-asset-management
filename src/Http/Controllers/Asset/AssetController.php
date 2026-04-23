@@ -187,6 +187,9 @@ class AssetController extends Controller
      */
     public function upload(Request $request)
     {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
         $maxKb = AssetHelper::getMaxUploadSizeKb();
         $sizeMessage = trans('dam::app.admin.dam.asset.datagrid.file-too-large', [
             'size' => $this->humanReadableSize($maxKb),
@@ -283,6 +286,9 @@ class AssetController extends Controller
      */
     public function reUpload(Request $request)
     {
+        set_time_limit(0);
+        ignore_user_abort(true);
+
         $maxKb = AssetHelper::getMaxUploadSizeKb();
         $sizeMessage = trans('dam::app.admin.dam.asset.datagrid.file-too-large', [
             'size' => $this->humanReadableSize($maxKb),

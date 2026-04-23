@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Uploading script files is not allowed.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Tool can help you organise, store, and manage all your media asset in one place',
-                'root'        => 'Root',
-                'upload'      => 'Upload',
+                'title'            => 'DAM',
+                'description'      => 'Tool can help you organise, store, and manage all your media asset in one place',
+                'root'             => 'Root',
+                'upload'           => 'Upload',
+                'uploading'        => 'Uploading...',
+                'cancel'           => 'Cancel',
+                'upload-cancelled' => 'Upload cancelled.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'History',
                     ],
                     'button' => [
-                        'download'        => 'Download',
-                        'custom_download' => 'Custom Download',
-                        'rename'          => 'Rename',
-                        're_upload'       => 'Re-Upload',
-                        'delete'          => 'Delete',
+                        'download'            => 'Download',
+                        'custom_download'     => 'Custom Download',
+                        'rename'              => 'Rename',
+                        're_upload'           => 'Re-Upload',
+                        're_uploading'        => 'Re-Uploading...',
+                        'cancel'              => 'Cancel',
+                        're-upload-cancelled' => 'Re-upload cancelled.',
+                        'delete'              => 'Delete',
+                        'preview'             => 'Preview',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Preview not available for this file type.',
+                        'download-file'   => 'Download File',
                     ],
 
                     'custom-download' => [

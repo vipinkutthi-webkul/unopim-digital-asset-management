@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Il caricamento di file di script non è consentito.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Lo strumento può aiutarti a organizzare, archiviare e gestire tutti i tuoi asset multimediali in un unico luogo',
-                'root'        => 'Radice',
-                'upload'      => 'Carica',
+                'title'            => 'DAM',
+                'description'      => 'Lo strumento può aiutarti a organizzare, archiviare e gestire tutti i tuoi asset multimediali in un unico luogo',
+                'root'             => 'Radice',
+                'upload'           => 'Carica',
+                'uploading'        => 'Caricamento...',
+                'cancel'           => 'Annulla',
+                'upload-cancelled' => 'Caricamento annullato.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Cronologia',
                     ],
                     'button' => [
-                        'download'        => 'Scarica',
-                        'custom_download' => 'Download Personalizzato',
-                        'rename'          => 'Rinomina',
-                        're_upload'       => 'Ricarica',
-                        'delete'          => 'Elimina',
+                        'download'            => 'Scarica',
+                        'custom_download'     => 'Download Personalizzato',
+                        'rename'              => 'Rinomina',
+                        're_upload'           => 'Ricarica',
+                        're_uploading'        => 'Ricaricamento...',
+                        'cancel'              => 'Annulla',
+                        're-upload-cancelled' => 'Ricaricamento annullato.',
+                        'delete'              => 'Elimina',
+                        'preview'             => 'Anteprima',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Anteprima non disponibile per questo tipo di file.',
+                        'download-file'   => 'Scarica File',
                     ],
 
                     'custom-download' => [

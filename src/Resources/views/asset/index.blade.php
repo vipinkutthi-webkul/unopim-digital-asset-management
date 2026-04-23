@@ -93,45 +93,57 @@
                         @lang('dam::app.admin.dam.index.root')
                     </p>
                     @if (bouncer()->hasPermission('dam.asset.upload') && bouncer()->hasPermission('dam.directory.index'))
-                        <input type="file"
-                            multiple="multiple"
-                            name="files[]"
-                            id="file-upload"
-                            class="hidden"
-                            :disabled="isUploading"
-                            @change="onFileChange"
-                        />
-                        <label
-                            for="file-upload"
-                            class="secondary-button cursor-pointer"
-                            :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading }"
-                            :aria-disabled="isUploading"
-                        >
-                            <svg
-                                v-if="isUploading"
-                                class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                aria-hidden="true"
-                                viewBox="0 0 24 24"
+                        <div class="flex items-center gap-2">
+                            <input type="file"
+                                multiple="multiple"
+                                name="files[]"
+                                id="file-upload"
+                                class="hidden"
+                                :disabled="isUploading"
+                                @change="onFileChange"
+                            />
+                            <label
+                                for="file-upload"
+                                class="secondary-button cursor-pointer"
+                                :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading }"
+                                :aria-disabled="isUploading"
                             >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                ></circle>
-                                <path
-                                    class="opacity-75"
-                                    fill="#8A2BE2"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                            </svg>
-                            <span v-else class="icon-dam-upload" style="color: inherit;"></span>
-                            @lang('dam::app.admin.dam.index.upload')
-                        </label>
+                                <svg
+                                    v-if="isUploading"
+                                    class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        class="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        stroke-width="4"
+                                    ></circle>
+                                    <path
+                                        class="opacity-75"
+                                        fill="#8A2BE2"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                                <span v-else class="icon-dam-upload" style="color: inherit;"></span>
+                                <span v-if="isUploading">@lang('dam::app.admin.dam.index.uploading')</span>
+                                <span v-else>@lang('dam::app.admin.dam.index.upload')</span>
+                            </label>
+
+                            <button
+                                v-if="isUploading"
+                                type="button"
+                                class="secondary-button"
+                                @click="cancelUpload"
+                            >
+                                @lang('dam::app.admin.dam.index.cancel')
+                            </button>
+                        </div>
                     @endif
                     
                 </div>
@@ -150,6 +162,9 @@
     
         </script>
     <script type="module">
+        const damUploadFileTooLargeMsg = @js(trans('dam::app.admin.dam.asset.datagrid.file-too-large', ['size' => \Webkul\DAM\Helpers\AssetHelper::humanReadableSize(\Webkul\DAM\Helpers\AssetHelper::getMaxUploadSizeKb())]));
+        const damUploadFailedMsg = @js(trans('dam::app.admin.dam.asset.datagrid.files-upload-failed'));
+
         app.component('v-dam-upload', {
             template: '#v-dam-upload-template',
 
@@ -157,6 +172,7 @@
                 return {
                     currentDirectory: null,
                     isUploading: false,
+                    abortController: null,
                 }
             },
 
@@ -193,14 +209,30 @@
 
                     e.target.value = null;
                 },
+
+                cancelUpload() {
+                    if (this.abortController) {
+                        this.abortController.abort();
+                        this.abortController = null;
+                    }
+                },
+
                 handleFileUpload(formData) {
                     this.isUploading = true;
+                    this.abortController = new AbortController();
 
                     this.$axios.post("{{ route('admin.dam.assets.upload') }}", formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
-                        }
+                        },
+                        signal: this.abortController.signal,
                     }).then((response) => {
+                        // Server-level errors (e.g. post_max_size exceeded) return 200 with an
+                        // HTML body instead of JSON. Detect by checking the data type.
+                        if (typeof response.data !== 'object' || response.data === null) {
+                            this.$emitter.emit('add-flash', { type: 'error', message: damUploadFileTooLargeMsg });
+                            return;
+                        }
                         this.$refs.datagrid.get();
                         this.$emitter.emit('uploaded-assets', response.data.files);
                         this.$emitter.emit('add-flash', {
@@ -208,12 +240,20 @@
                             message: response.data.message
                         });
                     }).catch((error) => {
-                        this.$emitter.emit('add-flash', {
-                            type: 'error',
-                            message: error.response.data.message
-                        });
+                        if (this.$axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+                            this.$emitter.emit('add-flash', {
+                                type: 'warning',
+                                message: @js(trans('dam::app.admin.dam.index.upload-cancelled')),
+                            });
+                            return;
+                        }
+                        const message = error.response?.status === 413
+                            ? damUploadFileTooLargeMsg
+                            : (error.response?.data?.message ?? damUploadFailedMsg);
+                        this.$emitter.emit('add-flash', { type: 'error', message });
                     }).finally(() => {
                         this.isUploading = false;
+                        this.abortController = null;
                     });
                 }
             }

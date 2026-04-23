@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Uppladdning av skriptfiler är inte tillåten.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Verktyget hjälper dig att organisera, lagra och hantera alla dina mediatillgångar på ett och samma ställe',
-                'root'        => 'Rot',
-                'upload'      => 'Ladda upp',
+                'title'            => 'DAM',
+                'description'      => 'Verktyget hjälper dig att organisera, lagra och hantera alla dina mediatillgångar på ett och samma ställe',
+                'root'             => 'Rot',
+                'upload'           => 'Ladda upp',
+                'uploading'        => 'Laddar upp...',
+                'cancel'           => 'Avbryt',
+                'upload-cancelled' => 'Uppladdning avbruten.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historik',
                     ],
                     'button' => [
-                        'download'        => 'Ladda ner',
-                        'custom_download' => 'Anpassad nedladdning',
-                        'rename'          => 'Byt namn',
-                        're_upload'       => 'Ladda upp igen',
-                        'delete'          => 'Ta bort',
+                        'download'            => 'Ladda ner',
+                        'custom_download'     => 'Anpassad nedladdning',
+                        'rename'              => 'Byt namn',
+                        're_upload'           => 'Ladda upp igen',
+                        're_uploading'        => 'Laddar upp igen...',
+                        'cancel'              => 'Avbryt',
+                        're-upload-cancelled' => 'Återuppladdning avbruten.',
+                        'delete'              => 'Ta bort',
+                        'preview'             => 'Förhandsgranskning',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Förhandsgranskning är inte tillgänglig för den här filtypen.',
+                        'download-file'   => 'Ladda ned fil',
                     ],
 
                     'custom-download' => [

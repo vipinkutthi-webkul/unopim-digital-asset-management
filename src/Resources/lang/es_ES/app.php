@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'No se pudo crear el archivo zip.',
                     'not-allowed'                               => 'No se permite la carga de archivos de script.',
                 ],
-                'description' => 'Esta herramienta te ayudará a organizar, almacenar y gestionar todos tus activos multimedia en un solo lugar',
-                'root'        => 'Raíz',
-                'upload'      => 'Subir',
+                'description'      => 'Esta herramienta te ayudará a organizar, almacenar y gestionar todos tus activos multimedia en un solo lugar',
+                'root'             => 'Raíz',
+                'upload'           => 'Subir',
+                'uploading'        => 'Subiendo...',
+                'cancel'           => 'Cancelar',
+                'upload-cancelled' => 'Subida cancelada.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'Historial',
                     ],
                     'button' => [
-                        'download'        => 'Descargar',
-                        'custom_download' => 'Descarga Personalizada',
-                        'rename'          => 'Renombrar',
-                        're_upload'       => 'Subir de nuevo',
-                        'delete'          => 'Eliminar',
+                        'download'            => 'Descargar',
+                        'custom_download'     => 'Descarga Personalizada',
+                        'rename'              => 'Renombrar',
+                        're_upload'           => 'Subir de nuevo',
+                        're_uploading'        => 'Subiendo de nuevo...',
+                        'cancel'              => 'Cancelar',
+                        're-upload-cancelled' => 'Resubida cancelada.',
+                        'delete'              => 'Eliminar',
+                        'preview'             => 'Vista previa',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Vista previa no disponible para este tipo de archivo.',
+                        'download-file'   => 'Descargar Archivo',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'Descarga Personalizada',
                         'format'             => 'Formato',

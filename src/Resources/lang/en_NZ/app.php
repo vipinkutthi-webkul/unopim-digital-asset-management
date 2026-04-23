@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'Failed to create the zip file.',
                     'not-allowed'                               => 'Uploading script files is not allowed.',
                 ],
-                'description' => 'Tool can help you organise, store, and manage all your media assets in one place',
-                'root'        => 'Root',
-                'upload'      => 'Upload',
+                'description'      => 'Tool can help you organise, store, and manage all your media assets in one place',
+                'root'             => 'Root',
+                'upload'           => 'Upload',
+                'uploading'        => 'Uploading...',
+                'cancel'           => 'Cancel',
+                'upload-cancelled' => 'Upload cancelled.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'History',
                     ],
                     'button' => [
-                        'download'        => 'Download',
-                        'custom_download' => 'Custom Download',
-                        'rename'          => 'Rename',
-                        're_upload'       => 'Re-Upload',
-                        'delete'          => 'Delete',
+                        'download'            => 'Download',
+                        'custom_download'     => 'Custom Download',
+                        'rename'              => 'Rename',
+                        're_upload'           => 'Re-Upload',
+                        're_uploading'        => 'Re-Uploading...',
+                        'cancel'              => 'Cancel',
+                        're-upload-cancelled' => 'Re-upload cancelled.',
+                        'delete'              => 'Delete',
+                        'preview'             => 'Preview',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Preview not available for this file type.',
+                        'download-file'   => 'Download File',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'Custom Download',
                         'format'             => 'Format',

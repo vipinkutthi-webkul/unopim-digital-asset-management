@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'No es permet la pujada de fitxers d\'script.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'L\'eina us pot ajudar a organitzar, emmagatzemar i gestionar tots els vostres actius multimèdia en un sol lloc',
-                'root'        => 'Arrel',
-                'upload'      => 'Pujar',
+                'title'            => 'DAM',
+                'description'      => 'L\'eina us pot ajudar a organitzar, emmagatzemar i gestionar tots els vostres actius multimèdia en un sol lloc',
+                'root'             => 'Arrel',
+                'upload'           => 'Pujar',
+                'uploading'        => 'Pujant...',
+                'cancel'           => 'Cancel·lar',
+                'upload-cancelled' => 'Càrrega cancel·lada.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historial',
                     ],
                     'button' => [
-                        'download'        => 'Descarregar',
-                        'custom_download' => 'Descàrrega Personalitzada',
-                        'rename'          => 'Canviar el nom',
-                        're_upload'       => 'Tornar a Pujar',
-                        'delete'          => 'Eliminar',
+                        'download'            => 'Descarregar',
+                        'custom_download'     => 'Descàrrega Personalitzada',
+                        'rename'              => 'Canviar el nom',
+                        're_upload'           => 'Tornar a Pujar',
+                        're_uploading'        => 'Tornant a pujar...',
+                        'cancel'              => 'Cancel·lar',
+                        're-upload-cancelled' => 'Càrrega cancel·lada.',
+                        'delete'              => 'Eliminar',
+                        'preview'             => 'Vista prèvia',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'La vista prèvia no està disponible per a aquest tipus de fitxer.',
+                        'download-file'   => 'Descarregar Fitxer',
                     ],
 
                     'custom-download' => [

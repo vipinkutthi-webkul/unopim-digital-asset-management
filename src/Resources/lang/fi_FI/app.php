@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Komentosarjatiedostojen lähettäminen ei ole sallittua.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Työkalu auttaa sinua järjestämään, tallentamaan ja hallitsemaan kaikkia mediaresurssejasi yhdessä paikassa',
-                'root'        => 'Juuri',
-                'upload'      => 'Lähetä',
+                'title'            => 'DAM',
+                'description'      => 'Työkalu auttaa sinua järjestämään, tallentamaan ja hallitsemaan kaikkia mediaresurssejasi yhdessä paikassa',
+                'root'             => 'Juuri',
+                'upload'           => 'Lähetä',
+                'uploading'        => 'Ladataan...',
+                'cancel'           => 'Peruuta',
+                'upload-cancelled' => 'Lataus peruutettu.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historia',
                     ],
                     'button' => [
-                        'download'        => 'Lataa',
-                        'custom_download' => 'Mukautettu lataus',
-                        'rename'          => 'Nimeä uudelleen',
-                        're_upload'       => 'Lähetä uudelleen',
-                        'delete'          => 'Poista',
+                        'download'            => 'Lataa',
+                        'custom_download'     => 'Mukautettu lataus',
+                        'rename'              => 'Nimeä uudelleen',
+                        're_upload'           => 'Lähetä uudelleen',
+                        're_uploading'        => 'Ladataan uudelleen...',
+                        'cancel'              => 'Peruuta',
+                        're-upload-cancelled' => 'Uudelleenlataus peruutettu.',
+                        'delete'              => 'Poista',
+                        'preview'             => 'Esikatselu',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Esikatselu ei ole saatavilla tälle tiedostotyypille.',
+                        'download-file'   => 'Lataa Tiedosto',
                     ],
 
                     'custom-download' => [

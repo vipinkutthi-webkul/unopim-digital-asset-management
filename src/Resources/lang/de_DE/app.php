@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'Fehler beim Erstellen der ZIP-Datei.',
                     'not-allowed'                               => 'Das Hochladen von Skriptdateien ist nicht erlaubt.',
                 ],
-                'description' => 'Dieses Tool hilft Ihnen, alle Ihre Medienassets an einem Ort zu organisieren, zu speichern und zu verwalten.',
-                'root'        => 'Wurzel',
-                'upload'      => 'Hochladen',
+                'description'      => 'Dieses Tool hilft Ihnen, alle Ihre Medienassets an einem Ort zu organisieren, zu speichern und zu verwalten.',
+                'root'             => 'Wurzel',
+                'upload'           => 'Hochladen',
+                'uploading'        => 'Hochladen...',
+                'cancel'           => 'Abbrechen',
+                'upload-cancelled' => 'Upload abgebrochen.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'Verlauf',
                     ],
                     'button' => [
-                        'download'        => 'Herunterladen',
-                        'custom_download' => 'Benutzerdefinierter Download',
-                        'rename'          => 'Umbenennen',
-                        're_upload'       => 'Erneut hochladen',
-                        'delete'          => 'Löschen',
+                        'download'            => 'Herunterladen',
+                        'custom_download'     => 'Benutzerdefinierter Download',
+                        'rename'              => 'Umbenennen',
+                        're_upload'           => 'Erneut hochladen',
+                        're_uploading'        => 'Erneut hochladen...',
+                        'cancel'              => 'Abbrechen',
+                        're-upload-cancelled' => 'Erneuter Upload abgebrochen.',
+                        'delete'              => 'Löschen',
+                        'preview'             => 'Vorschau',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Vorschau für diesen Dateityp nicht verfügbar.',
+                        'download-file'   => 'Datei herunterladen',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'Benutzerdefinierter Download',
                         'format'             => 'Format',

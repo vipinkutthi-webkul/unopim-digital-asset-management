@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Hindi pinapayagan ang pag-upload ng mga script file.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Ang tool na ito ay tumutulong sa iyo na ayusin, mag-imbak, at pamahalaan ang lahat ng iyong media asset sa isang lugar',
-                'root'        => 'Root',
-                'upload'      => 'Mag-upload',
+                'title'            => 'DAM',
+                'description'      => 'Ang tool na ito ay tumutulong sa iyo na ayusin, mag-imbak, at pamahalaan ang lahat ng iyong media asset sa isang lugar',
+                'root'             => 'Root',
+                'upload'           => 'Mag-upload',
+                'uploading'        => 'Ina-upload...',
+                'cancel'           => 'Kanselahin',
+                'upload-cancelled' => 'Kinansela ang pag-upload.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Kasaysayan',
                     ],
                     'button' => [
-                        'download'        => 'I-download',
-                        'custom_download' => 'Custom na Download',
-                        'rename'          => 'Palitan ang Pangalan',
-                        're_upload'       => 'Muling Mag-upload',
-                        'delete'          => 'Tanggalin',
+                        'download'            => 'I-download',
+                        'custom_download'     => 'Custom na Download',
+                        'rename'              => 'Palitan ang Pangalan',
+                        're_upload'           => 'Muling Mag-upload',
+                        're_uploading'        => 'Ina-upload muli...',
+                        'cancel'              => 'Kanselahin',
+                        're-upload-cancelled' => 'Kinansela ang muling pag-upload.',
+                        'delete'              => 'Tanggalin',
+                        'preview'             => 'I-preview',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Hindi available ang preview para sa uri ng file na ito.',
+                        'download-file'   => 'I-download ang File',
                     ],
 
                     'custom-download' => [

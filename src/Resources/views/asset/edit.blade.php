@@ -816,18 +816,32 @@
                         ></path>
                     </svg>
                     <span v-else class="text-xl text-violet-700 icon-dam-upload"></span>
-                    <span>@lang('dam::app.admin.dam.asset.edit.button.re_upload')</span>
+                    <span v-if="isUploading">@lang('dam::app.admin.dam.asset.edit.button.re_uploading')</span>
+                    <span v-else>@lang('dam::app.admin.dam.asset.edit.button.re_upload')</span>
                 </label>
+
+                <button
+                    v-if="isUploading"
+                    type="button"
+                    class="secondary-button"
+                    @click="cancelUpload"
+                >
+                    @lang('dam::app.admin.dam.asset.edit.button.cancel')
+                </button>
             @endif
         </script>
 
         <script type="module">
+            const reUploadFileTooLargeMsg = @js(trans('dam::app.admin.dam.asset.datagrid.file-too-large', ['size' => \Webkul\DAM\Helpers\AssetHelper::humanReadableSize(\Webkul\DAM\Helpers\AssetHelper::getMaxUploadSizeKb())]));
+            const reUploadFailedMsg = @js(trans('dam::app.admin.dam.asset.datagrid.file-upload-failed'));
+
             app.component('v-reupload-asset', {
                 template: '#v-reupload-asset-template',
                 data() {
                     return {
                         selectedItem: @json($asset),
                         isUploading: false,
+                        abortController: null,
                     };
                 },
                 methods: {
@@ -853,15 +867,30 @@
 
                         e.target.value = null;
                     },
+
+                    cancelUpload() {
+                        if (this.abortController) {
+                            this.abortController.abort();
+                            this.abortController = null;
+                        }
+                    },
+
                     handleFileUpload(formData) {
                         this.isUploading = true;
+                        this.abortController = new AbortController();
 
                         this.$axios.post("{{ route('admin.dam.assets.re_upload') }}", formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
-                            }
+                            },
+                            signal: this.abortController.signal,
                         }).then((response) => {
-
+                            // Server-level errors (e.g. post_max_size exceeded) return 200 with an
+                            // HTML body instead of JSON. Detect by checking the data type.
+                            if (typeof response.data !== 'object' || response.data === null) {
+                                this.$emitter.emit('add-flash', { type: 'error', message: reUploadFileTooLargeMsg });
+                                return;
+                            }
                             location.reload();
                             this.$emitter.emit('uploaded-assets', response.data.file);
                             this.$emitter.emit('add-flash', {
@@ -870,12 +899,20 @@
                             });
 
                         }).catch((error) => {
+                            if (this.$axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+                                this.$emitter.emit('add-flash', {
+                                    type: 'warning',
+                                    message: @js(trans('dam::app.admin.dam.asset.edit.button.re-upload-cancelled')),
+                                });
+                                return;
+                            }
+                            const message = error.response?.status === 413
+                                ? reUploadFileTooLargeMsg
+                                : (error.response?.data?.message ?? reUploadFailedMsg);
+                            this.$emitter.emit('add-flash', { type: 'error', message });
+                        }).finally(() => {
                             this.isUploading = false;
-                            this.$emitter.emit('add-flash', {
-                                type: 'error',
-                                message: error.response.data.message
-                            });
-                            console.error('Upload failed:', error);
+                            this.abortController = null;
                         });
                     }
                 }

@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => '无法创建 zip 文件。',
                     'not-allowed'                               => '不允许上传脚本文件。',
                 ],
-                'description' => '该工具可以帮助您在一个地方组织、存储和管理所有的媒体资产。',
-                'root'        => '根目录',
-                'upload'      => '上传',
+                'description'      => '该工具可以帮助您在一个地方组织、存储和管理所有的媒体资产。',
+                'root'             => '根目录',
+                'upload'           => '上传',
+                'uploading'        => '上传中...',
+                'cancel'           => '取消',
+                'upload-cancelled' => '上传已取消。',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => '历史',
                     ],
                     'button' => [
-                        'download'        => '下载',
-                        'custom_download' => '自定义下载',
-                        'rename'          => '重命名',
-                        're_upload'       => '重新上传',
-                        'delete'          => '删除',
+                        'download'            => '下载',
+                        'custom_download'     => '自定义下载',
+                        'rename'              => '重命名',
+                        're_upload'           => '重新上传',
+                        're_uploading'        => '重新上传中...',
+                        'cancel'              => '取消',
+                        're-upload-cancelled' => '重新上传已取消。',
+                        'delete'              => '删除',
+                        'preview'             => '预览',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => '此文件类型不支持预览。',
+                        'download-file'   => '下载文件',
+                    ],
+
                     'custom-download' => [
                         'title'              => '自定义下载',
                         'format'             => '格式',

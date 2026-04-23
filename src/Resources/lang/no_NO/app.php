@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Opplasting av skriptfiler er ikke tillatt.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Verktøyet hjelper deg med å organisere, lagre og administrere alle medieressursene dine på ett sted',
-                'root'        => 'Rot',
-                'upload'      => 'Last opp',
+                'title'            => 'DAM',
+                'description'      => 'Verktøyet hjelper deg med å organisere, lagre og administrere alle medieressursene dine på ett sted',
+                'root'             => 'Rot',
+                'upload'           => 'Last opp',
+                'uploading'        => 'Laster opp...',
+                'cancel'           => 'Avbryt',
+                'upload-cancelled' => 'Opplasting avbrutt.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historikk',
                     ],
                     'button' => [
-                        'download'        => 'Last ned',
-                        'custom_download' => 'Tilpasset nedlasting',
-                        'rename'          => 'Gi nytt navn',
-                        're_upload'       => 'Last opp på nytt',
-                        'delete'          => 'Slett',
+                        'download'            => 'Last ned',
+                        'custom_download'     => 'Tilpasset nedlasting',
+                        'rename'              => 'Gi nytt navn',
+                        're_upload'           => 'Last opp på nytt',
+                        're_uploading'        => 'Laster opp på nytt...',
+                        'cancel'              => 'Avbryt',
+                        're-upload-cancelled' => 'Gjenopplasting avbrutt.',
+                        'delete'              => 'Slett',
+                        'preview'             => 'Forhåndsvisning',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Forhåndsvisning er ikke tilgjengelig for denne filtypen.',
+                        'download-file'   => 'Last ned fil',
                     ],
 
                     'custom-download' => [

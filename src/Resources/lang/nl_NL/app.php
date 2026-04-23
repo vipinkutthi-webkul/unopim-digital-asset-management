@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'Mislukt om het zipbestand te maken.',
                     'not-allowed'                               => 'Het uploaden van scriptbestanden is niet toegestaan.',
                 ],
-                'description' => 'Deze tool helpt je om al je mediabestanden op één plaats te organiseren, op te slaan en te beheren.',
-                'root'        => 'Root',
-                'upload'      => 'Uploaden',
+                'description'      => 'Deze tool helpt je om al je mediabestanden op één plaats te organiseren, op te slaan en te beheren.',
+                'root'             => 'Root',
+                'upload'           => 'Uploaden',
+                'uploading'        => 'Uploaden...',
+                'cancel'           => 'Annuleren',
+                'upload-cancelled' => 'Upload geannuleerd.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'Geschiedenis',
                     ],
                     'button' => [
-                        'download'        => 'Downloaden',
-                        'custom_download' => 'Aangepaste Download',
-                        'rename'          => 'Hernoemen',
-                        're_upload'       => 'Opnieuw Uploaden',
-                        'delete'          => 'Verwijderen',
+                        'download'            => 'Downloaden',
+                        'custom_download'     => 'Aangepaste Download',
+                        'rename'              => 'Hernoemen',
+                        're_upload'           => 'Opnieuw Uploaden',
+                        're_uploading'        => 'Opnieuw uploaden...',
+                        'cancel'              => 'Annuleren',
+                        're-upload-cancelled' => 'Opnieuw uploaden geannuleerd.',
+                        'delete'              => 'Verwijderen',
+                        'preview'             => 'Voorbeeld',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Voorbeeld niet beschikbaar voor dit bestandstype.',
+                        'download-file'   => 'Bestand Downloaden',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'Aangepaste Download',
                         'format'             => 'Formaat',

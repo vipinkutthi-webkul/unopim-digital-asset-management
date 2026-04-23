@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Încărcarea fișierelor de tip script nu este permisă.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Instrumentul vă poate ajuta să organizați, să stocați și să gestionați toate activele media într-un singur loc',
-                'root'        => 'Rădăcină',
-                'upload'      => 'Încarcă',
+                'title'            => 'DAM',
+                'description'      => 'Instrumentul vă poate ajuta să organizați, să stocați și să gestionați toate activele media într-un singur loc',
+                'root'             => 'Rădăcină',
+                'upload'           => 'Încarcă',
+                'uploading'        => 'Se încarcă...',
+                'cancel'           => 'Anulare',
+                'upload-cancelled' => 'Încărcare anulată.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Istoric',
                     ],
                     'button' => [
-                        'download'        => 'Descarcă',
-                        'custom_download' => 'Descărcare Personalizată',
-                        'rename'          => 'Redenumește',
-                        're_upload'       => 'Reîncarcă',
-                        'delete'          => 'Șterge',
+                        'download'            => 'Descarcă',
+                        'custom_download'     => 'Descărcare Personalizată',
+                        'rename'              => 'Redenumește',
+                        're_upload'           => 'Reîncarcă',
+                        're_uploading'        => 'Reîncărcare în curs...',
+                        'cancel'              => 'Anulare',
+                        're-upload-cancelled' => 'Reîncărcare anulată.',
+                        'delete'              => 'Șterge',
+                        'preview'             => 'Previzualizare',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Previzualizare indisponibilă pentru acest tip de fișier.',
+                        'download-file'   => 'Descarcă Fișierul',
                     ],
 
                     'custom-download' => [
