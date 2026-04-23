@@ -1,6 +1,6 @@
 # CHANGELOG for unopim-digital-asset-management
 
-## Version 2.0.1 - Bug Fix & Enhancement Release
+## Version 2.1.0 - Features & Enhancements
 Compatible with UnoPim v2.0.0
 
 ### Features & Enhancements
@@ -26,6 +26,19 @@ Compatible with UnoPim v2.0.0
 
 ### Fixed
 
+- Directory tree flicker on upload
+Removed premature local-state push of uploaded assets that caused duplicate entries in
+the tree. The tree now rebuilds exclusively from the server response.
+
+- meta_data double-encoding
+Fixed a regression where the `meta_data` JSON field was serialised twice on asset store,
+producing a string-wrapped JSON value instead of a plain object.
+
+## Version 2.0.1 - Bug Fix Release
+Compatible with UnoPim v2.0.0
+
+### Fixed
+
 - S3 — Single asset move
 Fixed an issue where moving a single asset on S3 orphaned the object.
 
@@ -43,14 +56,6 @@ Fixed MySQL-specific queries causing errors on PostgreSQL.
 
 - Dark mode — Root Category label
 Fixed text visibility in dark mode.
-
-- Directory tree flicker on upload
-Removed premature local-state push of uploaded assets that caused duplicate entries in
-the tree. The tree now rebuilds exclusively from the server response.
-
-- meta_data double-encoding
-Fixed a regression where the `meta_data` JSON field was serialised twice on asset store,
-producing a string-wrapped JSON value instead of a plain object.
 
 ## **Version 2.0.0** - UnoPim v2.0.0 Compatibility
 
