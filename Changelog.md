@@ -1,7 +1,28 @@
 # CHANGELOG for unopim-digital-asset-management
 
-## Version 2.0.1 - Bug Fix Release
+## Version 2.0.1 - Bug Fix & Enhancement Release
 Compatible with UnoPim v2.0.0
+
+### Features & Enhancements
+
+- **Directory tree performance** — Asset eager-loading is skipped by default in the
+  directory tree; the asset picker opts in via `with_assets=1`, reducing the initial
+  payload for large libraries.
+
+- **Per-directory busy spinners** — Move, delete, and copy operations now show a spinner
+  only on the affected tree node instead of a full-screen overlay, giving precise visual
+  feedback without blocking the rest of the UI.
+
+- **Upload progress indicator** — Upload and re-upload buttons are disabled and display a
+  spinner while a transfer is in progress, preventing duplicate submissions.
+
+- **Persistent asset metadata** — Extracted metadata is stored in a new `meta_data` column
+  on `dam_assets` and surfaced in a dedicated Metadata tab in the asset editor, with a
+  new API endpoint for programmatic access.
+
+- **AWS S3 — URL resolution from disk** — Asset URLs for S3-hosted files are now resolved
+  from the configured disk using visibility-aware logic (public URL vs. temporary signed
+  URL), replacing the previous hard-coded path concatenation.
 
 ### Fixed
 
@@ -22,6 +43,14 @@ Fixed MySQL-specific queries causing errors on PostgreSQL.
 
 - Dark mode — Root Category label
 Fixed text visibility in dark mode.
+
+- Directory tree flicker on upload
+Removed premature local-state push of uploaded assets that caused duplicate entries in
+the tree. The tree now rebuilds exclusively from the server response.
+
+- meta_data double-encoding
+Fixed a regression where the `meta_data` JSON field was serialised twice on asset store,
+producing a string-wrapped JSON value instead of a plain object.
 
 ## **Version 2.0.0** - UnoPim v2.0.0 Compatibility
 
