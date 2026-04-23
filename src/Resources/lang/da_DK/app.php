@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Det er ikke tilladt at uploade scriptfiler.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Værktøjet hjælper dig med at organisere, opbevare og administrere alle dine medieaktiver ét sted',
-                'root'        => 'Rod',
-                'upload'      => 'Upload',
+                'title'            => 'DAM',
+                'description'      => 'Værktøjet hjælper dig med at organisere, opbevare og administrere alle dine medieaktiver ét sted',
+                'root'             => 'Rod',
+                'upload'           => 'Upload',
+                'uploading'        => 'Uploader...',
+                'cancel'           => 'Annuller',
+                'upload-cancelled' => 'Upload annulleret.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Historik',
                     ],
                     'button' => [
-                        'download'        => 'Download',
-                        'custom_download' => 'Brugerdefineret download',
-                        'rename'          => 'Omdøb',
-                        're_upload'       => 'Upload igen',
-                        'delete'          => 'Slet',
+                        'download'            => 'Download',
+                        'custom_download'     => 'Brugerdefineret download',
+                        'rename'              => 'Omdøb',
+                        're_upload'           => 'Upload igen',
+                        're_uploading'        => 'Uploader igen...',
+                        'cancel'              => 'Annuller',
+                        're-upload-cancelled' => 'Genupload annulleret.',
+                        'delete'              => 'Slet',
+                        'preview'             => 'Forhåndsvisning',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Forhåndsvisning er ikke tilgængelig for denne filtype.',
+                        'download-file'   => 'Download Fil',
                     ],
 
                     'custom-download' => [

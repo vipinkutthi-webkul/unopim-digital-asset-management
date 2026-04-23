@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Không cho phép tải lên các tệp script.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Công cụ giúp bạn tổ chức, lưu trữ và quản lý tất cả tài sản phương tiện ở một nơi',
-                'root'        => 'Gốc',
-                'upload'      => 'Tải lên',
+                'title'            => 'DAM',
+                'description'      => 'Công cụ giúp bạn tổ chức, lưu trữ và quản lý tất cả tài sản phương tiện ở một nơi',
+                'root'             => 'Gốc',
+                'upload'           => 'Tải lên',
+                'uploading'        => 'Đang tải lên...',
+                'cancel'           => 'Hủy',
+                'upload-cancelled' => 'Tải lên đã hủy.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Lịch sử',
                     ],
                     'button' => [
-                        'download'        => 'Tải xuống',
-                        'custom_download' => 'Tải xuống tùy chỉnh',
-                        'rename'          => 'Đổi tên',
-                        're_upload'       => 'Tải lên lại',
-                        'delete'          => 'Xóa',
+                        'download'            => 'Tải xuống',
+                        'custom_download'     => 'Tải xuống tùy chỉnh',
+                        'rename'              => 'Đổi tên',
+                        're_upload'           => 'Tải lên lại',
+                        're_uploading'        => 'Đang tải lên lại...',
+                        'cancel'              => 'Hủy',
+                        're-upload-cancelled' => 'Tải lên lại đã hủy.',
+                        'delete'              => 'Xóa',
+                        'preview'             => 'Xem trước',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Xem trước không khả dụng cho loại tệp này.',
+                        'download-file'   => 'Tải xuống tệp',
                     ],
 
                     'custom-download' => [

@@ -334,14 +334,16 @@ class MetadataExtractionService
                 CURLOPT_URL            => $url,
                 CURLOPT_FILE           => $fp,
                 CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_TIMEOUT        => $isPartial ? 5 : 300,
-                CURLOPT_CONNECTTIMEOUT => 5,
+                // 0 = no timeout for full downloads so large files don't fail mid-transfer.
+                // Partial header-only fetches keep a short timeout since only 64 KB is read.
+                CURLOPT_TIMEOUT        => $isPartial ? 10 : 0,
+                CURLOPT_CONNECTTIMEOUT => 10,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4,
                 CURLOPT_ENCODING       => '',
                 CURLOPT_TCP_FASTOPEN   => 1,
-                CURLOPT_BUFFERSIZE     => 65536,
+                CURLOPT_BUFFERSIZE     => 1048576,
             ];
 
             if ($isPartial) {

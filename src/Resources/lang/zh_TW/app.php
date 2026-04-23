@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => '不允許上傳指令碼檔案。',
                 ],
 
-                'title'       => 'DAM',
-                'description' => '此工具可協助您在一個地方組織、儲存及管理所有媒體資產',
-                'root'        => '根目錄',
-                'upload'      => '上傳',
+                'title'            => 'DAM',
+                'description'      => '此工具可協助您在一個地方組織、儲存及管理所有媒體資產',
+                'root'             => '根目錄',
+                'upload'           => '上傳',
+                'uploading'        => '上傳中...',
+                'cancel'           => '取消',
+                'upload-cancelled' => '上傳已取消。',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => '歷程記錄',
                     ],
                     'button' => [
-                        'download'        => '下載',
-                        'custom_download' => '自訂下載',
-                        'rename'          => '重新命名',
-                        're_upload'       => '重新上傳',
-                        'delete'          => '刪除',
+                        'download'            => '下載',
+                        'custom_download'     => '自訂下載',
+                        'rename'              => '重新命名',
+                        're_upload'           => '重新上傳',
+                        're_uploading'        => '重新上傳中...',
+                        'cancel'              => '取消',
+                        're-upload-cancelled' => '重新上傳已取消。',
+                        'delete'              => '刪除',
+                        'preview'             => '預覽',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => '此檔案類型不支援預覽。',
+                        'download-file'   => '下載檔案',
                     ],
 
                     'custom-download' => [

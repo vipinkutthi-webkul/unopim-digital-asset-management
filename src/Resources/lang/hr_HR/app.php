@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Prijenos skriptnih datoteka nije dopušten.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Alat koji vam pomaže organizirati, pohraniti i upravljati svim vašim medijskim resursima na jednom mjestu',
-                'root'        => 'Korijen',
-                'upload'      => 'Prenesi',
+                'title'            => 'DAM',
+                'description'      => 'Alat koji vam pomaže organizirati, pohraniti i upravljati svim vašim medijskim resursima na jednom mjestu',
+                'root'             => 'Korijen',
+                'upload'           => 'Prenesi',
+                'uploading'        => 'Učitavanje...',
+                'cancel'           => 'Otkaži',
+                'upload-cancelled' => 'Prijenos otkazan.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Povijest',
                     ],
                     'button' => [
-                        'download'        => 'Preuzmi',
-                        'custom_download' => 'Prilagođeno preuzimanje',
-                        'rename'          => 'Preimenuj',
-                        're_upload'       => 'Ponovno prenesi',
-                        'delete'          => 'Obriši',
+                        'download'            => 'Preuzmi',
+                        'custom_download'     => 'Prilagođeno preuzimanje',
+                        'rename'              => 'Preimenuj',
+                        're_upload'           => 'Ponovno prenesi',
+                        're_uploading'        => 'Ponovno učitavanje...',
+                        'cancel'              => 'Otkaži',
+                        're-upload-cancelled' => 'Ponovni prijenos otkazan.',
+                        'delete'              => 'Obriši',
+                        'preview'             => 'Pregled',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Pregled nije dostupan za ovu vrstu datoteke.',
+                        'download-file'   => 'Preuzmi Datoteku',
                     ],
 
                     'custom-download' => [

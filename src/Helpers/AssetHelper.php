@@ -9,14 +9,11 @@ use Webkul\DAM\Models\Directory;
 class AssetHelper
 {
     /**
-     * Maximum allowed asset upload size in kilobytes (50 MB).
-     */
-    public const MAX_UPLOAD_SIZE_KB = 51200;
-
-    /**
-     * Effective max upload size in KB — the lesser of the DAM cap
-     * and PHP's runtime upload_max_filesize, so the validator can never
-     * promise more than the server actually accepts.
+     * Effective max upload size in KB — derived entirely from PHP's runtime
+     * upload_max_filesize and post_max_size so the validator honours whatever
+     * the server is already configured to accept.
+     * Returns PHP_INT_MAX when PHP imposes no limit, so Laravel's max: rule
+     * effectively becomes a no-op and the server is the real gatekeeper.
      */
     public static function getMaxUploadSizeKb(): int
     {
@@ -24,12 +21,27 @@ class AssetHelper
         $postLimitKb = self::iniValueToKb((string) ini_get('post_max_size'));
 
         $candidates = array_filter([
-            self::MAX_UPLOAD_SIZE_KB,
             $phpLimitKb ?: null,
             $postLimitKb ?: null,
         ]);
 
-        return (int) min($candidates);
+        return $candidates ? (int) min($candidates) : PHP_INT_MAX;
+    }
+
+    /**
+     * Format a kilobyte count into a human-readable string (e.g. "512 MB", "2 GB").
+     */
+    public static function humanReadableSize(int $kilobytes): string
+    {
+        if ($kilobytes >= 1024 * 1024) {
+            return round($kilobytes / 1024 / 1024, 2).' GB';
+        }
+
+        if ($kilobytes >= 1024) {
+            return round($kilobytes / 1024, 2).' MB';
+        }
+
+        return $kilobytes.' KB';
     }
 
     /**

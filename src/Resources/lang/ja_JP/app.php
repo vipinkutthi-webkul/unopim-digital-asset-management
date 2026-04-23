@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'ZIPファイルの作成に失敗しました。',
                     'not-allowed'                               => 'スクリプトファイルのアップロードは許可されていません。',
                 ],
-                'description' => 'このツールは、すべてのメディアアセットを一箇所で整理、保存、管理するのに役立ちます。',
-                'root'        => 'ルート',
-                'upload'      => 'アップロード',
+                'description'      => 'このツールは、すべてのメディアアセットを一箇所で整理、保存、管理するのに役立ちます。',
+                'root'             => 'ルート',
+                'upload'           => 'アップロード',
+                'uploading'        => 'アップロード中...',
+                'cancel'           => 'キャンセル',
+                'upload-cancelled' => 'アップロードがキャンセルされました。',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => '履歴',
                     ],
                     'button' => [
-                        'download'        => 'ダウンロード',
-                        'custom_download' => 'カスタムダウンロード',
-                        'rename'          => '名前変更',
-                        're_upload'       => '再アップロード',
-                        'delete'          => '削除',
+                        'download'            => 'ダウンロード',
+                        'custom_download'     => 'カスタムダウンロード',
+                        'rename'              => '名前変更',
+                        're_upload'           => '再アップロード',
+                        're_uploading'        => '再アップロード中...',
+                        'cancel'              => 'キャンセル',
+                        're-upload-cancelled' => '再アップロードがキャンセルされました。',
+                        'delete'              => '削除',
+                        'preview'             => 'プレビュー',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'このファイルタイプはプレビューに対応していません。',
+                        'download-file'   => 'ファイルをダウンロード',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'カスタムダウンロード',
                         'format'             => 'フォーマット',

@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'Betik dosyaları yüklemeye izin verilmiyor.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'Tüm medya varlıklarınızı tek bir yerde düzenlemenize, saklamanıza ve yönetmenize yardımcı olan araç',
-                'root'        => 'Kök',
-                'upload'      => 'Yükle',
+                'title'            => 'DAM',
+                'description'      => 'Tüm medya varlıklarınızı tek bir yerde düzenlemenize, saklamanıza ve yönetmenize yardımcı olan araç',
+                'root'             => 'Kök',
+                'upload'           => 'Yükle',
+                'uploading'        => 'Yükleniyor...',
+                'cancel'           => 'İptal',
+                'upload-cancelled' => 'Yükleme iptal edildi.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Geçmiş',
                     ],
                     'button' => [
-                        'download'        => 'İndir',
-                        'custom_download' => 'Özel indirme',
-                        'rename'          => 'Yeniden adlandır',
-                        're_upload'       => 'Yeniden yükle',
-                        'delete'          => 'Sil',
+                        'download'            => 'İndir',
+                        'custom_download'     => 'Özel indirme',
+                        'rename'              => 'Yeniden adlandır',
+                        're_upload'           => 'Yeniden yükle',
+                        're_uploading'        => 'Yeniden yükleniyor...',
+                        'cancel'              => 'İptal',
+                        're-upload-cancelled' => 'Yeniden yükleme iptal edildi.',
+                        'delete'              => 'Sil',
+                        'preview'             => 'Önizleme',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Bu dosya türü için önizleme mevcut değil.',
+                        'download-file'   => 'Dosyayı İndir',
                     ],
 
                     'custom-download' => [

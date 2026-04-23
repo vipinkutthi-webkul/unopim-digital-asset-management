@@ -97,10 +97,13 @@ return [
                     'not-allowed'                               => 'O carregamento de ficheiros de script não é permitido.',
                 ],
 
-                'title'       => 'DAM',
-                'description' => 'A ferramenta pode ajudá-lo a organizar, armazenar e gerir todos os seus ativos de multimédia num só local',
-                'root'        => 'Raiz',
-                'upload'      => 'Carregar',
+                'title'            => 'DAM',
+                'description'      => 'A ferramenta pode ajudá-lo a organizar, armazenar e gerir todos os seus ativos de multimédia num só local',
+                'root'             => 'Raiz',
+                'upload'           => 'Carregar',
+                'uploading'        => 'A enviar...',
+                'cancel'           => 'Cancelar',
+                'upload-cancelled' => 'Envio cancelado.',
             ],
             'asset' => [
                 'properties' => [
@@ -175,11 +178,20 @@ return [
                         'history'          => 'Histórico',
                     ],
                     'button' => [
-                        'download'        => 'Transferir',
-                        'custom_download' => 'Transferência Personalizada',
-                        'rename'          => 'Renomear',
-                        're_upload'       => 'Recarregar',
-                        'delete'          => 'Eliminar',
+                        'download'            => 'Transferir',
+                        'custom_download'     => 'Transferência Personalizada',
+                        'rename'              => 'Renomear',
+                        're_upload'           => 'Recarregar',
+                        're_uploading'        => 'A reenviar...',
+                        'cancel'              => 'Cancelar',
+                        're-upload-cancelled' => 'Reenvio cancelado.',
+                        'delete'              => 'Eliminar',
+                        'preview'             => 'Pré-visualizar',
+                    ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Pré-visualização não disponível para este tipo de ficheiro.',
+                        'download-file'   => 'Descarregar Ficheiro',
                     ],
 
                     'custom-download' => [

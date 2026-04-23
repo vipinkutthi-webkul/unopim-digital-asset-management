@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'Gagal membuat file zip.',
                     'not-allowed'                               => 'Unggah file skrip tidak diperbolehkan.',
                 ],
-                'description' => 'Alat ini dapat membantu Anda mengorganisir, menyimpan, dan mengelola semua aset media Anda di satu tempat',
-                'root'        => 'Root',
-                'upload'      => 'Unggah',
+                'description'      => 'Alat ini dapat membantu Anda mengorganisir, menyimpan, dan mengelola semua aset media Anda di satu tempat',
+                'root'             => 'Root',
+                'upload'           => 'Unggah',
+                'uploading'        => 'Mengunggah...',
+                'cancel'           => 'Batal',
+                'upload-cancelled' => 'Unggahan dibatalkan.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'Sejarah',
                     ],
                     'button' => [
-                        'download'        => 'Unduh',
-                        'custom_download' => 'Unduh Kustom',
-                        'rename'          => 'Ganti Nama',
-                        're_upload'       => 'Unggah Ulang',
-                        'delete'          => 'Hapus',
+                        'download'            => 'Unduh',
+                        'custom_download'     => 'Unduh Kustom',
+                        'rename'              => 'Ganti Nama',
+                        're_upload'           => 'Unggah Ulang',
+                        're_uploading'        => 'Mengunggah ulang...',
+                        'cancel'              => 'Batal',
+                        're-upload-cancelled' => 'Unggah ulang dibatalkan.',
+                        'delete'              => 'Hapus',
+                        'preview'             => 'Pratinjau',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'Pratinjau tidak tersedia untuk jenis file ini.',
+                        'download-file'   => 'Unduh File',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'Unduh Kustom',
                         'format'             => 'Format',

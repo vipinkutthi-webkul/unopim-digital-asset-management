@@ -90,9 +90,12 @@ return [
                     'failed-download-directory'                 => 'فشل في إنشاء الملف المضغوط.',
                     'not-allowed'                               => 'رفع ملفات السكربت غير مسموح به.',
                 ],
-                'description' => 'الأداة تساعدك على تنظيم وتخزين وإدارة جميع أصولك الرقمية في مكان واحد',
-                'root'        => 'الجذر',
-                'upload'      => 'رفع',
+                'description'      => 'الأداة تساعدك على تنظيم وتخزين وإدارة جميع أصولك الرقمية في مكان واحد',
+                'root'             => 'الجذر',
+                'upload'           => 'رفع',
+                'uploading'        => 'جارٍ الرفع...',
+                'cancel'           => 'إلغاء',
+                'upload-cancelled' => 'تم إلغاء الرفع.',
             ],
             'asset' => [
                 'properties' => [
@@ -165,12 +168,22 @@ return [
                         'history'          => 'التاريخ',
                     ],
                     'button' => [
-                        'download'        => 'تحميل',
-                        'custom_download' => 'تحميل مخصص',
-                        'rename'          => 'إعادة تسمية',
-                        're_upload'       => 'إعادة تحميل',
-                        'delete'          => 'حذف',
+                        'download'            => 'تحميل',
+                        'custom_download'     => 'تحميل مخصص',
+                        'rename'              => 'إعادة تسمية',
+                        're_upload'           => 'إعادة تحميل',
+                        're_uploading'        => 'جارٍ إعادة التحميل...',
+                        'cancel'              => 'إلغاء',
+                        're-upload-cancelled' => 'تم إلغاء إعادة التحميل.',
+                        'delete'              => 'حذف',
+                        'preview'             => 'معاينة',
                     ],
+
+                    'preview-modal' => [
+                        'not-available'   => 'المعاينة غير متاحة لهذا النوع من الملفات.',
+                        'download-file'   => 'تنزيل الملف',
+                    ],
+
                     'custom-download' => [
                         'title'              => 'تحميل مخصص',
                         'format'             => 'الصيغة',
