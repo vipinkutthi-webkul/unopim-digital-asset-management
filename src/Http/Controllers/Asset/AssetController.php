@@ -226,7 +226,6 @@ class AssetController extends Controller
                     }
 
                     $originalName = $file->getClientOriginalName();
-                    $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
 
                     if (! $directory->isWritable($directoryPath)) {
                         throw new \Exception(trans('dam::app.admin.dam.index.directory.not-writable', [
@@ -238,26 +237,64 @@ class AssetController extends Controller
 
                     $disk = Directory::getAssetDisk();
 
-                    $filePath = $this->fileStorer->store(
-                        path: $directoryPath,
-                        file: $file,
-                        fileName: $uniqueFileName,
-                        options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
-                    );
+                    // If an asset with the same filename already exists in this directory,
+                    // overwrite its file instead of creating a renamed duplicate.
+                    $existingPath = $directoryPath.'/'.$originalName;
+                    $existingAsset = Asset::where('path', $existingPath)->first();
+                    $isOverwrite = (bool) $existingAsset;
 
-                    $localFilePath = $file->getRealPath();
-                    $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+                    if ($isOverwrite) {
+                        Storage::disk($disk)->delete($existingAsset->path);
+                        $this->clearAssetCache($existingAsset->path, $disk);
 
-                    $asset = Asset::create([
-                        'file_name' => $uniqueFileName,
-                        'file_type' => AssetHelper::getFileType($file),
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
-                        'extension' => $file->getClientOriginalExtension(),
-                        'path'      => $filePath,
-                        'meta_data' => $metaData,
-                    ]);
-                    $assetIds[] = $asset->id;
+                        $filePath = $this->fileStorer->store(
+                            path: $directoryPath,
+                            file: $file,
+                            fileName: $originalName,
+                            options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
+                        );
+                        $localFilePath = $file->getRealPath();
+                        $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
+                        $existingAsset->update([
+                            'file_name' => $originalName,
+                            'file_type' => AssetHelper::getFileType($file),
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                            'extension' => $file->getClientOriginalExtension(),
+                            'path'      => $filePath,
+                            'meta_data' => $metaData,
+                        ]);
+
+                        $asset = $existingAsset;
+                    } else {
+                        $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
+
+                        $filePath = $this->fileStorer->store(
+                            path: $directoryPath,
+                            file: $file,
+                            fileName: $uniqueFileName,
+                            options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
+                        );
+
+                        $localFilePath = $file->getRealPath();
+                        $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
+                        $asset = Asset::create([
+                            'file_name' => $uniqueFileName,
+                            'file_type' => AssetHelper::getFileType($file),
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                            'extension' => $file->getClientOriginalExtension(),
+                            'path'      => $filePath,
+                            'meta_data' => $metaData,
+                        ]);
+                    }
+
+                    // Only queue new assets for directory association; overwrites are already linked.
+                    if (! $isOverwrite) {
+                        $assetIds[] = $asset->id;
+                    }
                     array_push($uploadFiles, $asset);
                 }
             }
@@ -329,7 +366,9 @@ class AssetController extends Controller
             }
 
             $disk = Directory::getAssetDisk();
-            Storage::disk($disk)->delete($asset->path);
+            $oldPath = $asset->path;
+            Storage::disk($disk)->delete($oldPath);
+            $this->clearAssetCache($oldPath, $disk);
 
             $originalName = $file->getClientOriginalName();
             $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
@@ -466,6 +505,8 @@ class AssetController extends Controller
             ], 500);
         }
 
+        $this->clearAssetCache($asset->path, $disk);
+
         $asset->delete();
 
         return response()->json([
@@ -503,6 +544,8 @@ class AssetController extends Controller
                             'path'       => $asset->path,
                         ]));
                     }
+
+                    $this->clearAssetCache($asset->path, $disk);
 
                     Event::dispatch('dam.asset.delete.before', $assetId);
 
@@ -769,6 +812,17 @@ class AssetController extends Controller
     /**
      * Format a kilobyte value into a human readable string (e.g. "50 MB").
      */
+    private function clearAssetCache(string $path, string $disk): void
+    {
+        Storage::disk($disk)->delete('thumbnails/'.$path);
+
+        foreach (Storage::disk($disk)->allFiles('preview') as $previewFile) {
+            if (str_ends_with($previewFile, '/'.$path)) {
+                Storage::disk($disk)->delete($previewFile);
+            }
+        }
+    }
+
     protected function humanReadableSize(int $kilobytes): string
     {
         if ($kilobytes >= 1024 * 1024) {
