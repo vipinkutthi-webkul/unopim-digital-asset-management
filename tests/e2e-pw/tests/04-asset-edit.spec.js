@@ -8,17 +8,22 @@ const { navigateTo, searchInDataGrid, ensureAssetExists } = require('../utils/he
 async function navigateToFirstAssetEdit(page) {
   await navigateTo(page, 'dam');
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
 
   // Hover over the first image card to reveal action icons
   const firstCard = page.locator('.image-card').first();
+  await firstCard.waitFor({ state: 'visible', timeout: 20000 });
   await firstCard.hover();
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 
   // Click the edit icon that appears on hover
   const editIcon = firstCard.locator('.icon-edit').first();
   await editIcon.click({ force: true });
+  // Wait for the URL to confirm navigation to the edit page
+  await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
   await page.waitForLoadState('domcontentloaded');
+  // Allow Vue to finish rendering the edit page sidebar/tabs
+  await page.waitForTimeout(2000);
 }
 
 test.describe('DAM Asset Edit Page', () => {
