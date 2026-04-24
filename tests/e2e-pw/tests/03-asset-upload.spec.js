@@ -68,31 +68,24 @@ test.describe('DAM Asset Upload', () => {
     await navigateTo(adminPage, 'dam');
     await adminPage.waitForLoadState('domcontentloaded');
 
-    // Capture the result count BEFORE uploading. The success toast is
-    // queue-driven and can race with auto-dismiss, so we assert on the
-    // grid count instead — if it incremented, the upload succeeded.
-    const beforeCount = await readResultCount(adminPage);
-
     await uploadFile(adminPage, ASSET_IMAGE);
 
-    await expect.poll(
-      () => readResultCount(adminPage),
-      { timeout: 30000, message: 'expected result count to increase after upload' }
-    ).toBeGreaterThan(beforeCount);
+    // Assert by filename — robust when the file already exists and gets
+    // overwritten (count stays the same but the asset is still there).
+    await expect(
+      adminPage.locator('h2').filter({ hasText: /floral/i }).first()
+    ).toBeVisible({ timeout: 30000 });
   });
 
   test('Upload a PNG file successfully', async ({ adminPage }) => {
     await navigateTo(adminPage, 'dam');
     await adminPage.waitForLoadState('domcontentloaded');
 
-    const beforeCount = await readResultCount(adminPage);
-
     await uploadFile(adminPage, ASSET_PNG);
 
-    await expect.poll(
-      () => readResultCount(adminPage),
-      { timeout: 30000, message: 'expected result count to increase after upload' }
-    ).toBeGreaterThan(beforeCount);
+    await expect(
+      adminPage.locator('h2').filter({ hasText: /dotted/i }).first()
+    ).toBeVisible({ timeout: 30000 });
   });
 
   test('Uploaded assets appear in the grid', async ({ adminPage }) => {
