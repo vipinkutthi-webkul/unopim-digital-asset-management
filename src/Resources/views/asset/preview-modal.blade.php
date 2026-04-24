@@ -10,8 +10,8 @@
 
     $typeColor = 'bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300';
 
-    $bytes     = (int) ($asset->file_size ?? 0);
-    $fileSize  = $bytes >= 1048576
+    $bytes    = (int) ($asset->file_size ?? 0);
+    $fileSize = $bytes >= 1048576
         ? number_format($bytes / 1048576, 2) . ' MB'
         : ($bytes >= 1024 ? number_format($bytes / 1024, 1) . ' KB' : ($bytes > 0 ? $bytes . ' B' : null));
 @endphp
@@ -20,142 +20,11 @@
     type="text/x-template"
     id="v-asset-preview-modal-template"
 >
-    <div class="flex flex-col items-center gap-3 w-full min-h-[440px]">
-
-        <!-- Thumbnail / placeholder -->
-        <div class="flex items-center justify-center w-full flex-1 min-h-[200px] rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-            @if ($asset->file_type === 'image')
-                <img
-                    src="{{ $asset->previewPath }}"
-                    alt="{{ $asset->file_name }}"
-                    class="max-h-full max-w-full object-contain"
-                />
-            @else
-                <img
-                    src="{{ $placeholderSvg }}"
-                    alt="{{ $asset->file_name }}"
-                    class="h-24 w-24 object-contain opacity-60"
-                />
-            @endif
-        </div>
-
-        <!-- File metadata strip -->
-        <div class="flex items-center gap-2 text-xs">
-            <span class="px-2 py-0.5 rounded font-semibold {{ $typeColor }}">
-                {{ strtoupper($asset->extension) }}
-            </span>
-            @if ($fileSize)
-                <span class="text-gray-400 dark:text-gray-500">·</span>
-                <span class="text-gray-500 dark:text-gray-400">{{ $fileSize }}</span>
-            @endif
-            @if ($asset->file_type === 'image' && !empty($asset->width) && !empty($asset->height))
-                <span class="text-gray-400 dark:text-gray-500">·</span>
-                <span class="text-gray-500 dark:text-gray-400">{{ $asset->width }} × {{ $asset->height }}px</span>
-            @endif
-        </div>
-
-        <!-- Preview button -->
-        <button type="button" class="secondary-button" @click="openPreview">
-            <span class="text-xl text-violet-700 icon-dam-preview"></span>
-            <span>@lang('dam::app.admin.dam.asset.edit.button.preview')</span>
-        </button>
-
-        <!-- Fullscreen Modal Overlay -->
-        <div
-            v-if="isOpen"
-            class="fixed inset-0 z-[10010] flex items-center justify-center"
-        >
-            <!-- Backdrop -->
-            <div
-                class="absolute inset-0 bg-black/75"
-                @click="closePreview"
-            ></div>
-
-            <!-- Modal panel -->
-            <div class="relative z-10 flex flex-col w-[85vw] h-[88vh] max-w-6xl rounded-xl overflow-hidden bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10">
-
-                <!-- Header -->
-                <div class="flex items-center gap-3 px-5 py-3 shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-                    <span class="shrink-0 px-2 py-0.5 rounded text-xs font-semibold {{ $typeColor }}">
-                        {{ strtoupper($asset->extension) }}
-                    </span>
-                    <p class="flex-1 text-sm font-semibold text-gray-800 dark:text-white truncate">
-                        {{ $asset->file_name }}
-                    </p>
-                    @if ($fileSize)
-                        <span class="shrink-0 text-xs text-gray-400 dark:text-gray-500 hidden sm:block">{{ $fileSize }}</span>
-                    @endif
-                    <button
-                        type="button"
-                        class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-                        @click="closePreview"
-                        aria-label="Close preview"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Content -->
-                <div class="flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-
-                    @if ($asset->file_type === 'video')
-                        <video controls autoplay class="w-full h-full py-4">
-                            <source src="{{ $mediaUrl }}" type="{{ $asset->mime_type }}">
-                            @lang('dam::app.admin.dam.asset.edit.preview-modal.not-available')
-                        </video>
-
-                    @elseif ($asset->file_type === 'audio')
-                        <div class="flex flex-col items-center justify-center gap-8 w-full h-full p-8">
-                            <img
-                                src="{{ $placeholderSvg }}"
-                                alt="{{ $asset->file_name }}"
-                                class="h-32 w-32 object-contain opacity-50"
-                            />
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-xl">{{ $asset->file_name }}</p>
-                            <audio controls autoplay class="w-full max-w-2xl">
-                                <source src="{{ $mediaUrl }}" type="{{ $asset->mime_type }}">
-                                @lang('dam::app.admin.dam.asset.edit.preview-modal.not-available')
-                            </audio>
-                        </div>
-
-                    @elseif ($asset->extension === 'pdf')
-                        <iframe
-                            src="{{ $mediaUrl }}"
-                            class="w-full h-full"
-                        ></iframe>
-
-                    @elseif ($asset->file_type === 'image')
-                        <img
-                            src="{{ $asset->previewPath }}"
-                            alt="{{ $asset->file_name }}"
-                            class="max-w-full max-h-full object-contain p-4"
-                        />
-
-                    @else
-                        <div class="flex flex-col items-center gap-4 text-center">
-                            <img
-                                src="{{ $placeholderSvg }}"
-                                alt="{{ $asset->file_name }}"
-                                class="h-20 w-20 object-contain opacity-40"
-                            />
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                @lang('dam::app.admin.dam.asset.edit.preview-modal.not-available')
-                            </p>
-                            <a
-                                href="{{ route('admin.dam.assets.download', $asset->id) }}"
-                                class="primary-button inline-flex"
-                            >
-                                @lang('dam::app.admin.dam.asset.edit.preview-modal.download-file')
-                            </a>
-                        </div>
-                    @endif
-
-                </div>
-            </div>
-        </div>
+    <div class="flex flex-col items-center gap-2 w-full">
+        @include('dam::asset.preview-modal.card')
+        @include('dam::asset.preview-modal.info-modal')
+        @include('dam::asset.preview-modal.viewer-modal')
+        @include('dam::asset.preview-modal.editor-modal')
     </div>
 </script>
 
@@ -165,34 +34,211 @@
 
         data() {
             return {
-                isOpen: false,
+                isOpen:     false,
+                infoHover:  false,
+                isInfoOpen: false,
+                isEditOpen:  false,
+                editTool:    null,
+                editPrompt:  '',
+
+                // Image viewer
+                imgZoom:       1,
+                imgRotation:   0,
+                imgPanX:       0,
+                imgPanY:       0,
+                imgIsDragging: false,
+                imgDragStartX: 0,
+                imgDragStartY: 0,
+                imgPanStartX:  0,
+                imgPanStartY:  0,
+
+                // Video
+                videoSpeed: 1,
+
+                // Audio
+                audioIsPlaying:   false,
+                audioCurrentTime: 0,
+                audioDuration:    0,
+                audioVolume:      1,
+                audioEnded:       false,
+                audioIsSeeking:   false,
             };
         },
 
+        computed: {
+            imgTransformStyle() {
+                return `translate(${this.imgPanX}px,${this.imgPanY}px) scale(${this.imgZoom}) rotate(${this.imgRotation}deg)`;
+            },
+            imgZoomPercent() {
+                return Math.round(this.imgZoom * 100);
+            },
+            audioCurrentTimeDisplay() {
+                return this._formatTime(this.audioCurrentTime);
+            },
+            audioDurationDisplay() {
+                return this._formatTime(this.audioDuration);
+            },
+        },
+
         methods: {
+            // ── Open / close ──────────────────────────────────────────
             openPreview() {
+                this.imgZoom = 1; this.imgRotation = 0;
+                this.imgPanX = 0; this.imgPanY = 0; this.imgIsDragging = false;
+                this.videoSpeed = 1;
+                this.audioIsPlaying = false; this.audioCurrentTime = 0;
+                this.audioDuration = 0; this.audioVolume = 1; this.audioEnded = false;
                 this.isOpen = true;
                 document.body.style.overflow = 'hidden';
+                this.$nextTick(() => {
+                    if (this.$refs.videoEl) this.$refs.videoEl.playbackRate = 1;
+                    if (this.$refs.audioEl) {
+                        this.$refs.audioEl.pause();
+                        this.$refs.audioEl.currentTime = 0;
+                        this.$refs.audioEl.volume = 1;
+                    }
+                    if (this.$refs.seekBar) this.$refs.seekBar.value = 0;
+                });
             },
 
             closePreview() {
+                if (this.$refs.audioEl) this.$refs.audioEl.pause();
+                this.audioIsPlaying = false;
                 this.isOpen = false;
                 document.body.style.overflow = '';
             },
 
-            handleEscape(event) {
-                if (event.key === 'Escape' && this.isOpen) {
-                    this.closePreview();
+            handleEscape(e) {
+                if (e.key === 'Escape' && this.isInfoOpen) { this.isInfoOpen = false; return; }
+                if (e.key === 'Escape' && this.isEditOpen) { this.isEditOpen = false; this.editTool = null; this.editPrompt = ''; return; }
+                if (!this.isOpen) return;
+                switch (e.key) {
+                    case 'Escape': this.closePreview(); break;
+                    case '+': case '=': e.preventDefault(); this.imgZoomIn(); break;
+                    case '-':           e.preventDefault(); this.imgZoomOut(); break;
+                    case 'r': case 'R': this.imgRotateRight(); break;
+                    case 'l': case 'L': this.imgRotateLeft(); break;
+                    case '0':           this.imgReset(); break;
                 }
+            },
+
+            // ── Image viewer ──────────────────────────────────────────
+            imgZoomIn()      { this.imgZoom = Math.min(10,  parseFloat((this.imgZoom + 0.25).toFixed(2))); },
+            imgZoomOut()     { this.imgZoom = Math.max(0.1, parseFloat((this.imgZoom - 0.25).toFixed(2))); },
+            imgRotateRight() { this.imgRotation = (this.imgRotation + 90) % 360; },
+            imgRotateLeft()  { this.imgRotation = (this.imgRotation - 90 + 360) % 360; },
+            imgFitToScreen() { this.imgZoom = 1; this.imgPanX = 0; this.imgPanY = 0; },
+            imgActualSize()  { this.imgZoom = 1; this.imgPanX = 0; this.imgPanY = 0; },
+            imgReset()       { this.imgZoom = 1; this.imgRotation = 0; this.imgPanX = 0; this.imgPanY = 0; },
+
+            imgOnWheel(e) {
+                const factor = e.deltaY < 0 ? 1.1 : 0.9;
+                this.imgZoom = Math.min(10, Math.max(0.1, parseFloat((this.imgZoom * factor).toFixed(3))));
+            },
+
+            imgOnMouseDown(e) {
+                if (e.button !== 0) return;
+                this.imgIsDragging = true;
+                this.imgDragStartX = e.clientX; this.imgDragStartY = e.clientY;
+                this.imgPanStartX  = this.imgPanX; this.imgPanStartY = this.imgPanY;
+                e.preventDefault();
+            },
+
+            imgOnMouseMove(e) {
+                if (!this.imgIsDragging) return;
+                this.imgPanX = this.imgPanStartX + (e.clientX - this.imgDragStartX);
+                this.imgPanY = this.imgPanStartY + (e.clientY - this.imgDragStartY);
+            },
+
+            imgOnMouseUp() { this.imgIsDragging = false; },
+
+            // ── Video ─────────────────────────────────────────────────
+            setVideoSpeed(rate) {
+                this.videoSpeed = rate;
+                if (this.$refs.videoEl) this.$refs.videoEl.playbackRate = rate;
+            },
+
+            videoSkip(sec) {
+                const el = this.$refs.videoEl;
+                if (!el) return;
+                el.currentTime = Math.max(0, el.currentTime + sec);
+            },
+
+            // ── Audio ─────────────────────────────────────────────────
+            audioTogglePlay() {
+                const el = this.$refs.audioEl;
+                if (!el) return;
+                if (this.audioEnded) {
+                    el.currentTime = 0;
+                    this.audioCurrentTime = 0;
+                    this.audioEnded = false;
+                }
+                if (el.paused) { el.play(); this.audioIsPlaying = true; }
+                else           { el.pause(); this.audioIsPlaying = false; }
+            },
+
+            audioSeekStart() {
+                this.audioIsSeeking = true;
+            },
+
+            audioOnSeek(e) {
+                const t = parseFloat(e.target.value);
+                this.audioCurrentTime = t;
+                if (this.$refs.audioEl) this.$refs.audioEl.currentTime = t;
+            },
+
+            audioSeekEnd() {
+                this.audioIsSeeking = false;
+            },
+
+            audioOnVolume(e) {
+                const v = parseFloat(e.target.value);
+                this.audioVolume = v;
+                this.$refs.audioEl.volume = v;
+            },
+
+            audioOnTimeUpdate() {
+                if (!this.$refs.audioEl) return;
+                this.audioCurrentTime = this.$refs.audioEl.currentTime;
+                if (!this.audioIsSeeking && this.$refs.seekBar) {
+                    this.$refs.seekBar.value = this.$refs.audioEl.currentTime;
+                }
+            },
+
+            audioOnLoadedMeta() {
+                if (this.$refs.audioEl) this.audioDuration = this.$refs.audioEl.duration;
+            },
+
+            audioOnEnded() {
+                this.audioIsPlaying = false;
+                this.audioEnded = true;
+            },
+
+            audioSkip(sec) {
+                const el = this.$refs.audioEl;
+                if (!el) return;
+                el.currentTime = Math.max(0, el.currentTime + sec);
+                this.audioCurrentTime = el.currentTime;
+                if (this.$refs.seekBar) this.$refs.seekBar.value = el.currentTime;
+            },
+
+            _formatTime(s) {
+                if (!s || isNaN(s)) return '0:00';
+                const m = Math.floor(s / 60);
+                return `${m}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
             },
         },
 
         mounted() {
-            window.addEventListener('keydown', this.handleEscape);
+            window.addEventListener('keydown',   this.handleEscape);
+            window.addEventListener('mousemove', this.imgOnMouseMove);
+            window.addEventListener('mouseup',   this.imgOnMouseUp);
         },
 
         beforeUnmount() {
-            window.removeEventListener('keydown', this.handleEscape);
+            window.removeEventListener('keydown',   this.handleEscape);
+            window.removeEventListener('mousemove', this.imgOnMouseMove);
+            window.removeEventListener('mouseup',   this.imgOnMouseUp);
             document.body.style.overflow = '';
         },
     });
