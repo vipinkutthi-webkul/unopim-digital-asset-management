@@ -49,7 +49,7 @@
 </div>
 
 <!-- Thumbnail / placeholder -->
-<div class="flex items-center justify-center w-full h-48 rounded-lg overflow-hidden">
+<div class="flex items-center justify-center w-full max-h-[300px] rounded-lg overflow-hidden">
     @if ($asset->file_type === 'image')
         <img
             src="{{ $asset->previewPath }}"
