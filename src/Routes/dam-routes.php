@@ -11,6 +11,7 @@ use Webkul\DAM\Http\Controllers\AssetPickerController;
 use Webkul\DAM\Http\Controllers\DAMController;
 use Webkul\DAM\Http\Controllers\DirectoryController;
 use Webkul\DAM\Http\Controllers\FileController;
+use Webkul\DAM\Http\Controllers\ImageEditController;
 
 Route::group([
     'middleware' => ['admin', 'dam'],
@@ -62,6 +63,12 @@ Route::group([
             Route::post('/edit/{id}/comment/create', 'commentCreate')->name('admin.dam.asset.comment.store');
             Route::put('/edit/{id}/comment/update', 'commentUpdate')->name('admin.dam.asset.comment.update');
             Route::delete('edit/{id}/comment/delete', 'commentDelete')->name('admin.dam.asset.comment.delete');
+        });
+
+        Route::controller(ImageEditController::class)->prefix('image-edit')->group(function () {
+            Route::post('/resize/{id}', 'resize')->name('admin.dam.assets.image_edit.resize')->where('id', '[0-9]+');
+            Route::post('/adjust/{id}', 'adjust')->name('admin.dam.assets.image_edit.adjust')->where('id', '[0-9]+');
+            Route::post('/transform/{id}', 'transform')->name('admin.dam.assets.image_edit.transform')->where('id', '[0-9]+');
         });
 
         Route::controller(LinkedResourcesController::class)->prefix('linked-resources')->group(function () {
