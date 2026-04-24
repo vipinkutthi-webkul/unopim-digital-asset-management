@@ -216,10 +216,9 @@ class FileController
             return redirect($url);
         }
 
-        $file = Storage::disk($disk)->get($path);
-        $mimeType = Storage::disk($disk)->mimeType($path);
+        $absolutePath = Storage::disk($disk)->path($path);
 
-        return response($file, 200)->header('Content-Type', $mimeType);
+        return response()->file($absolutePath);
     }
 
     /**
