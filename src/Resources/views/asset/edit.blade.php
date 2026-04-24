@@ -133,40 +133,11 @@
                     <div class="flex gap-2.5 mt-3.5 w-full">
 
                         <!-- Left sub Component -->
-                        <div class="flex flex-col flex-1 gap-2 overflow-auto bg-white dark:bg-cherry-900 rounded-lg box-shadow  
-                            @if($asset->file_type === 'audio')
-                                items-center justify-center
-                            @endif
-                        ">
+                        <div class="flex flex-col flex-1 gap-2 overflow-auto bg-white dark:bg-cherry-900 rounded-lg box-shadow items-center justify-start p-8">
                             {!! view_render_event('unopim.dam.asset.edit.card.general.before', ['asset' => $asset]) !!}
-                            
-                                @if ($asset->extension == 'pdf')
-                                    <div id="iframe-container">
-                                        <iframe 
-                                            src="{{ $asset->previewPath }}" 
-                                            width="100%" 
-                                            height="800"
-                                            onerror="document.getElementById('iframe-container').innerHTML = '<p>Unable to load content. Please check your network connection or resource availability.</p>';"
-                                        >
-                                        </iframe>
-                                    </div>
-                                @elseif (in_array($asset->file_type, ['audio']))
-                                    <audio controls="" autoplay="" name="media">
-                                        <source src="{{ $asset->previewPath }}"  type="audio/{{ $asset->extension }}">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                @elseif (in_array($asset->file_type, ['video', 'audio']))
-                                    <video controls="" autoplay="" name="media" width="100%">
-                                        <source src="{{ $asset->previewPath }}" type="video/{{ $asset->extension }}">
-                                        Your browser does not support the video element.
-                                    </video>
-                                     
-                                @else
-                                    <img
-                                        src="{{ $asset->previewPath }}"
-                                        alt="{{ $asset->file_name }}"
-                                    />
-                                @endif
+
+                            <v-asset-preview-modal></v-asset-preview-modal>
+
                             {!! view_render_event('unopim.dam.asset.edit.card.general.after', ['asset' => $asset]) !!}
                         </div>
 
@@ -304,6 +275,9 @@
                 }
             });
         </script>
+
+        <!-- **** Asset Preview Modal **** -->
+        @include('dam::asset.preview-modal')
 
         <!-- **** Custom Download **** -->
         <script
