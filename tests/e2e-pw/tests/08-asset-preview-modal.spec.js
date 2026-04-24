@@ -780,6 +780,158 @@ test.describe('DAM Asset Preview Modal', () => {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Crop drag interaction
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  test.describe('Crop drag interaction', () => {
+
+    async function openCropTool(page) {
+      const opened = await openEditorIfImage(page);
+      if (!opened) return false;
+      await page.getByText('Crop & Resize').first().click();
+      // Wait for the crop overlay to appear (depends on image load)
+      await page.locator('.border-white\\/90.pointer-events-auto').first()
+        .waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+      return true;
+    }
+
+    test('Crop overlay appears after selecting Crop & Resize', async ({ adminPage }) => {
+      const ok = await openCropTool(adminPage);
+      if (!ok) { test.skip(true, 'Not an image asset'); return; }
+      // Crop overlay: border-2 border-white/90 pointer-events-auto (the crop box)
+      await expect(adminPage.locator('.border-white\\/90.pointer-events-auto').first()).toBeVisible({ timeout: 10000 });
+    });
+
+    test('Drawing new selection by dragging on image container changes crop dimensions', async ({ adminPage }) => {
+      const ok = await openCropTool(adminPage);
+      if (!ok) { test.skip(true, 'Not an image asset'); return; }
+
+      // Get the image container (the panel that holds the crop overlay)
+      const container = adminPage.locator('[ref="editImgContainer"], .bg-gray-50.border-r').first();
+      const box = await container.boundingBox();
+      if (!box) { test.skip(true, 'Could not get container bounding box'); return; }
+
+      // Get initial dimension badge text
+      const badge = adminPage.locator('.font-mono').filter({ hasText: /\d+ × \d+ px/ }).first();
+      const beforeText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+
+      // Draw a new selection: start at 20% from left/top, drag to 60% right/down
+      const startX = box.x + box.width * 0.2;
+      const startY = box.y + box.height * 0.2;
+      const endX   = box.x + box.width * 0.6;
+      const endY   = box.y + box.height * 0.6;
+
+      await adminPage.mouse.move(startX, startY);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(endX, endY, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const afterText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+      // Dimensions must have changed (new selection ≠ full-image initial selection)
+      expect(afterText).not.toBe(beforeText);
+    });
+
+    test('Dragging br corner handle inward resizes the crop box', async ({ adminPage }) => {
+      const ok = await openCropTool(adminPage);
+      if (!ok) { test.skip(true, 'Not an image asset'); return; }
+
+      const badge = adminPage.locator('.font-mono').filter({ hasText: /\d+ × \d+ px/ }).first();
+      const beforeText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+
+      // Bottom-right corner handle: -bottom-1.5 -right-1.5 (last .w-3.h-3 inside crop box)
+      const brHandle = adminPage.locator('.absolute.-bottom-1\\.5.-right-1\\.5').first();
+      const handleBox = await brHandle.boundingBox().catch(() => null);
+      if (!handleBox) { test.skip(true, 'BR handle not found'); return; }
+
+      const hx = handleBox.x + handleBox.width / 2;
+      const hy = handleBox.y + handleBox.height / 2;
+
+      await adminPage.mouse.move(hx, hy);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(hx - 60, hy - 60, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const afterText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+      expect(afterText).not.toBe(beforeText);
+    });
+
+    test('Dragging left edge handle right shrinks selection from left', async ({ adminPage }) => {
+      const ok = await openCropTool(adminPage);
+      if (!ok) { test.skip(true, 'Not an image asset'); return; }
+
+      // First draw a medium selection so handles are accessible
+      const container = adminPage.locator('.bg-gray-50.border-r').first();
+      const box = await container.boundingBox();
+      if (!box) { test.skip(true, 'No container box'); return; }
+
+      await adminPage.mouse.move(box.x + box.width * 0.1, box.y + box.height * 0.1);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.9, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const badge = adminPage.locator('.font-mono').filter({ hasText: /\d+ × \d+ px/ }).first();
+      const beforeText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+
+      // Left edge handle: top-1/2 -left-1.5
+      const lHandle = adminPage.locator('.absolute.top-1\\/2.-left-1\\.5').first();
+      const lBox = await lHandle.boundingBox().catch(() => null);
+      if (!lBox) { test.skip(true, 'Left handle not found'); return; }
+
+      const lx = lBox.x + lBox.width / 2;
+      const ly = lBox.y + lBox.height / 2;
+
+      await adminPage.mouse.move(lx, ly);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(lx + 50, ly, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const afterText = await badge.textContent({ timeout: 3000 }).catch(() => '');
+      expect(afterText).not.toBe(beforeText);
+    });
+
+    test('Moving crop box updates its position', async ({ adminPage }) => {
+      const ok = await openCropTool(adminPage);
+      if (!ok) { test.skip(true, 'Not an image asset'); return; }
+
+      // Draw a small selection in the top-left quadrant (20%→50%) so the box
+      // has room to move right and down, regardless of the initial box size.
+      const container = adminPage.locator('.bg-gray-50.border-r').first();
+      const cbox = await container.boundingBox();
+      if (!cbox) { test.skip(true, 'No container bounds'); return; }
+
+      await adminPage.mouse.move(cbox.x + cbox.width * 0.2, cbox.y + cbox.height * 0.2);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(cbox.x + cbox.width * 0.5, cbox.y + cbox.height * 0.5, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const cropBox = adminPage.locator('.border-white\\/90.pointer-events-auto').first();
+      const beforeStyle = await cropBox.getAttribute('style');
+
+      const cropBounds = await cropBox.boundingBox();
+      if (!cropBounds) { test.skip(true, 'No crop box bounds'); return; }
+
+      const cx = cropBounds.x + cropBounds.width / 2;
+      const cy = cropBounds.y + cropBounds.height / 2;
+
+      // Move RIGHT and DOWN — the drawn box is in the top-left, so room exists both ways
+      await adminPage.mouse.move(cx, cy);
+      await adminPage.mouse.down();
+      await adminPage.mouse.move(cx + 40, cy + 20, { steps: 10 });
+      await adminPage.mouse.up();
+      await adminPage.waitForTimeout(200);
+
+      const afterStyle = await cropBox.getAttribute('style');
+      expect(afterStyle).not.toBe(beforeStyle);
+    });
+
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Video player (conditional — only runs on video assets)
   // ═══════════════════════════════════════════════════════════════════════════
 
