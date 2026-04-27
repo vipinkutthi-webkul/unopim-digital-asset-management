@@ -10,6 +10,8 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Webkul\DAM\Models\Asset;
 use Webkul\DAM\Models\Directory;
+use Webkul\MagicAI\Repository\MagicAIPlatformRepository;
+use Webkul\MagicAI\Services\LaravelAiAdapter;
 
 class ImageEditController
 {
@@ -136,6 +138,46 @@ class ImageEditController
         $this->clearCache($asset->path, $disk);
 
         return response()->json(['message' => trans('dam::app.admin.dam.asset.edit.image-editor.success-transformed')]);
+    }
+
+    public function bgRemove(Request $request, int $id): JsonResponse
+    {
+        $asset = Asset::findOrFail($id);
+
+        $validated = $request->validate([
+            'prompt'      => 'required|string|max:1000',
+            'platform_id' => 'required|integer',
+            'model'       => 'required|string',
+        ]);
+
+        $platform = app(MagicAIPlatformRepository::class)->findOrFail($validated['platform_id']);
+
+        $adapter = new LaravelAiAdapter(
+            platform: $platform,
+            model: $validated['model'],
+            prompt: $validated['prompt'],
+            temperature: 0.7,
+            maxTokens: 1054,
+            systemPrompt: '',
+            stream: false,
+        );
+
+        $images = $adapter->images(['size' => '1024x1024', 'quality' => 'standard']);
+
+        if (empty($images[0]['url'])) {
+            return response()->json(['message' => trans('dam::app.admin.dam.asset.edit.image-editor.error-no-ai-image')], 422);
+        }
+
+        $dataUrl = $images[0]['url'];
+
+        // Decode base64 data URI
+        $imageData = base64_decode(preg_replace('/^data:[^;]+;base64,/', '', $dataUrl));
+
+        $disk = Directory::getAssetDisk();
+        Storage::disk($disk)->put($asset->path, $imageData);
+        $this->clearCache($asset->path, $disk);
+
+        return response()->json(['message' => trans('dam::app.admin.dam.asset.edit.image-editor.success-ai')]);
     }
 
     private function clearCache(string $path, string $disk): void

@@ -88,7 +88,17 @@
                 imgPanStartY:  0,
 
                 // Video
-                videoSpeed: 1,
+                videoSpeed:            1,
+                videoIsPlaying:        false,
+                videoCurrentTime:      0,
+                videoDuration:         0,
+                videoVolume:           1,
+                videoEnded:            false,
+                videoIsSeeking:        false,
+                videoControlsVisible:  true,
+                videoControlsTimer:    null,
+                videoIsFullscreen:     false,
+                videoIsMuted:          false,
 
                 // Audio
                 audioIsPlaying:   false,
@@ -107,6 +117,13 @@
             imgZoomPercent() {
                 return Math.round(this.imgZoom * 100);
             },
+            videoCurrentTimeDisplay() {
+                return this._formatTime(this.videoCurrentTime);
+            },
+            videoDurationDisplay() {
+                return this._formatTime(this.videoDuration);
+            },
+
             audioCurrentTimeDisplay() {
                 return this._formatTime(this.audioCurrentTime);
             },
@@ -144,13 +161,23 @@
             openPreview() {
                 this.imgZoom = 1; this.imgRotation = 0;
                 this.imgPanX = 0; this.imgPanY = 0; this.imgIsDragging = false;
-                this.videoSpeed = 1;
+                this.videoSpeed = 1; this.videoIsPlaying = false;
+                this.videoCurrentTime = 0; this.videoDuration = 0;
+                this.videoVolume = 1; this.videoEnded = false;
+                this.videoControlsVisible = true; clearTimeout(this.videoControlsTimer);
+                this.videoIsMuted = false;
                 this.audioIsPlaying = false; this.audioCurrentTime = 0;
                 this.audioDuration = 0; this.audioVolume = 1; this.audioEnded = false;
                 this.isOpen = true;
                 document.body.style.overflow = 'hidden';
                 this.$nextTick(() => {
-                    if (this.$refs.videoEl) this.$refs.videoEl.playbackRate = 1;
+                    if (this.$refs.videoEl) {
+                        this.$refs.videoEl.pause();
+                        this.$refs.videoEl.currentTime = 0;
+                        this.$refs.videoEl.volume = 1;
+                        this.$refs.videoEl.playbackRate = 1;
+                    }
+                    if (this.$refs.videoSeekBar) this.$refs.videoSeekBar.value = 0;
                     if (this.$refs.audioEl) {
                         this.$refs.audioEl.pause();
                         this.$refs.audioEl.currentTime = 0;
@@ -161,6 +188,9 @@
             },
 
             closePreview() {
+                if (this.$refs.videoEl) this.$refs.videoEl.pause();
+                this.videoIsPlaying = false;
+                clearTimeout(this.videoControlsTimer);
                 if (this.$refs.audioEl) this.$refs.audioEl.pause();
                 this.audioIsPlaying = false;
                 this.isOpen = false;
@@ -173,6 +203,12 @@
                 if (!this.isOpen) return;
                 switch (e.key) {
                     case 'Escape': this.closePreview(); break;
+                    case ' ':
+                        if (this.$refs.videoEl) { e.preventDefault(); this.videoTogglePlay(); }
+                        break;
+                    case 'f': case 'F':
+                        if (this.$refs.videoEl) { e.preventDefault(); this.videoToggleFullscreen(); }
+                        break;
                     case '+': case '=': e.preventDefault(); this.imgZoomIn(); break;
                     case '-':           e.preventDefault(); this.imgZoomOut(); break;
                     case 'r': case 'R': this.imgRotateRight(); break;
@@ -220,7 +256,95 @@
             videoSkip(sec) {
                 const el = this.$refs.videoEl;
                 if (!el) return;
-                el.currentTime = Math.max(0, el.currentTime + sec);
+                el.currentTime = Math.max(0, Math.min(el.duration || 0, el.currentTime + sec));
+                this.videoCurrentTime = el.currentTime;
+                if (this.$refs.videoSeekBar) this.$refs.videoSeekBar.value = el.currentTime;
+            },
+
+            videoShowControls() {
+                this.videoControlsVisible = true;
+                clearTimeout(this.videoControlsTimer);
+                if (this.videoIsPlaying) {
+                    this.videoControlsTimer = setTimeout(() => {
+                        this.videoControlsVisible = false;
+                    }, 3000);
+                }
+            },
+
+            videoKeepControls() {
+                this.videoControlsVisible = true;
+                clearTimeout(this.videoControlsTimer);
+            },
+
+            videoTogglePlay() {
+                const el = this.$refs.videoEl;
+                if (!el) return;
+                if (this.videoEnded) {
+                    el.currentTime = 0;
+                    this.videoCurrentTime = 0;
+                    this.videoEnded = false;
+                }
+                if (el.paused) {
+                    el.play();
+                    this.videoIsPlaying = true;
+                    this.videoShowControls();
+                } else {
+                    el.pause();
+                    this.videoIsPlaying = false;
+                    this.videoKeepControls();
+                }
+            },
+
+            videoSeekStart() { this.videoIsSeeking = true; },
+
+            videoOnSeek(e) {
+                const t = parseFloat(e.target.value);
+                this.videoCurrentTime = t;
+                if (this.$refs.videoEl) this.$refs.videoEl.currentTime = t;
+            },
+
+            videoSeekEnd() { this.videoIsSeeking = false; },
+
+            videoOnVolume(e) {
+                const v = parseFloat(e.target.value);
+                this.videoVolume = v;
+                if (this.$refs.videoEl) this.$refs.videoEl.volume = v;
+            },
+
+            videoOnTimeUpdate() {
+                const el = this.$refs.videoEl;
+                if (!el) return;
+                this.videoCurrentTime = el.currentTime;
+                if (!this.videoIsSeeking && this.$refs.videoSeekBar) {
+                    this.$refs.videoSeekBar.value = el.currentTime;
+                }
+            },
+
+            videoOnLoadedMeta() {
+                if (this.$refs.videoEl) this.videoDuration = this.$refs.videoEl.duration;
+            },
+
+            videoOnEnded() {
+                this.videoIsPlaying = false;
+                this.videoEnded = true;
+            },
+
+            videoToggleFullscreen() {
+                const container = this.$refs.videoContainer;
+                if (!container) return;
+                if (document.fullscreenElement) document.exitFullscreen();
+                else container.requestFullscreen();
+            },
+
+            videoOnFullscreenChange() {
+                this.videoIsFullscreen = !!document.fullscreenElement;
+            },
+
+            videoToggleMute() {
+                const el = this.$refs.videoEl;
+                if (!el) return;
+                this.videoIsMuted = !this.videoIsMuted;
+                el.muted = this.videoIsMuted;
             },
 
             // ── Audio ─────────────────────────────────────────────────
@@ -478,6 +602,7 @@
             window.addEventListener('mouseup',   this.imgOnMouseUp);
             window.addEventListener('mousemove', this.cropMouseMove);
             window.addEventListener('mouseup',   this.cropMouseUp);
+            document.addEventListener('fullscreenchange', this.videoOnFullscreenChange);
         },
 
         beforeUnmount() {
@@ -486,6 +611,7 @@
             window.removeEventListener('mouseup',   this.imgOnMouseUp);
             window.removeEventListener('mousemove', this.cropMouseMove);
             window.removeEventListener('mouseup',   this.cropMouseUp);
+            document.removeEventListener('fullscreenchange', this.videoOnFullscreenChange);
             document.body.style.overflow = '';
         },
     });

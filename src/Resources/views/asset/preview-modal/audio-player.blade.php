@@ -1,16 +1,12 @@
 <div class="flex flex-col items-center justify-center gap-6 w-full h-full p-8">
-
     <img
         src="{{ $placeholderSvg }}"
         alt="{{ $asset->file_name }}"
         class="h-28 w-28 object-contain opacity-50"
     />
+    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-xl text-center">{{ $asset->file_name }}</p>
 
-    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-xl text-center">
-        {{ $asset->file_name }}
-    </p>
-
-    <!-- Hidden native element driven by Vue -->
+    <!-- Hidden native audio element driven by Vue -->
     <audio
         ref="audioEl"
         class="hidden"
@@ -25,21 +21,21 @@
 
         <!-- Seek bar -->
         <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 text-right shrink-0">
-                @{{ audioCurrentTimeDisplay }}
-            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 text-right shrink-0">@{{ audioCurrentTimeDisplay }}</span>
             <input
                 type="range"
+                ref="seekBar"
                 class="flex-1 h-1.5 accent-violet-600 cursor-pointer"
-                :min="0"
+                min="0"
                 :max="audioDuration || 100"
                 step="0.1"
-                :value="audioCurrentTime"
+                @mousedown="audioSeekStart"
+                @touchstart="audioSeekStart"
                 @input="audioOnSeek"
+                @mouseup="audioSeekEnd"
+                @touchend="audioSeekEnd"
             />
-            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 shrink-0">
-                @{{ audioDurationDisplay }}
-            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 shrink-0">@{{ audioDurationDisplay }}</span>
         </div>
 
         <!-- Controls row -->
@@ -66,14 +62,14 @@
             <!-- Skip back 10s -->
             <button
                 type="button"
-                class="flex flex-col items-center justify-center w-9 h-9 rounded-full text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
+                class="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-semibold shrink-0"
                 title="Back 10s"
                 @click="audioSkip(-10)"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
                 </svg>
-                <span class="text-[9px] font-semibold leading-none -mt-0.5">10</span>
+                <span>10s</span>
             </button>
 
             <!-- Play / Pause -->
@@ -93,14 +89,14 @@
             <!-- Skip forward 10s -->
             <button
                 type="button"
-                class="flex flex-col items-center justify-center w-9 h-9 rounded-full text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
+                class="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-semibold shrink-0"
                 title="Forward 10s"
                 @click="audioSkip(10)"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/>
+                <span>10s</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="4" x2="19" y2="20"/>
                 </svg>
-                <span class="text-[9px] font-semibold leading-none -mt-0.5">10</span>
             </button>
 
             <div class="ml-auto w-[calc(1rem+6rem+1rem)]"></div>
