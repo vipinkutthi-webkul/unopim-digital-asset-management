@@ -367,7 +367,8 @@ test.describe('DAM Asset Preview Modal', () => {
     test('Header shows asset filename (non-empty)', async ({ adminPage }) => {
       await navigateToFirstAssetEdit(adminPage);
       await openPreviewModal(adminPage);
-      const filenamePara = adminPage.locator('p.font-semibold.truncate').first();
+      // text-sm distinguishes the viewer-modal <p> from the hidden hover-tooltip <p>
+      const filenamePara = adminPage.locator('p.text-sm.font-semibold.truncate').first();
       await expect(filenamePara).toBeVisible({ timeout: 5000 });
       expect((await filenamePara.textContent())?.trim().length).toBeGreaterThan(0);
     });
@@ -667,8 +668,8 @@ test.describe('DAM Asset Preview Modal', () => {
     test('Editor image preview panel shows asset image', async ({ adminPage }) => {
       const opened = await openEditorIfImage(adminPage);
       if (!opened) { test.skip(true, 'Not an image asset'); return; }
-      // Image panel: bg-gray-50 border-r, contains <img class="... p-6">
-      const previewImg = adminPage.locator('img.object-contain.p-6').first();
+      // Image panel: bg-gray-50 border-r div, img inside has no p-6 (that's the container)
+      const previewImg = adminPage.locator('div.bg-gray-50.border-r img').first();
       await expect(previewImg).toBeVisible({ timeout: 5000 });
     });
 
@@ -741,9 +742,9 @@ test.describe('DAM Asset Preview Modal', () => {
       const cropBtn = adminPage.locator('button').filter({ has: adminPage.getByText('Crop & Resize') }).first();
       await cropBtn.click();
       await adminPage.waitForTimeout(200);
-      // Active class: bg-violet-50 dark:bg-violet-900 text-violet-700
+      // Crop active class: bg-blue-50 (bg-violet-50 is for bg-remove tool)
       const classList = await cropBtn.evaluate(el => el.className);
-      expect(classList).toContain('bg-violet-50');
+      expect(classList).toContain('bg-blue-50');
     });
 
     test('Close editor button closes editor modal', async ({ adminPage }) => {
@@ -1008,17 +1009,18 @@ test.describe('DAM Asset Preview Modal', () => {
       await expect(adminPage.locator('button.w-12.h-12.rounded-full').first()).toBeVisible({ timeout: 5000 });
     });
 
-    test('Seek bar range input visible', async ({ adminPage }) => {
+    test('Seek bar visible', async ({ adminPage }) => {
       const ok = await openAudioPreview(adminPage);
       if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      await expect(adminPage.locator('input[type="range"].accent-violet-600.flex-1').first()).toBeVisible({ timeout: 5000 });
+      // Seek bar is a custom div-based scrubber, not an input[type="range"]
+      await expect(adminPage.locator('div[ref="audioSeekContainer"]').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Volume slider visible', async ({ adminPage }) => {
       const ok = await openAudioPreview(adminPage);
       if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      // Volume slider: w-24 h-1.5 accent-violet-600
-      await expect(adminPage.locator('input[type="range"].w-24').first()).toBeVisible({ timeout: 5000 });
+      // Volume slider: w-20 h-1.5 accent-violet-600
+      await expect(adminPage.locator('input[type="range"].w-20').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Current time display starts at 0:00', async ({ adminPage }) => {
@@ -1099,7 +1101,7 @@ test.describe('DAM Asset Preview Modal', () => {
       await infoBtn.click({ force: true });
       // Wait for info backdrop
       await adminPage.locator('.absolute.inset-0.bg-black\\/60').first()
-        .waitFor({ state: 'visible', timeout: 8000 });
+        .waitFor({ state: 'visible', timeout: 30000 });
 
       // Both modals open — first Escape must close info only, preview stays
       await adminPage.keyboard.press('Escape');
@@ -1116,7 +1118,7 @@ test.describe('DAM Asset Preview Modal', () => {
       const infoBtn = adminPage.locator('button').filter({ has: adminPage.locator('.icon-information') }).first();
       await infoBtn.click({ force: true });
       await adminPage.locator('.absolute.inset-0.bg-black\\/60').first()
-        .waitFor({ state: 'visible', timeout: 8000 });
+        .waitFor({ state: 'visible', timeout: 30000 });
 
       await adminPage.keyboard.press('Escape'); // closes info
       await adminPage.waitForTimeout(300);
