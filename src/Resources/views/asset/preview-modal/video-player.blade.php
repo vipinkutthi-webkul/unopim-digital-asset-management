@@ -1,10 +1,11 @@
-<div ref="videoContainer" class="flex flex-col w-full h-full" @mousemove="videoShowControls" @mouseleave="videoShowControls">
+<div ref="videoContainer" class="relative w-full h-full" @mousemove="videoShowControls" @mouseleave="videoShowControls">
 
-    <!-- Video area — click to play/pause -->
+    <!-- Video area — fills full space; control bar overlays it from bottom -->
     <div
-        class="flex-1 min-h-0 flex items-center justify-center bg-black select-none"
+        class="relative w-full h-full flex items-center justify-center bg-black select-none"
         :class="!videoControlsVisible ? 'cursor-none' : 'cursor-pointer'"
-        @click="videoTogglePlay"
+        @click="videoOnClick"
+        @dblclick="videoOnDblClick"
     >
         <video
             ref="videoEl"
@@ -12,6 +13,9 @@
             class="max-w-full max-h-full"
             @timeupdate="videoOnTimeUpdate"
             @loadedmetadata="videoOnLoadedMeta"
+            @progress="videoOnProgress"
+            @waiting="videoOnWaiting"
+            @canplay="videoOnCanPlay"
             @ended="videoOnEnded"
             @play="videoIsPlaying = true"
             @pause="videoIsPlaying = false"
@@ -19,38 +23,77 @@
             <source src="{{ $mediaUrl }}" type="{{ $asset->mime_type }}">
             @lang('dam::app.admin.dam.asset.edit.preview-modal.not-available')
         </video>
+
+        <!-- Buffering spinner -->
+        <div v-if="videoIsBuffering" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-12 h-12 rounded-full border-4 border-white/20 border-t-violet-400 animate-spin"></div>
+        </div>
+
+        <!-- Center play/pause overlay -->
+        <div
+            class="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300"
+            :class="(!videoIsPlaying && !videoIsBuffering) || videoClickFlash ? 'opacity-100' : 'opacity-0'"
+        >
+            <div
+                class="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center transition-transform duration-150"
+                :class="videoClickFlash ? 'scale-90' : 'scale-100'"
+            >
+                <svg v-if="!videoIsPlaying" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white translate-x-0.5" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+                </svg>
+            </div>
+        </div>
     </div>
 
-    <!-- Custom control bar — auto-hides when playing, shown on mouse move -->
+    <!-- Control bar — transparent gradient overlay from bottom, auto-hides -->
     <div
-        class="shrink-0 flex flex-col bg-gray-900 border-t border-white/10 transition-opacity duration-300"
+        class="absolute bottom-0 left-0 right-0 flex flex-col pt-14 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-opacity duration-300"
         :class="videoControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
         @mouseenter="videoKeepControls"
         @mouseleave="videoShowControls"
     >
 
         <!-- Seek bar -->
-        <div class="px-4 pt-3 pb-1">
-            <input
-                type="range"
-                ref="videoSeekBar"
-                class="w-full h-1.5 accent-violet-600 cursor-pointer"
-                min="0"
-                :max="videoDuration || 100"
-                step="0.1"
-                @mousedown="videoSeekStart"
-                @touchstart="videoSeekStart"
-                @input="videoOnSeek"
-                @mouseup="videoSeekEnd"
-                @touchend="videoSeekEnd"
-            />
+        <div class="px-4 pb-1">
+            <div
+                ref="videoSeekContainer"
+                class="relative h-4 group cursor-pointer"
+                @mousedown="videoOnSeekDown"
+                @mousemove="videoOnSeekHover"
+                @mouseleave="videoOnSeekLeave"
+            >
+                <!-- Tooltip -->
+                <div
+                    v-show="videoSeekTooltipVisible && videoDuration"
+                    class="absolute px-1.5 py-0.5 rounded bg-black/80 text-white text-xs font-mono pointer-events-none whitespace-nowrap z-10"
+                    :style="{ left: videoSeekTooltipX + 'px', bottom: 'calc(100% + 8px)', transform: 'translateX(-50%)' }"
+                >@{{ videoSeekTooltip }}</div>
+
+                <!-- Track: full bg / buffered / played -->
+                <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-white/30 overflow-hidden">
+                    <div
+                        class="absolute inset-y-0 left-0 bg-white/60 transition-[width] duration-300"
+                        :style="{ width: videoBuffered + '%' }"
+                    ></div>
+                    <div
+                        class="absolute inset-y-0 left-0 bg-violet-400"
+                        :style="{ width: (videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0) + '%' }"
+                    ></div>
+                </div>
+
+                <!-- Playhead thumb -->
+                <div
+                    class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                    :style="{ left: (videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0) + '%' }"
+                ></div>
+            </div>
         </div>
 
-        <!-- Controls row -->
-        <div
-            class="flex items-center gap-2 px-4 pb-3"
-            :class="videoIsFullscreen ? 'text-white' : 'text-gray-500 dark:text-white'"
-        >
+        <!-- Controls row — always white (over dark gradient) -->
+        <div class="flex items-center gap-2 px-4 pb-3 text-white">
 
             <!-- Play / Pause -->
             <button
@@ -69,31 +112,31 @@
             <!-- Skip back -->
             <button
                 type="button"
-                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium hover:text-white hover:bg-white/10 border border-gray-500 hover:border-gray-300 transition-colors shrink-0"
-                title="Back 10s"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium hover:bg-white/10 border border-white/30 hover:border-white/60 transition-colors shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.back-10s')"
                 @click="videoSkip(-10)"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
                 </svg>
-                10s
+                @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.10s')
             </button>
 
             <!-- Skip forward -->
             <button
                 type="button"
-                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium hover:text-white hover:bg-white/10 border border-gray-500 hover:border-gray-300 transition-colors shrink-0"
-                title="Forward 10s"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium hover:bg-white/10 border border-white/30 hover:border-white/60 transition-colors shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.forward-10s')"
                 @click="videoSkip(10)"
             >
-                10s
+                @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.10s')
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
                 </svg>
             </button>
 
             <!-- Time display -->
-            <span class="text-xs font-mono tabular-nums shrink-0">
+            <span class="text-xs font-mono tabular-nums shrink-0 opacity-80">
                 @{{ videoCurrentTimeDisplay }} / @{{ videoDurationDisplay }}
             </span>
 
@@ -101,23 +144,37 @@
 
             <!-- Speed selector -->
             <div class="flex items-center gap-1 shrink-0">
-                <span class="text-xs mr-1 opacity-70">Speed</span>
+                <span class="text-xs mr-1 opacity-50">@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.speed')</span>
                 <template v-for="rate in [0.5, 0.75, 1, 1.25, 1.5, 2]" :key="rate">
                     <button
                         type="button"
                         class="px-2 py-1 rounded text-xs font-semibold transition-colors"
-                        :class="videoSpeed === rate ? 'bg-violet-600 !text-white' : 'hover:text-white hover:bg-white/10'"
+                        :class="videoSpeed === rate ? 'bg-violet-600 text-white' : 'opacity-70 hover:opacity-100 hover:bg-white/10'"
                         @click="setVideoSpeed(rate)"
                     >@{{ rate }}×</button>
                 </template>
             </div>
 
+            <!-- Loop toggle -->
+            <button
+                type="button"
+                class="flex items-center justify-center w-7 h-7 rounded transition-colors shrink-0"
+                :class="videoIsLooping ? 'bg-violet-600 text-white' : 'opacity-70 hover:opacity-100 hover:bg-white/10'"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.loop')"
+                @click="videoToggleLoop"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+            </button>
+
             <!-- Volume -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <button
                     type="button"
-                    class="shrink-0 hover:text-white transition-colors"
-                    title="Toggle mute"
+                    class="opacity-70 hover:opacity-100 transition-opacity shrink-0"
+                    title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.mute')"
                     @click="videoToggleMute"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,18 +191,31 @@
                 </button>
                 <input
                     type="range"
-                    class="w-20 h-1.5 accent-violet-600 cursor-pointer"
+                    class="w-20 h-1.5 accent-violet-400 cursor-pointer opacity-80 hover:opacity-100"
                     min="0" max="1" step="0.01"
                     :value="videoIsMuted ? 0 : videoVolume"
                     @input="videoOnVolume"
                 />
             </div>
 
+            <!-- Picture-in-Picture -->
+            <button
+                v-if="videoSupportsPiP"
+                type="button"
+                class="flex items-center justify-center w-7 h-7 rounded hover:bg-white/10 opacity-70 hover:opacity-100 transition-opacity shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.picture-in-picture')"
+                @click="videoTogglePiP"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="11" width="9" height="7" rx="1"/>
+                </svg>
+            </button>
+
             <!-- Fullscreen -->
             <button
                 type="button"
-                class="flex items-center justify-center w-7 h-7 rounded hover:text-white hover:bg-white/10 transition-colors shrink-0"
-                title="Fullscreen"
+                class="flex items-center justify-center w-7 h-7 rounded hover:bg-white/10 opacity-70 hover:opacity-100 transition-opacity shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.fullscreen')"
                 @click="videoToggleFullscreen"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
