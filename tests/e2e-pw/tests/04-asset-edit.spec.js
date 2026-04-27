@@ -21,9 +21,9 @@ async function navigateToFirstAssetEdit(page) {
   await editIcon.click({ force: true });
   // Wait for the URL to confirm navigation to the edit page
   await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
-  await page.waitForLoadState('domcontentloaded');
-  // Allow Vue to finish rendering the edit page sidebar/tabs
-  await page.waitForTimeout(2000);
+  // networkidle ensures Vue has finished mounting all components (accordion slots,
+  // action buttons, etc.). The edit page has no background polling so this resolves.
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 }
 
 test.describe('DAM Asset Edit Page', () => {

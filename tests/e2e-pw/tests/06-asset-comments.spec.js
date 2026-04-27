@@ -17,14 +17,12 @@ async function navigateToCommentsTab(page) {
   await page.waitForTimeout(500);
   await firstCard.locator('.icon-edit').first().click({ force: true });
   await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 
   // Click Comments tab
   const commentsTab = page.locator('#app').getByText('Comments').first();
   await commentsTab.click();
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(500);
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 }
 
 test.describe('DAM Asset Comments', () => {
