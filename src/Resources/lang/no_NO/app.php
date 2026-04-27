@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Forhåndsvisning er ikke tilgjengelig for denne filtypen.',
                         'download-file'   => 'Last ned fil',
+                        'download-zip'    => 'Last ned som ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s bakover',
+                            'forward-10s'        => '10 s fremover',
+                            '10s'                => '10 s',
+                            'speed'              => 'Hastighet',
+                            'loop'               => 'Gjenta (L)',
+                            'mute'               => 'Demp (M)',
+                            'picture-in-picture' => 'Bilde i bilde',
+                            'fullscreen'         => 'Fullskjerm (F)',
+                        ],
                     ],
 
                     'custom-download' => [

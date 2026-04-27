@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Voorbeeld niet beschikbaar voor dit bestandstype.',
                         'download-file'   => 'Bestand Downloaden',
+                        'download-zip'    => 'Downloaden als ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s terug',
+                            'forward-10s'        => '10 s vooruit',
+                            '10s'                => '10 s',
+                            'speed'              => 'Snelheid',
+                            'loop'               => 'Herhalen (L)',
+                            'mute'               => 'Dempen (M)',
+                            'picture-in-picture' => 'Beeld in beeld',
+                            'fullscreen'         => 'Volledig scherm (F)',
+                        ],
                     ],
 
                     'custom-download' => [

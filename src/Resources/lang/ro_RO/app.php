@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Previzualizare indisponibilă pentru acest tip de fișier.',
                         'download-file'   => 'Descarcă Fișierul',
+                        'download-zip'    => 'Descarcă ca ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s înapoi',
+                            'forward-10s'        => '10 s înainte',
+                            '10s'                => '10 s',
+                            'speed'              => 'Viteză',
+                            'loop'               => 'Buclă (L)',
+                            'mute'               => 'Silențios (M)',
+                            'picture-in-picture' => 'Imagine în imagine',
+                            'fullscreen'         => 'Ecran complet (F)',
+                        ],
                     ],
 
                     'custom-download' => [

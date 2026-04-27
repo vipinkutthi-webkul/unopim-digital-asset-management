@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Esikatselu ei ole saatavilla tälle tiedostotyypille.',
                         'download-file'   => 'Lataa Tiedosto',
+                        'download-zip'    => 'Lataa ZIP-tiedostona',
+                        'video-player'    => [
+                            'back-10s'           => '10 s taaksepäin',
+                            'forward-10s'        => '10 s eteenpäin',
+                            '10s'                => '10 s',
+                            'speed'              => 'Nopeus',
+                            'loop'               => 'Toista (L)',
+                            'mute'               => 'Mykistä (M)',
+                            'picture-in-picture' => 'Kuva kuvassa',
+                            'fullscreen'         => 'Koko näyttö (F)',
+                        ],
                     ],
 
                     'custom-download' => [

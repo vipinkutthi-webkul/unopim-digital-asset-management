@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Предпросмотр недоступен для данного типа файла.',
                         'download-file'   => 'Скачать файл',
+                        'download-zip'    => 'Скачать как ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 с назад',
+                            'forward-10s'        => '10 с вперёд',
+                            '10s'                => '10 с',
+                            'speed'              => 'Скорость',
+                            'loop'               => 'Повтор (L)',
+                            'mute'               => 'Без звука (M)',
+                            'picture-in-picture' => 'Картинка в картинке',
+                            'fullscreen'         => 'На весь экран (F)',
+                        ],
                     ],
 
                     'custom-download' => [

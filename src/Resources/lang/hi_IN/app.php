@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'इस फ़ाइल प्रकार के लिए पूर्वावलोकन उपलब्ध नहीं है।',
                         'download-file'   => 'फ़ाइल डाउनलोड करें',
+                        'download-zip'    => 'ZIP के रूप में डाउनलोड करें',
+                        'video-player'    => [
+                            'back-10s'           => '10 सेकंड पीछे',
+                            'forward-10s'        => '10 सेकंड आगे',
+                            '10s'                => '10 से',
+                            'speed'              => 'गति',
+                            'loop'               => 'लूप (L)',
+                            'mute'               => 'म्यूट (M)',
+                            'picture-in-picture' => 'पिक्चर इन पिक्चर',
+                            'fullscreen'         => 'पूर्ण स्क्रीन (F)',
+                        ],
                     ],
 
                     'custom-download' => [

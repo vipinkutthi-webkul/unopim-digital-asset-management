@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => '此檔案類型不支援預覽。',
                         'download-file'   => '下載檔案',
+                        'download-zip'    => '下載為ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '後退 10 秒',
+                            'forward-10s'        => '前進 10 秒',
+                            '10s'                => '10 秒',
+                            'speed'              => '速度',
+                            'loop'               => '循環 (L)',
+                            'mute'               => '靜音 (M)',
+                            'picture-in-picture' => '子母畫面',
+                            'fullscreen'         => '全螢幕 (F)',
+                        ],
                     ],
 
                     'custom-download' => [

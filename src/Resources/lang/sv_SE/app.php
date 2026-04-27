@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Förhandsgranskning är inte tillgänglig för den här filtypen.',
                         'download-file'   => 'Ladda ned fil',
+                        'download-zip'    => 'Ladda ner som ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s bakåt',
+                            'forward-10s'        => '10 s framåt',
+                            '10s'                => '10 s',
+                            'speed'              => 'Hastighet',
+                            'loop'               => 'Upprepa (L)',
+                            'mute'               => 'Tyst (M)',
+                            'picture-in-picture' => 'Bild i bild',
+                            'fullscreen'         => 'Helskärm (F)',
+                        ],
                     ],
 
                     'custom-download' => [

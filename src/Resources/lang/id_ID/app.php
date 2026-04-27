@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Pratinjau tidak tersedia untuk jenis file ini.',
                         'download-file'   => 'Unduh File',
+                        'download-zip'    => 'Unduh sebagai ZIP',
+                        'video-player'    => [
+                            'back-10s'           => 'Mundur 10 dtk',
+                            'forward-10s'        => 'Maju 10 dtk',
+                            '10s'                => '10 dtk',
+                            'speed'              => 'Kecepatan',
+                            'loop'               => 'Ulangi (L)',
+                            'mute'               => 'Bisukan (M)',
+                            'picture-in-picture' => 'Gambar dalam gambar',
+                            'fullscreen'         => 'Layar penuh (F)',
+                        ],
                     ],
 
                     'custom-download' => [

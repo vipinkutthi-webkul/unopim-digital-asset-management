@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Vorschau für diesen Dateityp nicht verfügbar.',
                         'download-file'   => 'Datei herunterladen',
+                        'download-zip'    => 'Als ZIP herunterladen',
+                        'video-player'    => [
+                            'back-10s'           => '10 s zurück',
+                            'forward-10s'        => '10 s vor',
+                            '10s'                => '10 s',
+                            'speed'              => 'Geschwindigkeit',
+                            'loop'               => 'Wiederholen (L)',
+                            'mute'               => 'Stummschalten (M)',
+                            'picture-in-picture' => 'Bild im Bild',
+                            'fullscreen'         => 'Vollbild (F)',
+                        ],
                     ],
 
                     'custom-download' => [

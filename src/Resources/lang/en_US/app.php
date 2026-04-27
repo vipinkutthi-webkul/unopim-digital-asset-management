@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Preview not available for this file type.',
                         'download-file'   => 'Download File',
+                        'download-zip'    => 'Download as ZIP',
+                        'video-player'    => [
+                            'back-10s'           => 'Back 10s',
+                            'forward-10s'        => 'Forward 10s',
+                            '10s'                => '10s',
+                            'speed'              => 'Speed',
+                            'loop'               => 'Loop (L)',
+                            'mute'               => 'Mute (M)',
+                            'picture-in-picture' => 'Picture in Picture',
+                            'fullscreen'         => 'Fullscreen (F)',
+                        ],
                     ],
 
                     'custom-download' => [

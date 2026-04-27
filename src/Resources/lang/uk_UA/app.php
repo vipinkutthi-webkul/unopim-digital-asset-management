@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Попередній перегляд недоступний для цього типу файлу.',
                         'download-file'   => 'Завантажити файл',
+                        'download-zip'    => 'Завантажити як ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 с назад',
+                            'forward-10s'        => '10 с вперед',
+                            '10s'                => '10 с',
+                            'speed'              => 'Швидкість',
+                            'loop'               => 'Повтор (L)',
+                            'mute'               => 'Без звуку (M)',
+                            'picture-in-picture' => 'Картинка в картинці',
+                            'fullscreen'         => 'На весь екран (F)',
+                        ],
                     ],
 
                     'custom-download' => [

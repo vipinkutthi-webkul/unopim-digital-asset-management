@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Hindi available ang preview para sa uri ng file na ito.',
                         'download-file'   => 'I-download ang File',
+                        'download-zip'    => 'I-download bilang ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s pabalik',
+                            'forward-10s'        => '10 s pasulong',
+                            '10s'                => '10 s',
+                            'speed'              => 'Bilis',
+                            'loop'               => 'Ulitin (L)',
+                            'mute'               => 'I-mute (M)',
+                            'picture-in-picture' => 'Larawan sa larawan',
+                            'fullscreen'         => 'Buong screen (F)',
+                        ],
                     ],
 
                     'custom-download' => [

@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Podgląd niedostępny dla tego typu pliku.',
                         'download-file'   => 'Pobierz Plik',
+                        'download-zip'    => 'Pobierz jako ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s do tyłu',
+                            'forward-10s'        => '10 s do przodu',
+                            '10s'                => '10 s',
+                            'speed'              => 'Prędkość',
+                            'loop'               => 'Pętla (L)',
+                            'mute'               => 'Wycisz (M)',
+                            'picture-in-picture' => 'Obraz w obrazie',
+                            'fullscreen'         => 'Pełny ekran (F)',
+                        ],
                     ],
 
                     'custom-download' => [
