@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Bu dosya türü için önizleme mevcut değil.',
                         'download-file'   => 'Dosyayı İndir',
+                        'download-zip'    => 'ZIP olarak indir',
+                        'video-player'    => [
+                            'back-10s'           => '10 s geri',
+                            'forward-10s'        => '10 s ileri',
+                            '10s'                => '10 s',
+                            'speed'              => 'Hız',
+                            'loop'               => 'Döngü (L)',
+                            'mute'               => 'Sessiz (M)',
+                            'picture-in-picture' => 'Resim içinde resim',
+                            'fullscreen'         => 'Tam ekran (F)',
+                        ],
                     ],
 
                     'custom-download' => [

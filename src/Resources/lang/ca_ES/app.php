@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'La vista prèvia no està disponible per a aquest tipus de fitxer.',
                         'download-file'   => 'Descarregar Fitxer',
+                        'download-zip'    => 'Descarrega com a ZIP',
+                        'video-player'    => [
+                            'back-10s'           => 'Enrere 10 s',
+                            'forward-10s'        => 'Endavant 10 s',
+                            '10s'                => '10 s',
+                            'speed'              => 'Velocitat',
+                            'loop'               => 'Bucle (L)',
+                            'mute'               => 'Silenci (M)',
+                            'picture-in-picture' => 'Imatge en imatge',
+                            'fullscreen'         => 'Pantalla completa (F)',
+                        ],
                     ],
 
                     'custom-download' => [

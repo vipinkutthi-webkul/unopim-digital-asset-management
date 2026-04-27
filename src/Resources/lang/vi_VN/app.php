@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Xem trước không khả dụng cho loại tệp này.',
                         'download-file'   => 'Tải xuống tệp',
+                        'download-zip'    => 'Tải xuống dưới dạng ZIP',
+                        'video-player'    => [
+                            'back-10s'           => 'Lùi 10 s',
+                            'forward-10s'        => 'Tiến 10 s',
+                            '10s'                => '10 s',
+                            'speed'              => 'Tốc độ',
+                            'loop'               => 'Lặp lại (L)',
+                            'mute'               => 'Tắt tiếng (M)',
+                            'picture-in-picture' => 'Hình trong hình',
+                            'fullscreen'         => 'Toàn màn hình (F)',
+                        ],
                     ],
 
                     'custom-download' => [

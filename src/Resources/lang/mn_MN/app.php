@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Энэ файлын төрлийн урьдчилан харалт боломжгүй.',
                         'download-file'   => 'Файл татах',
+                        'download-zip'    => 'ZIP файлаар татаж авах',
+                        'video-player'    => [
+                            'back-10s'           => '10 секунд ухраах',
+                            'forward-10s'        => '10 секунд урагшлуулах',
+                            '10s'                => '10 с',
+                            'speed'              => 'Хурд',
+                            'loop'               => 'Давтах (L)',
+                            'mute'               => 'Дуугүй болгох (M)',
+                            'picture-in-picture' => 'Зурган дотор зураг',
+                            'fullscreen'         => 'Бүтэн дэлгэц (F)',
+                        ],
                     ],
 
                     'custom-download' => [

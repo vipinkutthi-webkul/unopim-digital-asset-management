@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'このファイルタイプはプレビューに対応していません。',
                         'download-file'   => 'ファイルをダウンロード',
+                        'download-zip'    => 'ZIPでダウンロード',
+                        'video-player'    => [
+                            'back-10s'           => '10秒戻る',
+                            'forward-10s'        => '10秒進む',
+                            '10s'                => '10秒',
+                            'speed'              => '速度',
+                            'loop'               => 'ループ (L)',
+                            'mute'               => 'ミュート (M)',
+                            'picture-in-picture' => 'ピクチャー・イン・ピクチャー',
+                            'fullscreen'         => 'フルスクリーン (F)',
+                        ],
                     ],
 
                     'custom-download' => [

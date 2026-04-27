@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'المعاينة غير متاحة لهذا النوع من الملفات.',
                         'download-file'   => 'تنزيل الملف',
+                        'download-zip'    => 'تنزيل كملف ZIP',
+                        'video-player'    => [
+                            'back-10s'           => 'رجوع 10 ثانية',
+                            'forward-10s'        => 'تقديم 10 ثانية',
+                            '10s'                => '10 ث',
+                            'speed'              => 'السرعة',
+                            'loop'               => 'تكرار (L)',
+                            'mute'               => 'كتم الصوت (M)',
+                            'picture-in-picture' => 'صورة داخل صورة',
+                            'fullscreen'         => 'ملء الشاشة (F)',
+                        ],
                     ],
 
                     'custom-download' => [

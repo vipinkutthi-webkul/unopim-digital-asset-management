@@ -190,6 +190,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => '此文件类型不支持预览。',
                         'download-file'   => '下载文件',
+                        'download-zip'    => '下载为ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '后退 10 秒',
+                            'forward-10s'        => '前进 10 秒',
+                            '10s'                => '10 秒',
+                            'speed'              => '速度',
+                            'loop'               => '循环 (L)',
+                            'mute'               => '静音 (M)',
+                            'picture-in-picture' => '画中画',
+                            'fullscreen'         => '全屏 (F)',
+                        ],
                     ],
 
                     'custom-download' => [

@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => '이 파일 유형은 미리보기를 지원하지 않습니다.',
                         'download-file'   => '파일 다운로드',
+                        'download-zip'    => 'ZIP으로 다운로드',
+                        'video-player'    => [
+                            'back-10s'           => '10초 뒤로',
+                            'forward-10s'        => '10초 앞으로',
+                            '10s'                => '10초',
+                            'speed'              => '속도',
+                            'loop'               => '반복 (L)',
+                            'mute'               => '음소거 (M)',
+                            'picture-in-picture' => '화면 속 화면',
+                            'fullscreen'         => '전체화면 (F)',
+                        ],
                     ],
 
                     'custom-download' => [

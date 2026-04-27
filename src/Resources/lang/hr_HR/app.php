@@ -200,6 +200,17 @@ return [
                     'preview-modal' => [
                         'not-available'   => 'Pregled nije dostupan za ovu vrstu datoteke.',
                         'download-file'   => 'Preuzmi Datoteku',
+                        'download-zip'    => 'Preuzmi kao ZIP',
+                        'video-player'    => [
+                            'back-10s'           => '10 s natrag',
+                            'forward-10s'        => '10 s naprijed',
+                            '10s'                => '10 s',
+                            'speed'              => 'Brzina',
+                            'loop'               => 'Ponovi (L)',
+                            'mute'               => 'Isključi zvuk (M)',
+                            'picture-in-picture' => 'Slika u slici',
+                            'fullscreen'         => 'Cijeli zaslon (F)',
+                        ],
                     ],
 
                     'custom-download' => [
