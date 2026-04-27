@@ -17,15 +17,12 @@ async function navigateToPropertiesTab(page) {
   await page.waitForTimeout(500);
   await firstCard.locator('.icon-edit').first().click({ force: true });
   await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 
   // Click Properties tab
   const propsTab = page.locator('#app').getByText('Properties').first();
   await propsTab.click();
-  await page.waitForLoadState('domcontentloaded');
-  // Wait for the Vue component to fully render (shimmer → real content)
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
   // Ensure the "Create Property" button is from the real component, not shimmer
   await page.getByRole('button', { name: 'Create Property' }).waitFor({ state: 'visible', timeout: 15000 });
 }
