@@ -17,44 +17,74 @@
         <source src="{{ $mediaUrl }}" type="{{ $asset->mime_type }}">
     </audio>
 
-    <div class="flex flex-col gap-3 w-full max-w-lg">
+    <div class="flex flex-col gap-2 w-full max-w-lg">
 
-        <!-- Seek bar -->
-        <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 text-right shrink-0">@{{ audioCurrentTimeDisplay }}</span>
-            <input
-                type="range"
-                ref="seekBar"
-                class="flex-1 h-1.5 accent-violet-600 cursor-pointer"
-                min="0"
-                :max="audioDuration || 100"
-                step="0.1"
-                @mousedown="audioSeekStart"
-                @touchstart="audioSeekStart"
-                @input="audioOnSeek"
-                @mouseup="audioSeekEnd"
-                @touchend="audioSeekEnd"
-            />
-            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums w-10 shrink-0">@{{ audioDurationDisplay }}</span>
+        <!-- Custom seek bar -->
+        <div
+            ref="audioSeekContainer"
+            class="relative h-4 group cursor-pointer"
+            @mousedown="audioOnSeekDown"
+            @mousemove="audioOnSeekHover"
+            @mouseleave="audioOnSeekLeave"
+        >
+            <!-- Tooltip -->
+            <div
+                v-show="audioSeekTooltipVisible && audioDuration"
+                class="absolute px-1.5 py-0.5 rounded shadow-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-mono pointer-events-none whitespace-nowrap z-10"
+                :style="{ left: audioSeekTooltipX + 'px', bottom: 'calc(100% + 8px)', transform: 'translateX(-50%)' }"
+            >@{{ audioSeekTooltip }}</div>
+
+            <!-- Track: full bg / played -->
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div
+                    class="absolute inset-y-0 left-0 bg-violet-500"
+                    :style="{ width: (audioDuration ? (audioCurrentTime / audioDuration) * 100 : 0) + '%' }"
+                ></div>
+            </div>
+
+            <!-- Playhead thumb -->
+            <div
+                class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-violet-600 shadow pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                :style="{ left: (audioDuration ? (audioCurrentTime / audioDuration) * 100 : 0) + '%' }"
+            ></div>
+        </div>
+
+        <!-- Time display -->
+        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-mono tabular-nums">
+            <span>@{{ audioCurrentTimeDisplay }}</span>
+            <span>@{{ audioDurationDisplay }}</span>
         </div>
 
         <!-- Controls row -->
-        <div class="flex items-center justify-center gap-4">
+        <div class="flex items-center justify-center gap-3 mt-1">
 
-            <!-- Volume -->
-            <div class="flex items-center gap-2 mr-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                    <path v-if="audioVolume > 0.5" d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                    <path v-else-if="audioVolume > 0" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                </svg>
+            <!-- Volume with mute button -->
+            <div class="flex items-center gap-1.5 mr-auto">
+                <button
+                    type="button"
+                    class="shrink-0 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+                    title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.mute')"
+                    @click="audioToggleMute"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <template v-if="!audioIsMuted">
+                            <path v-if="audioVolume > 0.5" d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            <path v-else-if="audioVolume > 0" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        </template>
+                        <template v-else>
+                            <line x1="23" y1="9" x2="17" y2="15"/>
+                            <line x1="17" y1="9" x2="23" y2="15"/>
+                        </template>
+                    </svg>
+                </button>
                 <input
                     type="range"
-                    class="w-24 h-1.5 accent-violet-600 cursor-pointer"
+                    class="w-20 h-1.5 accent-violet-600 cursor-pointer"
                     min="0"
                     max="1"
                     step="0.01"
-                    :value="audioVolume"
+                    :value="audioIsMuted ? 0 : audioVolume"
                     @input="audioOnVolume"
                 />
             </div>
@@ -62,14 +92,14 @@
             <!-- Skip back 10s -->
             <button
                 type="button"
-                class="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-semibold shrink-0"
-                title="Back 10s"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-700 transition-colors shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.back-10s')"
                 @click="audioSkip(-10)"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
                 </svg>
-                <span>10s</span>
+                @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.10s')
             </button>
 
             <!-- Play / Pause -->
@@ -89,17 +119,42 @@
             <!-- Skip forward 10s -->
             <button
                 type="button"
-                class="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-semibold shrink-0"
-                title="Forward 10s"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-700 transition-colors shrink-0"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.forward-10s')"
                 @click="audioSkip(10)"
             >
-                <span>10s</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="4" x2="19" y2="20"/>
+                @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.10s')
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
                 </svg>
             </button>
 
-            <div class="ml-auto w-[calc(1rem+6rem+1rem)]"></div>
+            <!-- Loop toggle -->
+            <button
+                type="button"
+                class="flex items-center justify-center w-7 h-7 rounded transition-colors shrink-0 ml-auto"
+                :class="audioIsLooping ? 'bg-violet-600 text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+                title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.loop')"
+                @click="audioToggleLoop"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Speed selector -->
+        <div class="flex items-center gap-1 justify-center mt-1">
+            <span class="text-xs text-gray-400 dark:text-gray-500 mr-1">@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.speed')</span>
+            <template v-for="rate in [0.5, 0.75, 1, 1.25, 1.5, 2]" :key="rate">
+                <button
+                    type="button"
+                    class="px-2 py-1 rounded text-xs font-semibold transition-colors"
+                    :class="audioSpeed === rate ? 'bg-violet-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'"
+                    @click="setAudioSpeed(rate)"
+                >@{{ rate }}×</button>
+            </template>
         </div>
     </div>
 </div>
