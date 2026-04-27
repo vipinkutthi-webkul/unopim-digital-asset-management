@@ -69,6 +69,7 @@ Route::group([
             Route::post('/resize/{id}', 'resize')->name('admin.dam.assets.image_edit.resize')->where('id', '[0-9]+');
             Route::post('/adjust/{id}', 'adjust')->name('admin.dam.assets.image_edit.adjust')->where('id', '[0-9]+');
             Route::post('/transform/{id}', 'transform')->name('admin.dam.assets.image_edit.transform')->where('id', '[0-9]+');
+            Route::post('/bg-remove/{id}', 'bgRemove')->name('admin.dam.assets.image_edit.bg_remove')->where('id', '[0-9]+');
         });
 
         Route::controller(LinkedResourcesController::class)->prefix('linked-resources')->group(function () {

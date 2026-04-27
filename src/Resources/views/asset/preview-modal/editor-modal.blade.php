@@ -107,6 +107,23 @@
                 </div>
                 <div class="flex flex-col gap-1 px-3 pb-3">
 
+                    <!-- Background Remover -->
+                    <button
+                        type="button"
+                        class="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-left transition-colors"
+                        :class="editTool === 'bg-remove' ? 'bg-violet-50 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                        @click="onEditToolSelect('bg-remove')"
+                    >
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-300 shrink-0">
+                            <span class="icon-magic-ai text-base"></span>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium leading-tight">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-remove') }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-remove-sub') }}</p>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-300">{{ trans('dam::app.admin.dam.asset.edit.image-editor.ai-badge') }}</span>
+                    </button>
+
                     <!-- Crop & Resize -->
                     <button
                         type="button"
@@ -282,6 +299,49 @@
                     </div>
                 </div>
 
+                <!-- ── Background Remover controls ── -->
+                <div v-if="editTool === 'bg-remove'" class="px-4 py-4 flex flex-col gap-4">
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ trans('dam::app.admin.dam.asset.edit.image-editor.ai-settings') }}</p>
+
+                    <!-- Platform select -->
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.platform') }}</label>
+                        <select
+                            v-model="editSelectedPlatformId"
+                            @change="onEditPlatformChange"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        >
+                            <option v-if="!editPlatforms.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.platform-loading') }}</option>
+                            <option v-for="p in editPlatforms" :key="p.id" :value="p.id">
+                                @{{ p.label || p.provider }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Model select -->
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.model') }}</label>
+                        <select
+                            v-model="editSelectedModel"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        >
+                            <option v-if="!editCurrentPlatformModels.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.no-models') }}</option>
+                            <option v-for="m in editCurrentPlatformModels" :key="m" :value="m">@{{ m }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Prompt -->
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.prompt') }}</label>
+                        <textarea
+                            v-model="editPrompt"
+                            rows="3"
+                            placeholder="{{ trans('dam::app.admin.dam.asset.edit.image-editor.prompt-placeholder') }}"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        ></textarea>
+                    </div>
+                </div>
+
                 <!-- Error -->
                 <div v-if="editError" class="mx-4 mb-2 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-xs text-red-600 dark:text-red-400">
                     @{{ editError }}
@@ -304,6 +364,7 @@
                             <span>{{ trans('dam::app.admin.dam.asset.edit.image-editor.applying') }}</span>
                         </template>
                         <template v-else>
+                            <span v-if="editTool === 'bg-remove'" class="icon-magic-ai text-base mr-1"></span>
                             <span>{{ trans('dam::app.admin.dam.asset.edit.image-editor.apply') }}</span>
                         </template>
                     </button>
