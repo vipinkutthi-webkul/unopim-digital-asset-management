@@ -390,8 +390,11 @@ test.describe('DAM Asset Preview Modal', () => {
     test('Content area is visible and contains at least one media element', async ({ adminPage }) => {
       await navigateToFirstAssetEdit(adminPage);
       await openPreviewModal(adminPage);
-      const content = adminPage.locator('.flex-1.min-h-0.overflow-hidden').first();
+      // Scope to viewer modal's content specifically (bg-gray-50 distinguishes it from the
+      // base admin layout wrapper which also has flex-1 min-h-0 overflow-hidden)
+      const content = adminPage.locator('.flex-1.min-h-0.overflow-hidden.bg-gray-50').first();
       await expect(content).toBeVisible({ timeout: 5000 });
+      await adminPage.waitForTimeout(500);
       const hasImg    = await content.locator('img').first().isVisible().catch(() => false);
       const hasVideo  = await content.locator('video').first().isVisible().catch(() => false);
       const hasAudio  = await content.locator('audio').first().isVisible().catch(() => false);
@@ -679,10 +682,10 @@ test.describe('DAM Asset Preview Modal', () => {
       await expect(adminPage.getByText('Tools').first()).toBeVisible({ timeout: 5000 });
     });
 
-    test('Editor shows Background Remover tool', async ({ adminPage }) => {
+    test('Editor shows Edit Background tool', async ({ adminPage }) => {
       const opened = await openEditorIfImage(adminPage);
       if (!opened) { test.skip(true, 'Not an image asset'); return; }
-      await expect(adminPage.getByText('Background Remover').first()).toBeVisible({ timeout: 5000 });
+      await expect(adminPage.getByText('Edit Background').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Editor shows Crop & Resize tool', async ({ adminPage }) => {
@@ -719,12 +722,15 @@ test.describe('DAM Asset Preview Modal', () => {
       await expect(adminPage.locator('button').filter({ hasText: /^Apply$/ }).first()).toBeEnabled({ timeout: 5000 });
     });
 
-    test('Selecting Background Remover shows AI prompt textarea', async ({ adminPage }) => {
+    test('Selecting Edit Background and Prompt tab shows AI prompt textarea', async ({ adminPage }) => {
       const opened = await openEditorIfImage(adminPage);
       if (!opened) { test.skip(true, 'Not an image asset'); return; }
-      await adminPage.getByText('Background Remover').first().click();
+      await adminPage.getByText('Edit Background').first().click();
       await adminPage.waitForTimeout(200);
-      // v-if="editTool === 'bg-remove'" renders the Prompt textarea
+      // The 'ai' sub-tab (labelled "Prompt") reveals the textarea via v-if="bgSubTab === 'ai'"
+      // Use exact:true to avoid matching the subtitle "Color, upload, or Prompt" on the tool button
+      await adminPage.getByText('Prompt', { exact: true }).first().click();
+      await adminPage.waitForTimeout(200);
       await expect(adminPage.locator('textarea').first()).toBeVisible({ timeout: 5000 });
     });
 
@@ -817,9 +823,10 @@ test.describe('DAM Asset Preview Modal', () => {
       const badge = adminPage.locator('.font-mono').filter({ hasText: /\d+ × \d+ px/ }).first();
       const beforeText = await badge.textContent({ timeout: 3000 }).catch(() => '');
 
-      // Draw a new selection: start at 20% from left/top, drag to 60% right/down
-      const startX = box.x + box.width * 0.2;
-      const startY = box.y + box.height * 0.2;
+      // Start in the 24px container padding (before image/crop box) so the mousedown
+      // reaches cropStartDraw and isn't swallowed by the crop box's @mousedown.stop.prevent.
+      const startX = box.x + 3;
+      const startY = box.y + 3;
       const endX   = box.x + box.width * 0.6;
       const endY   = box.y + box.height * 0.6;
 
@@ -905,7 +912,8 @@ test.describe('DAM Asset Preview Modal', () => {
       const cbox = await container.boundingBox();
       if (!cbox) { test.skip(true, 'No container bounds'); return; }
 
-      await adminPage.mouse.move(cbox.x + cbox.width * 0.2, cbox.y + cbox.height * 0.2);
+      // Start in container padding (3px from edge) to avoid the crop box's mousedown.stop.prevent
+      await adminPage.mouse.move(cbox.x + 3, cbox.y + 3);
       await adminPage.mouse.down();
       await adminPage.mouse.move(cbox.x + cbox.width * 0.5, cbox.y + cbox.height * 0.5, { steps: 10 });
       await adminPage.mouse.up();
@@ -1095,13 +1103,13 @@ test.describe('DAM Asset Preview Modal', () => {
       await navigateToFirstAssetEdit(adminPage);
       await openPreviewModal(adminPage);
 
-      // Info button is in the card DOM even when preview overlay is on top —
-      // click it with force to bypass the visual occlusion.
+      // dispatchEvent bypasses browser hit-testing (unlike force:true which still routes
+      // through screen coordinates and gets intercepted by the preview backdrop).
       const infoBtn = adminPage.locator('button').filter({ has: adminPage.locator('.icon-information') }).first();
-      await infoBtn.click({ force: true });
+      await infoBtn.dispatchEvent('click');
       // Wait for info backdrop
       await adminPage.locator('.absolute.inset-0.bg-black\\/60').first()
-        .waitFor({ state: 'visible', timeout: 30000 });
+        .waitFor({ state: 'visible', timeout: 10000 });
 
       // Both modals open — first Escape must close info only, preview stays
       await adminPage.keyboard.press('Escape');
@@ -1115,10 +1123,11 @@ test.describe('DAM Asset Preview Modal', () => {
     test('Second Escape closes preview modal after info is already dismissed', async ({ adminPage }) => {
       await navigateToFirstAssetEdit(adminPage);
       await openPreviewModal(adminPage);
+
       const infoBtn = adminPage.locator('button').filter({ has: adminPage.locator('.icon-information') }).first();
-      await infoBtn.click({ force: true });
+      await infoBtn.dispatchEvent('click');
       await adminPage.locator('.absolute.inset-0.bg-black\\/60').first()
-        .waitFor({ state: 'visible', timeout: 30000 });
+        .waitFor({ state: 'visible', timeout: 10000 });
 
       await adminPage.keyboard.press('Escape'); // closes info
       await adminPage.waitForTimeout(300);
