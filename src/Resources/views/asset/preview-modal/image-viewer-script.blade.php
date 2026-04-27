@@ -17,9 +17,31 @@ window._damImageViewer = {
         cropImgOffsetX: 0,
         cropImgOffsetY: 0,
 
-        // Brightness & Contrast
+        // Brightness, Contrast, Sharpen, Blur
         brightness: 0,
         contrast:   0,
+        sharpen:    0,
+        blur:       0,
+
+        // Filters
+        filterGreyscale: false,
+        filterInvert:    false,
+
+        // Edit Background
+        bgSubTab:             'color',
+        bgColor:              '#ffffff',
+        bgUploadFile:         null,
+        bgAiPrompt:           '',
+        bgPlatforms:          [],
+        bgSelectedPlatformId: null,
+        bgSelectedModel:      null,
+        bgPlatformError:      null,
+        bgSwatches: [
+            '#ffffff', '#f3f4f6', '#e5e7eb', '#9ca3af', '#6b7280', '#374151', '#1f2937', '#000000',
+            '#fee2e2', '#ef4444', '#fef3c7', '#fbbf24', '#d1fae5', '#22c55e',
+            '#cffafe', '#06b6d4', '#dbeafe', '#3b82f6', '#ede9fe', '#8b5cf6',
+            '#fce7f3', '#ec4899', '#fff1f2', '#f43f5e',
+        ],
 
         // Rotate & Flip
         rotation: 0,
@@ -28,7 +50,6 @@ window._damImageViewer = {
 
         // Image editor
         editTool:     null,
-        editPrompt:   '',
         editApplying: false,
         editError:    null,
 
@@ -57,11 +78,30 @@ window._damImageViewer = {
         cropPixelH() {
             return this.cropImgH ? Math.round(this.cropBox.h * this.cropNatH / this.cropImgH) : 0;
         },
+        bgCurrentPlatformModels() {
+            const p = this.bgPlatforms.find(p => p.id === this.bgSelectedPlatformId);
+            if (!p) return [];
+            const imagePatterns = {
+                openai: ['gpt-image'],
+                gemini: ['gemini-2', 'imagen'],
+                xai:    ['grok'],
+            };
+            const patterns = imagePatterns[p.provider] || [];
+            if (!patterns.length) return p.models || [];
+            return (p.models || []).filter(m => patterns.some(pat => m.toLowerCase().includes(pat)));
+        },
         editPreviewFilter() {
-            if (this.editTool !== 'adjust') return '';
-            const b = (100 + this.brightness) / 100;
-            const c = (100 + this.contrast) / 100;
-            return `brightness(${b}) contrast(${c})`;
+            const parts = [];
+            if (this.editTool === 'adjust') {
+                parts.push(`brightness(${(100 + this.brightness) / 100})`);
+                parts.push(`contrast(${(100 + this.contrast) / 100})`);
+                if (this.blur > 0) parts.push(`blur(${(this.blur * 0.3).toFixed(1)}px)`);
+            }
+            if (this.editTool === 'filters') {
+                if (this.filterGreyscale) parts.push('grayscale(1)');
+                if (this.filterInvert)    parts.push('invert(1)');
+            }
+            return parts.join(' ');
         },
         editPreviewTransform() {
             if (this.editTool !== 'rotate') return '';
@@ -224,18 +264,61 @@ window._damImageViewer = {
 
         // ── Image Editor ──────────────────────────────────────────────
         onEditToolSelect(tool) {
-            this.editTool     = tool;
-            this.editError    = null;
-            this.editApplying = false;
-            this.cropWidth    = null;
-            this.cropHeight   = null;
-            this.brightness   = 0;
-            this.contrast     = 0;
-            this.rotation     = 0;
-            this.flipH        = false;
-            this.flipV        = false;
-            this.editPrompt   = '';
-            if (tool === 'crop') this.initCropBox();
+            if (this.editTool === tool) {
+                this.editTool = null;
+                return;
+            }
+            this.editTool        = tool;
+            this.editError       = null;
+            this.editApplying    = false;
+            this.cropWidth       = null;
+            this.cropHeight      = null;
+            this.brightness      = 0;
+            this.contrast        = 0;
+            this.sharpen         = 0;
+            this.blur            = 0;
+            this.filterGreyscale = false;
+            this.filterInvert    = false;
+            this.rotation        = 0;
+            this.flipH           = false;
+            this.flipV           = false;
+            this.bgSubTab        = 'color';
+            this.bgColor         = '#ffffff';
+            this.bgUploadFile    = null;
+            this.bgAiPrompt      = '';
+            this.bgPlatformError = null;
+            if (tool === 'crop')     this.initCropBox();
+            if (tool === 'edit-bg')  this.loadBgPlatforms();
+        },
+
+        async loadBgPlatforms() {
+            if (this.bgPlatforms.length) return;
+            try {
+                const { data } = await window.axios.get('{{ route('admin.magic_ai.platforms') }}');
+                const imagePlatforms = (data.platforms || []).filter(p => ['openai', 'gemini', 'xai'].includes(p.provider));
+                this.bgPlatforms = imagePlatforms;
+                if (!this.bgPlatforms.length) {
+                    this.bgPlatformError = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.error-no-image-platform') }}';
+                    return;
+                }
+                const def = this.bgPlatforms.find(p => p.is_default) || this.bgPlatforms[0];
+                if (def) {
+                    this.bgSelectedPlatformId = def.id;
+                    this.bgSelectedModel      = this.bgCurrentPlatformModels[0] || null;
+                }
+                if (!this.bgSelectedModel) {
+                    this.bgPlatformError = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.no-models') }}';
+                }
+            } catch (e) {
+                this.bgPlatformError = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.error-platforms') }}';
+            }
+        },
+
+        onBgPlatformChange() {
+            this.bgSelectedModel = this.bgCurrentPlatformModels[0] || null;
+            this.bgPlatformError = this.bgSelectedModel
+                ? null
+                : '{{ trans('dam::app.admin.dam.asset.edit.image-editor.no-models') }}';
         },
 
         async applyEdit() {
@@ -244,9 +327,10 @@ window._damImageViewer = {
             this.editError    = null;
 
             const routeMap = {
-                crop:   '{{ route('admin.dam.assets.image_edit.resize',    ['id' => $asset->id]) }}',
-                adjust: '{{ route('admin.dam.assets.image_edit.adjust',    ['id' => $asset->id]) }}',
-                rotate: '{{ route('admin.dam.assets.image_edit.transform', ['id' => $asset->id]) }}',
+                crop:    '{{ route('admin.dam.assets.image_edit.resize',    ['id' => $asset->id]) }}',
+                adjust:  '{{ route('admin.dam.assets.image_edit.adjust',    ['id' => $asset->id]) }}',
+                rotate:  '{{ route('admin.dam.assets.image_edit.transform', ['id' => $asset->id]) }}',
+                filters: '{{ route('admin.dam.assets.image_edit.filters',   ['id' => $asset->id]) }}',
             };
 
             const bodyMap = {
@@ -260,12 +344,43 @@ window._damImageViewer = {
                     width:     this.cropWidth  || null,
                     height:    this.cropHeight || null,
                 }),
-                adjust: () => ({ brightness: this.brightness, contrast: this.contrast }),
-                rotate: () => ({ rotation: this.rotation, flip_h: this.flipH, flip_v: this.flipV }),
+                adjust:  () => ({ brightness: this.brightness, contrast: this.contrast, sharpen: this.sharpen, blur: this.blur }),
+                rotate:  () => ({ rotation: this.rotation, flip_h: this.flipH, flip_v: this.flipV }),
+                filters: () => ({ greyscale: this.filterGreyscale, invert: this.filterInvert }),
             };
 
+            let postRoute, postBody;
+
+            if (this.editTool === 'edit-bg') {
+                if (!this.bgSelectedPlatformId || !this.bgSelectedModel) {
+                    this.editError    = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.error-platforms') }}';
+                    this.editApplying = false;
+                    return;
+                }
+                const bgRoutes = {
+                    color:  '{{ route('admin.dam.assets.image_edit.bg_color',  ['id' => $asset->id]) }}',
+                    upload: '{{ route('admin.dam.assets.image_edit.bg_upload', ['id' => $asset->id]) }}',
+                    ai:     '{{ route('admin.dam.assets.image_edit.bg_ai',     ['id' => $asset->id]) }}',
+                };
+                postRoute = bgRoutes[this.bgSubTab];
+                if (this.bgSubTab === 'color') {
+                    postBody = { color: this.bgColor, platform_id: this.bgSelectedPlatformId, model: this.bgSelectedModel };
+                } else if (this.bgSubTab === 'upload') {
+                    const fd = new FormData();
+                    fd.append('image',       this.bgUploadFile);
+                    fd.append('platform_id', this.bgSelectedPlatformId);
+                    fd.append('model',       this.bgSelectedModel);
+                    postBody = fd;
+                } else {
+                    postBody = { prompt: this.bgAiPrompt, platform_id: this.bgSelectedPlatformId, model: this.bgSelectedModel };
+                }
+            } else {
+                postRoute = routeMap[this.editTool];
+                postBody  = bodyMap[this.editTool]();
+            }
+
             try {
-                await window.axios.post(routeMap[this.editTool], bodyMap[this.editTool]());
+                await window.axios.post(postRoute, postBody);
                 this.isEditOpen = false;
                 this.editTool   = null;
                 const url = new URL(window.location.href);
