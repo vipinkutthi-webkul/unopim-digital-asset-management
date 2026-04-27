@@ -23,6 +23,7 @@ use Webkul\DAM\Repositories\AssetTagRepository;
 use Webkul\DAM\Repositories\DirectoryRepository;
 use Webkul\DAM\Services\MetadataExtractionService;
 use Webkul\DAM\Traits\Directory as DirectoryTrait;
+use ZipArchive;
 
 class AssetController extends Controller
 {
@@ -606,6 +607,34 @@ class AssetController extends Controller
         }
 
         return Storage::disk($disk)->download($asset->path);
+    }
+
+    /**
+     * Download asset wrapped in a ZIP archive.
+     */
+    public function downloadCompressed(int $id)
+    {
+        $asset = Asset::find($id);
+        $disk = Directory::getAssetDisk();
+
+        if (! $asset || ! Storage::disk($disk)->exists($asset->path)) {
+            abort(404);
+        }
+
+        $baseName = pathinfo($asset->file_name, PATHINFO_FILENAME);
+        $zipFileName = $baseName.'_'.uniqid().'.zip';
+        $zipPath = public_path($zipFileName);
+
+        $zip = new ZipArchive;
+
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
+            abort(500);
+        }
+
+        $zip->addFromString($asset->file_name, Storage::disk($disk)->get($asset->path));
+        $zip->close();
+
+        return response()->download($zipPath, $baseName.'.zip')->deleteFileAfterSend(true);
     }
 
     /**
