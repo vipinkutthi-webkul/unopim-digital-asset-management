@@ -4,7 +4,7 @@
     v-if="isEditOpen"
     class="fixed inset-0 z-[10010] flex items-center justify-center"
 >
-    <div class="absolute inset-0 bg-black/75" @click="isEditOpen = false; editTool = null; editPrompt = ''"></div>
+    <div class="absolute inset-0 bg-black/75" @click="isEditOpen = false; editTool = null"></div>
 
     <div class="relative z-10 flex flex-col w-[90vw] h-[90vh] max-w-6xl rounded-xl overflow-hidden bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10">
 
@@ -17,7 +17,7 @@
             <button
                 type="button"
                 class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
-                @click="isEditOpen = false; editTool = null; editPrompt = ''"
+                @click="isEditOpen = false; editTool = null"
                 aria-label="{{ trans('dam::app.admin.dam.asset.edit.image-editor.close') }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -107,21 +107,20 @@
                 </div>
                 <div class="flex flex-col gap-1 px-3 pb-3">
 
-                    <!-- Background Remover -->
+                    <!-- Edit Background -->
                     <button
                         type="button"
                         class="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-left transition-colors"
-                        :class="editTool === 'bg-remove' ? 'bg-violet-50 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                        @click="onEditToolSelect('bg-remove')"
+                        :class="editTool === 'edit-bg' ? 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                        @click="onEditToolSelect('edit-bg')"
                     >
-                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-300 shrink-0">
-                            <span class="icon-magic-ai text-base"></span>
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                         </span>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium leading-tight">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-remove') }}</p>
-                            <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-remove-sub') }}</p>
+                            <p class="text-sm font-medium leading-tight">{{ trans('dam::app.admin.dam.asset.edit.image-editor.edit-bg') }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">{{ trans('dam::app.admin.dam.asset.edit.image-editor.edit-bg-sub') }}</p>
                         </div>
-                        <span class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-300">{{ trans('dam::app.admin.dam.asset.edit.image-editor.ai-badge') }}</span>
                     </button>
 
                     <!-- Crop & Resize -->
@@ -169,6 +168,22 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium leading-tight">{{ trans('dam::app.admin.dam.asset.edit.image-editor.rotate') }}</p>
                             <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">{{ trans('dam::app.admin.dam.asset.edit.image-editor.rotate-sub') }}</p>
+                        </div>
+                    </button>
+
+                    <!-- Filters -->
+                    <button
+                        type="button"
+                        class="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-left transition-colors"
+                        :class="editTool === 'filters' ? 'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                        @click="onEditToolSelect('filters')"
+                    >
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium leading-tight">{{ trans('dam::app.admin.dam.asset.edit.image-editor.filters') }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">{{ trans('dam::app.admin.dam.asset.edit.image-editor.filters-sub') }}</p>
                         </div>
                     </button>
 
@@ -252,6 +267,38 @@
                             <span>-100</span><span>0</span><span>+100</span>
                         </div>
                     </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs text-gray-500 dark:text-gray-400">{{ trans('dam::app.admin.dam.asset.edit.image-editor.sharpen') }}</label>
+                            <span class="text-xs font-mono text-gray-700 dark:text-gray-300">@{{ sharpen }}</span>
+                        </div>
+                        <input
+                            type="range"
+                            v-model.number="sharpen"
+                            min="0" max="100" step="1"
+                            class="w-full h-1.5 accent-amber-500 cursor-pointer"
+                        />
+                        <div class="flex justify-between mt-0.5 text-[10px] text-gray-400 dark:text-gray-600">
+                            <span>0</span><span>50</span><span>100</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs text-gray-500 dark:text-gray-400">{{ trans('dam::app.admin.dam.asset.edit.image-editor.blur') }}</label>
+                            <span class="text-xs font-mono text-gray-700 dark:text-gray-300">@{{ blur }}</span>
+                        </div>
+                        <input
+                            type="range"
+                            v-model.number="blur"
+                            min="0" max="100" step="1"
+                            class="w-full h-1.5 accent-amber-500 cursor-pointer"
+                        />
+                        <div class="flex justify-between mt-0.5 text-[10px] text-gray-400 dark:text-gray-600">
+                            <span>0</span><span>50</span><span>100</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ── Rotate & Flip controls ── -->
@@ -299,22 +346,57 @@
                     </div>
                 </div>
 
-                <!-- ── Background Remover controls ── -->
-                <div v-if="editTool === 'bg-remove'" class="px-4 py-4 flex flex-col gap-4">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ trans('dam::app.admin.dam.asset.edit.image-editor.ai-settings') }}</p>
+                <!-- ── Filters controls ── -->
+                <div v-if="editTool === 'filters'" class="px-4 py-4 flex flex-col gap-4">
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ trans('dam::app.admin.dam.asset.edit.image-editor.filters') }}</p>
+                    <div class="flex gap-2">
+                        <button
+                            type="button"
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-xs font-semibold transition-colors"
+                            :class="filterGreyscale
+                                ? 'bg-pink-500 text-white border-pink-500'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                            @click="filterGreyscale = !filterGreyscale"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/></svg>
+                            {{ trans('dam::app.admin.dam.asset.edit.image-editor.greyscale') }}
+                        </button>
+                        <button
+                            type="button"
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-xs font-semibold transition-colors"
+                            :class="filterInvert
+                                ? 'bg-pink-500 text-white border-pink-500'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                            @click="filterInvert = !filterInvert"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z"/></svg>
+                            {{ trans('dam::app.admin.dam.asset.edit.image-editor.invert') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Edit Background controls ── -->
+                <div v-if="editTool === 'edit-bg'" class="px-4 py-4 flex flex-col gap-4">
+
+                    <!-- Flash error (no platforms / no models) -->
+                    <div
+                        v-if="bgPlatformError"
+                        class="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span class="text-xs text-red-600 dark:text-red-400">@{{ bgPlatformError }}</span>
+                    </div>
 
                     <!-- Platform select -->
                     <div>
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.platform') }}</label>
                         <select
-                            v-model="editSelectedPlatformId"
-                            @change="onEditPlatformChange"
-                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                            v-model="bgSelectedPlatformId"
+                            @change="onBgPlatformChange"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500"
                         >
-                            <option v-if="!editPlatforms.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.platform-loading') }}</option>
-                            <option v-for="p in editPlatforms" :key="p.id" :value="p.id">
-                                @{{ p.label || p.provider }}
-                            </option>
+                            <option v-if="!bgPlatforms.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.platform-loading') }}</option>
+                            <option v-for="p in bgPlatforms" :key="p.id" :value="p.id">@{{ p.label || p.provider }}</option>
                         </select>
                     </div>
 
@@ -322,22 +404,101 @@
                     <div>
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.model') }}</label>
                         <select
-                            v-model="editSelectedModel"
-                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                            v-model="bgSelectedModel"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500"
                         >
-                            <option v-if="!editCurrentPlatformModels.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.no-models') }}</option>
-                            <option v-for="m in editCurrentPlatformModels" :key="m" :value="m">@{{ m }}</option>
+                            <option v-if="!bgCurrentPlatformModels.length" :value="null" disabled>{{ trans('dam::app.admin.dam.asset.edit.image-editor.no-models') }}</option>
+                            <option v-for="m in bgCurrentPlatformModels" :key="m" :value="m">@{{ m }}</option>
                         </select>
                     </div>
 
-                    <!-- Prompt -->
-                    <div>
+                    <!-- Divider -->
+                    <div class="border-t border-gray-100 dark:border-gray-700 -mx-0"></div>
+
+                    <!-- Sub-tab switcher -->
+                    <div class="flex gap-0.5 p-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
+                        <button
+                            type="button"
+                            class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-all"
+                            :class="bgSubTab === 'color'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                            @click="bgSubTab = 'color'"
+                        >{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-tab-color') }}</button>
+                        <button
+                            type="button"
+                            class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-all"
+                            :class="bgSubTab === 'upload'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                            @click="bgSubTab = 'upload'"
+                        >{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-tab-upload') }}</button>
+                        <button
+                            type="button"
+                            class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-all"
+                            :class="bgSubTab === 'ai'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                            @click="bgSubTab = 'ai'"
+                        >{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-tab-ai') }}</button>
+                    </div>
+
+                    <!-- Color tab -->
+                    <div v-if="bgSubTab === 'color'" class="flex flex-col gap-3">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-color-label') }}</p>
+                        <div class="grid grid-cols-8 gap-2">
+                            <button
+                                v-for="swatch in bgSwatches"
+                                :key="swatch"
+                                type="button"
+                                class="w-7 h-7 rounded-full border-2 transition-all hover:scale-110"
+                                :style="{ backgroundColor: swatch }"
+                                :class="bgColor === swatch
+                                    ? 'border-rose-500 ring-2 ring-rose-300 dark:ring-rose-700 scale-110'
+                                    : 'border-gray-200 dark:border-gray-600'"
+                                @click="bgColor = swatch"
+                            ></button>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input
+                                type="color"
+                                v-model="bgColor"
+                                class="w-7 h-7 rounded cursor-pointer border border-gray-200 dark:border-gray-600 p-0.5 bg-white dark:bg-gray-800"
+                            />
+                            <span class="text-xs font-mono text-gray-600 dark:text-gray-300">@{{ bgColor }}</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-custom-color') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload tab -->
+                    <div v-if="bgSubTab === 'upload'" class="flex flex-col gap-3">
+                        <label
+                            class="flex flex-col items-center justify-center gap-2 w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors"
+                            :class="bgUploadFile
+                                ? 'border-rose-400 dark:border-rose-600 bg-rose-50/60 dark:bg-rose-900/20'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-rose-300 dark:hover:border-rose-700 hover:bg-rose-50/40 dark:hover:bg-rose-900/10'"
+                        >
+                            <input type="file" accept="image/*" class="hidden" @change="bgUploadFile = $event.target.files[0]" />
+                            <template v-if="!bgUploadFile">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300 dark:text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 text-center px-4">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-upload-hint') }}</span>
+                            </template>
+                            <template v-else>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span class="text-xs text-gray-700 dark:text-gray-200 font-medium truncate max-w-full px-3">@{{ bgUploadFile.name }}</span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-upload-change') }}</span>
+                            </template>
+                        </label>
+                    </div>
+
+                    <!-- AI tab -->
+                    <div v-if="bgSubTab === 'ai'" class="flex flex-col gap-3">
                         <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">{{ trans('dam::app.admin.dam.asset.edit.image-editor.prompt') }}</label>
                         <textarea
-                            v-model="editPrompt"
-                            rows="3"
-                            placeholder="{{ trans('dam::app.admin.dam.asset.edit.image-editor.prompt-placeholder') }}"
-                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500"
+                            v-model="bgAiPrompt"
+                            rows="4"
+                            placeholder="{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-ai-prompt-placeholder') }}"
+                            class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-rose-500"
                         ></textarea>
                     </div>
                 </div>
@@ -364,7 +525,7 @@
                             <span>{{ trans('dam::app.admin.dam.asset.edit.image-editor.applying') }}</span>
                         </template>
                         <template v-else>
-                            <span v-if="editTool === 'bg-remove'" class="icon-magic-ai text-base mr-1"></span>
+                            <span v-if="editTool === 'edit-bg' && bgSubTab === 'ai'" class="icon-magic-ai text-base mr-1"></span>
                             <span>{{ trans('dam::app.admin.dam.asset.edit.image-editor.apply') }}</span>
                         </template>
                     </button>
