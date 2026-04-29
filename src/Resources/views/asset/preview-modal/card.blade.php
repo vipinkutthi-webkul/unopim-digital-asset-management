@@ -21,7 +21,7 @@
                 @if ($fileSize)<span class="text-gray-400 dark:text-gray-500">{{ $fileSize }}</span>@endif
                 @if ($asset->file_type === 'image' && !empty($asset->width) && !empty($asset->height))<span class="text-gray-400 dark:text-gray-500">{{ $asset->width }}×{{ $asset->height }}px</span>@endif
             </div>
-            <p class="text-gray-400 dark:text-gray-500 text-[11px]">Click for full details</p>
+            <p class="text-gray-400 dark:text-gray-500 text-[11px]">{{ trans('dam::app.admin.dam.asset.edit.preview-modal.card.click-for-details') }}</p>
         </div>
     </div>
 
@@ -29,7 +29,7 @@
     <button
         type="button"
         class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
-        title="Preview"
+        title="{{ trans('dam::app.admin.dam.asset.edit.preview-modal.card.preview') }}"
         @click="openPreview"
     >
         <span class="text-lg icon-dam-preview"></span>
@@ -40,7 +40,7 @@
     <button
         type="button"
         class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
-        title="Edit image"
+        title="{{ trans('dam::app.admin.dam.asset.edit.preview-modal.card.edit-image') }}"
         @click="isEditOpen = true"
     >
         <span class="text-lg icon-edit"></span>
