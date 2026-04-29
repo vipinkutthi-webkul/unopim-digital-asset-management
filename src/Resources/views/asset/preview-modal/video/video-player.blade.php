@@ -191,7 +191,7 @@
                 </button>
                 <input
                     type="range"
-                    class="w-20 h-1.5 accent-violet-400 cursor-pointer opacity-80 hover:opacity-100"
+                    class="w-20 h-1 accent-violet-400 cursor-pointer opacity-80 hover:opacity-100"
                     min="0" max="1" step="0.01"
                     :value="videoIsMuted ? 0 : videoVolume"
                     @input="videoOnVolume"
@@ -222,6 +222,84 @@
                     <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
                 </svg>
             </button>
+
+            <!-- Three-dot action menu -->
+            <div class="relative shrink-0">
+                <button
+                    type="button"
+                    class="flex items-center justify-center w-7 h-7 rounded hover:bg-white/10 opacity-70 hover:opacity-100 transition-opacity"
+                    title="@lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.more-actions')"
+                    @click="videoMenuOpen = !videoMenuOpen; videoMenuOpen ? videoKeepControls() : null"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                    </svg>
+                </button>
+
+                <div
+                    v-if="videoMenuOpen"
+                    class="fixed inset-0 z-[10015]"
+                    @click="videoMenuOpen = false"
+                ></div>
+
+                <div
+                    v-if="videoMenuOpen"
+                    class="absolute bottom-12 right-0 w-52 rounded-lg bg-white dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 shadow-2xl z-[10020] py-1 text-sm overflow-hidden"
+                >
+                    <a
+                        href="{{ route('admin.dam.assets.download', $asset->id) }}"
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-600 hover:text-white dark:hover:bg-gray-600 transition-colors"
+                        @click="videoMenuOpen = false"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        @lang('dam::app.admin.dam.asset.edit.preview-modal.download-file')
+                    </a>
+
+                    <a
+                        href="{{ route('admin.dam.assets.download_compressed', $asset->id) }}"
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-600 hover:text-white dark:hover:bg-gray-600 transition-colors"
+                        @click="videoMenuOpen = false"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 8l-6-6H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/><polyline points="15 2 15 8 21 8"/><line x1="12" y1="12" x2="12" y2="18"/><polyline points="9 15 12 18 15 15"/>
+                        </svg>
+                        @lang('dam::app.admin.dam.asset.edit.preview-modal.download-zip')
+                    </a>
+
+                    <div class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
+
+                    <button
+                        type="button"
+                        class="w-full flex items-center gap-2.5 px-4 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-600 hover:text-white dark:hover:bg-gray-600 transition-colors text-left"
+                        @click="videoCopyLink('{{ $mediaUrl }}')"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span v-if="videoLinkCopied" class="text-green-600 dark:text-green-400">
+                            @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.link-copied')
+                        </span>
+                        <span v-else>
+                            @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.copy-link')
+                        </span>
+                    </button>
+
+                    <a
+                        href="{{ $mediaUrl }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-600 hover:text-white dark:hover:bg-gray-600 transition-colors"
+                        @click="videoMenuOpen = false"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                        </svg>
+                        @lang('dam::app.admin.dam.asset.edit.preview-modal.video-player.open-in-new-tab')
+                    </a>
+                </div>
+            </div>
 
         </div>
     </div>

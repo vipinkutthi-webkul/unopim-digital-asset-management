@@ -28,9 +28,9 @@
     </div>
 </script>
 
-@include('dam::asset.preview-modal.image-viewer-script')
-@include('dam::asset.preview-modal.video-player-script')
-@include('dam::asset.preview-modal.audio-player-script')
+@include('dam::asset.preview-modal.image.image-viewer-script')
+@include('dam::asset.preview-modal.video.video-player-script')
+@include('dam::asset.preview-modal.audio.audio-player-script')
 
 <script type="module">
     // Keep the plain CSRF token in the X-CSRF-TOKEN header so it's always valid
