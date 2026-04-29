@@ -50,7 +50,7 @@
             @endif
             @if (!empty($asset->mime_type))
             <div class="flex items-center justify-between py-3 gap-4">
-                <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0">MIME</span>
+                <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0">{{ trans('dam::app.admin.dam.asset.edit.preview-modal.mime') }}</span>
                 <span class="text-xs font-medium text-gray-700 dark:text-gray-200">{{ $asset->mime_type }}</span>
             </div>
             @endif

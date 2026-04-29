@@ -295,13 +295,13 @@
             @endphp
 
             @if($asset->previousAssetId)
-                <button class="secondary-button" title="Previous"
+                <button class="secondary-button" title="{{ trans('dam::app.admin.dam.asset.edit.previous') }}"
                  @click="goToPreviousAsset('{{ route('admin.dam.assets.edit', $asset->previousAssetId) }}{{ $queryString }}')">
                     <span class="text-2xl">&larr;</span>
                 </button>
             @endif
             @if($asset->nextAssetId)
-                <button class="secondary-button"  title="Next"
+                <button class="secondary-button"  title="{{ trans('dam::app.admin.dam.asset.edit.next') }}"
                     @click="goToNextAsset('{{ route('admin.dam.assets.edit', $asset->nextAssetId) }}{{ $queryString }}')">
 
                     <span class="text-2xl">&rarr;</span>
