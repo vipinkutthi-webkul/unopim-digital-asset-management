@@ -417,3 +417,89 @@ it('should move asset from one directory to another', function () {
 
     Storage::disk($disk)->assertMissing($originalPath);
 });
+
+// ── Download Compressed ───────────────────────────────────────────────────
+
+it('should download asset as a zip file', function () {
+    $disk = Directory::getAssetDisk();
+    Storage::fake($disk);
+
+    $fileName = 'sample-'.uniqid().'.pdf';
+    $filePath = 'assets/Root/'.$fileName;
+    Storage::disk($disk)->put($filePath, 'dummy content');
+
+    $asset = Asset::factory()->create([
+        'file_name' => $fileName,
+        'path'      => $filePath,
+    ]);
+
+    $response = $this->get(route('admin.dam.assets.download_compressed', $asset->id));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Disposition');
+});
+
+it('should return 404 when compressed-download targets a non-existent asset', function () {
+    $this->get(route('admin.dam.assets.download_compressed', 99999))
+        ->assertNotFound();
+});
+
+it('should return 404 when compressed-download file is missing from storage', function () {
+    $disk = Directory::getAssetDisk();
+    Storage::fake($disk);
+
+    $asset = Asset::factory()->create([
+        'file_name' => 'missing.pdf',
+        'path'      => 'assets/Root/missing.pdf',
+    ]);
+
+    $this->get(route('admin.dam.assets.download_compressed', $asset->id))
+        ->assertNotFound();
+});
+
+// ── Metadata ──────────────────────────────────────────────────────────────
+
+it('should return cached metadata for an asset', function () {
+    $asset = Asset::factory()->create([
+        'meta_data' => ['FileType' => 'JPEG', 'ImageWidth' => 800],
+    ]);
+
+    $this->getJson(route('admin.dam.assets.metadata', $asset->id))
+        ->assertOk()
+        ->assertJson(['success' => true])
+        ->assertJsonPath('data.FileType', 'JPEG')
+        ->assertJsonPath('data.ImageWidth', 800);
+});
+
+it('should flatten exif sub-keys from cached metadata', function () {
+    $asset = Asset::factory()->create([
+        'meta_data' => [
+            'FileType'  => 'PNG',
+            'exif'      => ['Make' => 'Canon', 'Model' => 'EOS'],
+        ],
+    ]);
+
+    $response = $this->getJson(route('admin.dam.assets.metadata', $asset->id))
+        ->assertOk()
+        ->assertJson(['success' => true]);
+
+    // exif scalar values merged to top level; 'exif' key removed
+    $data = $response->json('data');
+    expect($data)->toHaveKey('Make');
+    expect($data)->toHaveKey('Model');
+    expect($data)->not->toHaveKey('exif');
+});
+
+it('should return error when asset has no metadata and file is missing', function () {
+    $disk = Directory::getAssetDisk();
+    Storage::fake($disk);
+
+    $asset = Asset::factory()->create([
+        'path'      => 'assets/Root/missing-file.jpg',
+        'meta_data' => null,
+    ]);
+
+    $this->getJson(route('admin.dam.assets.metadata', $asset->id))
+        ->assertOk()
+        ->assertJson(['success' => false]);
+});
