@@ -42,8 +42,8 @@ return [
                 ],
 
                 'directory' => [
-                    'title'  => 'Direktorij',
-                    'create' => [
+                    'title'        => 'Direktorij',
+                    'create'       => [
                         'title'    => 'Stvori direktorij',
                         'name'     => 'Naziv',
                         'save-btn' => 'Spremi direktorij',
@@ -111,7 +111,7 @@ return [
                         'title'      => 'Svojstva resursa',
                         'create-btn' => 'Stvori svojstvo',
 
-                        'datagrid' => [
+                        'datagrid'      => [
                             'name'     => 'Naziv',
                             'type'     => 'Vrsta',
                             'language' => 'Jezik',
@@ -120,7 +120,7 @@ return [
                             'delete'   => 'Obriši',
                         ],
 
-                        'create' => [
+                        'create'     => [
                             'title'    => 'Stvori svojstvo',
                             'name'     => 'Naziv',
                             'type'     => 'Vrsta',
@@ -158,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Uredi resurs',
+                    'previous'              => 'Prethodno',
+                    'next'                  => 'Sljedeće',
                     'name'                  => 'Naziv',
                     'value'                 => 'Vrijednost',
                     'back-btn'              => 'Natrag',
@@ -201,6 +203,22 @@ return [
                         'not-available'   => 'Pregled nije dostupan za ovu vrstu datoteke.',
                         'download-file'   => 'Preuzmi Datoteku',
                         'download-zip'    => 'Preuzmi kao ZIP',
+                        'close'           => 'Zatvori pregled',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Kliknite za sve detalje',
+                            'preview'           => 'Pregled',
+                            'edit-image'        => 'Uredi sliku',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Rotiraj lijevo (L)',
+                            'rotate-right' => 'Rotiraj desno (R)',
+                            'zoom-out'     => 'Umanji (-)',
+                            'zoom-in'      => 'Uvećaj (+)',
+                            'fit-to-screen'=> 'Prilagodi ekranu',
+                            'actual-size'  => 'Stvarna veličina',
+                            'reset-all'    => 'Resetuj sve (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 s natrag',
                             'forward-10s'        => '10 s naprijed',
@@ -210,6 +228,10 @@ return [
                             'mute'               => 'Isključi zvuk (M)',
                             'picture-in-picture' => 'Slika u slici',
                             'fullscreen'         => 'Cijeli zaslon (F)',
+                            'more-actions'       => 'Više radnji',
+                            'copy-link'          => 'Kopiraj vezu',
+                            'link-copied'        => 'Kopirano!',
+                            'open-in-new-tab'    => 'Otvori u novoj kartici',
                         ],
                     ],
 
@@ -256,6 +278,7 @@ return [
                         'width-px'                   => 'Širina (px)',
                         'height-px'                  => 'Visina (px)',
                         'blank-keep-dims'            => 'Ostavi prazno za zadržavanje izrezanih dimenzija.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Prilagodbe',
                         'brightness'                 => 'Svjetlina',
                         'contrast'                   => 'Kontrast',
@@ -266,6 +289,31 @@ return [
                         'ai-settings'                => 'AI postavke',
                         'platform'                   => 'Platforma',
                         'platform-loading'           => 'Učitavanje…',
+                        'no-platforms'               => 'Nema platformi',
+                        'color-white'                => 'Bijela',
+                        'color-silver'               => 'Srebrna',
+                        'color-light-gray'           => 'Svijetlosiva',
+                        'color-gray'                 => 'Siva',
+                        'color-slate'                => 'Škriljevosiva',
+                        'color-dark-gray'            => 'Tamnasiva',
+                        'color-charcoal'             => 'Ugljen',
+                        'color-black'                => 'Crna',
+                        'color-light-red'            => 'Svijetlocrvena',
+                        'color-red'                  => 'Crvena',
+                        'color-light-yellow'         => 'Svijetložuta',
+                        'color-yellow'               => 'Žuta',
+                        'color-light-green'          => 'Svijetlozelena',
+                        'color-green'                => 'Zelena',
+                        'color-light-cyan'           => 'Svijetlocijan',
+                        'color-cyan'                 => 'Cijan',
+                        'color-light-blue'           => 'Svijetloplava',
+                        'color-blue'                 => 'Plava',
+                        'color-light-purple'         => 'Svijetloljubičasta',
+                        'color-purple'               => 'Ljubičasta',
+                        'color-light-pink'           => 'Svijetloružičasta',
+                        'color-pink'                 => 'Ružičasta',
+                        'color-light-rose'           => 'Blijedoružičasta',
+                        'color-rose'                 => 'Ruža',
                         'model'                      => 'Model',
                         'no-models'                  => 'Nema modela',
                         'prompt'                     => 'Upit',
@@ -354,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Neke datoteke nisu obrađene',
                     'file-forbidden-type'                 => 'Datoteka ima zabranjenu vrstu ili ekstenziju.',
                     'file-too-large'                      => 'Datoteka je prevelika. Maksimalno dopuštena veličina je :size.',
+                    'storage-upload-failed'               => 'Neuspjelo učitavanje ":name" u pohranu. Provjerite vjerodajnice diska i dopuštenja.',
                 ],
             ],
         ],

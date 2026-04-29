@@ -42,8 +42,8 @@ return [
                 ],
 
                 'directory' => [
-                    'title'  => 'Dizin',
-                    'create' => [
+                    'title'        => 'Dizin',
+                    'create'       => [
                         'title'    => 'Dizin oluştur',
                         'name'     => 'Ad',
                         'save-btn' => 'Dizini kaydet',
@@ -111,7 +111,7 @@ return [
                         'title'      => 'Varlık özellikleri',
                         'create-btn' => 'Özellik oluştur',
 
-                        'datagrid' => [
+                        'datagrid'      => [
                             'name'     => 'Ad',
                             'type'     => 'Tür',
                             'language' => 'Dil',
@@ -120,7 +120,7 @@ return [
                             'delete'   => 'Sil',
                         ],
 
-                        'create' => [
+                        'create'     => [
                             'title'    => 'Özellik oluştur',
                             'name'     => 'Ad',
                             'type'     => 'Tür',
@@ -158,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Varlığı düzenle',
+                    'previous'              => 'Önceki',
+                    'next'                  => 'Sonraki',
                     'name'                  => 'Ad',
                     'value'                 => 'Değer',
                     'back-btn'              => 'Geri',
@@ -201,6 +203,22 @@ return [
                         'not-available'   => 'Bu dosya türü için önizleme mevcut değil.',
                         'download-file'   => 'Dosyayı İndir',
                         'download-zip'    => 'ZIP olarak indir',
+                        'close'           => 'Önizlemeyi kapat',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Tüm detaylar için tıklayın',
+                            'preview'           => 'Önizleme',
+                            'edit-image'        => 'Görüntüyü düzenle',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Sola döndür (L)',
+                            'rotate-right' => 'Sağa döndür (R)',
+                            'zoom-out'     => 'Uzaklaştır (-)',
+                            'zoom-in'      => 'Yaklaştır (+)',
+                            'fit-to-screen'=> 'Ekrana sığdır',
+                            'actual-size'  => 'Gerçek boyut',
+                            'reset-all'    => 'Tümünü sıfırla (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 s geri',
                             'forward-10s'        => '10 s ileri',
@@ -210,6 +228,10 @@ return [
                             'mute'               => 'Sessiz (M)',
                             'picture-in-picture' => 'Resim içinde resim',
                             'fullscreen'         => 'Tam ekran (F)',
+                            'more-actions'       => 'Daha fazla eylem',
+                            'copy-link'          => 'Bağlantıyı kopyala',
+                            'link-copied'        => 'Kopyalandı!',
+                            'open-in-new-tab'    => 'Yeni sekmede aç',
                         ],
                     ],
 
@@ -256,6 +278,7 @@ return [
                         'width-px'                   => 'Genişlik (px)',
                         'height-px'                  => 'Yükseklik (px)',
                         'blank-keep-dims'            => 'Kırpılmış boyutları korumak için boş bırakın.',
+                        'auto'                       => 'otomatik',
                         'adjustments'                => 'Ayarlamalar',
                         'brightness'                 => 'Parlaklık',
                         'contrast'                   => 'Kontrast',
@@ -266,6 +289,31 @@ return [
                         'ai-settings'                => 'YZ Ayarları',
                         'platform'                   => 'Platform',
                         'platform-loading'           => 'Yükleniyor…',
+                        'no-platforms'               => 'Platform yok',
+                        'color-white'                => 'Beyaz',
+                        'color-silver'               => 'Gümüş',
+                        'color-light-gray'           => 'Açık gri',
+                        'color-gray'                 => 'Gri',
+                        'color-slate'                => 'Arduvaz grisi',
+                        'color-dark-gray'            => 'Koyu gri',
+                        'color-charcoal'             => 'Kömür',
+                        'color-black'                => 'Siyah',
+                        'color-light-red'            => 'Açık kırmızı',
+                        'color-red'                  => 'Kırmızı',
+                        'color-light-yellow'         => 'Açık sarı',
+                        'color-yellow'               => 'Sarı',
+                        'color-light-green'          => 'Açık yeşil',
+                        'color-green'                => 'Yeşil',
+                        'color-light-cyan'           => 'Açık camgöbeği',
+                        'color-cyan'                 => 'Camgöbeği',
+                        'color-light-blue'           => 'Açık mavi',
+                        'color-blue'                 => 'Mavi',
+                        'color-light-purple'         => 'Açık mor',
+                        'color-purple'               => 'Mor',
+                        'color-light-pink'           => 'Açık pembe',
+                        'color-pink'                 => 'Pembe',
+                        'color-light-rose'           => 'Açık gül',
+                        'color-rose'                 => 'Gül',
                         'model'                      => 'Model',
                         'no-models'                  => 'Model yok',
                         'prompt'                     => 'İstem',
@@ -354,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Bazı dosyalar işlenemedi',
                     'file-forbidden-type'                 => 'Dosyanın türü veya uzantısı yasaklı.',
                     'file-too-large'                      => 'Dosya çok büyük. İzin verilen maksimum boyut: :size.',
+                    'storage-upload-failed'               => '":name" depolamaya yüklenemedi. Disk kimlik bilgilerini ve izinleri kontrol edin.',
                 ],
             ],
         ],

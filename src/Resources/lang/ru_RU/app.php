@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Название файла',
                     'tags'           => 'Теги',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Путь',
                     'size'           => 'Размер',
                 ],
+
                 'directory' => [
-                    'title'  => 'Директория',
-                    'create' => [
+                    'title'        => 'Директория',
+                    'create'       => [
                         'title'    => 'Создать директорию',
                         'name'     => 'Название',
                         'save-btn' => 'Сохранить директорию',
                     ],
+
                     'rename' => [
                         'title' => 'Переименовать директорию',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Переименовать актив',
                             'save-btn' => 'Сохранить актив',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Удалить',
                         'rename'                    => 'Переименовать',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Получить по идентификатору',
                         'comment'                   => 'Комментарий',
                     ],
+
                     'linked-resources'                          => 'Связанные ресурсы',
                     'not-found'                                 => 'Директория не найдена',
                     'created-success'                           => 'Директория успешно создана',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Не удалось создать zip файл.',
                     'not-allowed'                               => 'Загрузка скриптовых файлов не разрешена.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Этот инструмент поможет вам организовать, хранить и управлять всеми вашими медиа-активами в одном месте',
                 'root'             => 'Корень',
                 'upload'           => 'Загрузить',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Свойства актива',
                         'create-btn' => 'Создать свойство',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Название',
                             'type'     => 'Тип',
                             'language' => 'Язык',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Редактировать',
                             'delete'   => 'Удалить',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Создать свойство',
                             'name'     => 'Название',
                             'type'     => 'Тип',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Редактировать актив',
+                    'previous'              => 'Назад',
+                    'next'                  => 'Вперёд',
                     'name'                  => 'Название',
                     'value'                 => 'Значение',
                     'back-btn'              => 'Назад',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Предпросмотр недоступен для данного типа файла.',
                         'download-file'   => 'Скачать файл',
                         'download-zip'    => 'Скачать как ZIP',
+                        'close'           => 'Закрыть предварительный просмотр',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Нажмите для полной информации',
+                            'preview'           => 'Предварительный просмотр',
+                            'edit-image'        => 'Редактировать изображение',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Повернуть влево (L)',
+                            'rotate-right' => 'Повернуть вправо (R)',
+                            'zoom-out'     => 'Уменьшить (-)',
+                            'zoom-in'      => 'Увеличить (+)',
+                            'fit-to-screen'=> 'По размеру экрана',
+                            'actual-size'  => 'Реальный размер',
+                            'reset-all'    => 'Сбросить всё (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 с назад',
                             'forward-10s'        => '10 с вперёд',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Без звука (M)',
                             'picture-in-picture' => 'Картинка в картинке',
                             'fullscreen'         => 'На весь экран (F)',
+                            'more-actions'       => 'Больше действий',
+                            'copy-link'          => 'Скопировать ссылку',
+                            'link-copied'        => 'Скопировано!',
+                            'open-in-new-tab'    => 'Открыть в новой вкладке',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Высота (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Скачать',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Оригинал',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Тег уже существует',
                     'image-source-not-readable' => 'Источник изображения не читаем',
                     'failed-to-read'            => 'Не удалось прочитать метаданные изображения :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Ширина (px)',
                         'height-px'                  => 'Высота (px)',
                         'blank-keep-dims'            => 'Оставьте пустым, чтобы сохранить обрезанные размеры.',
+                        'auto'                       => 'авто',
                         'adjustments'                => 'Настройки',
                         'brightness'                 => 'Яркость',
                         'contrast'                   => 'Контрастность',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'Настройки ИИ',
                         'platform'                   => 'Платформа',
                         'platform-loading'           => 'Загрузка…',
+                        'no-platforms'               => 'Нет платформ',
+                        'color-white'                => 'Белый',
+                        'color-silver'               => 'Серебряный',
+                        'color-light-gray'           => 'Светло-серый',
+                        'color-gray'                 => 'Серый',
+                        'color-slate'                => 'Шиферный',
+                        'color-dark-gray'            => 'Тёмно-серый',
+                        'color-charcoal'             => 'Угольный',
+                        'color-black'                => 'Чёрный',
+                        'color-light-red'            => 'Светло-красный',
+                        'color-red'                  => 'Красный',
+                        'color-light-yellow'         => 'Светло-жёлтый',
+                        'color-yellow'               => 'Жёлтый',
+                        'color-light-green'          => 'Светло-зелёный',
+                        'color-green'                => 'Зелёный',
+                        'color-light-cyan'           => 'Светло-голубой',
+                        'color-cyan'                 => 'Голубой',
+                        'color-light-blue'           => 'Светло-синий',
+                        'color-blue'                 => 'Синий',
+                        'color-light-purple'         => 'Светло-фиолетовый',
+                        'color-purple'               => 'Фиолетовый',
+                        'color-light-pink'           => 'Светло-розовый',
+                        'color-pink'                 => 'Розовый',
+                        'color-light-rose'           => 'Бледно-розовый',
+                        'color-rose'                 => 'Розовый',
                         'model'                      => 'Модель',
                         'no-models'                  => 'Нет моделей',
                         'prompt'                     => 'Запрос',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Теги успешно добавлены',
                         'create-failure' => 'Не удалось создать теги',
                     ],
+
                     'no-comments'    => 'Теги ещё не добавлены',
                     'found-success'  => 'Тег успешно найден',
                     'not-found'      => 'Теги не найдены',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Некоторые файлы не удалось обработать',
                     'file-forbidden-type'                 => 'Файл имеет запрещенный тип или расширение.',
                     'file-too-large'                      => 'Файл слишком большой. Максимально допустимый размер: :size.',
+                    'storage-upload-failed'               => 'Не удалось загрузить ":name" в хранилище. Проверьте учётные данные диска и права доступа.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'Скачать Zip',
             'asset-assign'     => 'Назначить актив',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'Поле :attribute обязательно для заполнения.',
             ],
+
             'comment' => [
                 'required' => 'Сообщение комментария обязательно.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Это действие не авторизовано.',
         ],

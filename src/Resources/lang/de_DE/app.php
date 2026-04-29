@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Dateiname',
                     'tags'           => 'Tags',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Pfad',
                     'size'           => 'Größe',
                 ],
+
                 'directory' => [
-                    'title'  => 'Verzeichnis',
-                    'create' => [
+                    'title'        => 'Verzeichnis',
+                    'create'       => [
                         'title'    => 'Verzeichnis erstellen',
                         'name'     => 'Name',
                         'save-btn' => 'Verzeichnis speichern',
                     ],
+
                     'rename' => [
                         'title' => 'Verzeichnis umbenennen',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Asset umbenennen',
                             'save-btn' => 'Asset speichern',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Löschen',
                         'rename'                    => 'Umbenennen',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Nach ID suchen',
                         'comment'                   => 'Kommentar',
                     ],
+
                     'linked-resources'                          => 'Verlinkte Ressourcen',
                     'not-found'                                 => 'Kein Verzeichnis gefunden',
                     'created-success'                           => 'Verzeichnis erfolgreich erstellt',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Fehler beim Erstellen der ZIP-Datei.',
                     'not-allowed'                               => 'Das Hochladen von Skriptdateien ist nicht erlaubt.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Dieses Tool hilft Ihnen, alle Ihre Medienassets an einem Ort zu organisieren, zu speichern und zu verwalten.',
                 'root'             => 'Wurzel',
                 'upload'           => 'Hochladen',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Asset-Eigenschaften',
                         'create-btn' => 'Eigenschaft erstellen',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Name',
                             'type'     => 'Typ',
                             'language' => 'Sprache',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Bearbeiten',
                             'delete'   => 'Löschen',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Eigenschaft erstellen',
                             'name'     => 'Name',
                             'type'     => 'Typ',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Asset bearbeiten',
+                    'previous'              => 'Zurück',
+                    'next'                  => 'Weiter',
                     'name'                  => 'Name',
                     'value'                 => 'Wert',
                     'back-btn'              => 'Zurück',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Vorschau für diesen Dateityp nicht verfügbar.',
                         'download-file'   => 'Datei herunterladen',
                         'download-zip'    => 'Als ZIP herunterladen',
+                        'close'           => 'Vorschau schließen',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Klicken für vollständige Details',
+                            'preview'           => 'Vorschau',
+                            'edit-image'        => 'Bild bearbeiten',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Links drehen (L)',
+                            'rotate-right' => 'Rechts drehen (R)',
+                            'zoom-out'     => 'Verkleinern (-)',
+                            'zoom-in'      => 'Vergrößern (+)',
+                            'fit-to-screen'=> 'An Bildschirm anpassen',
+                            'actual-size'  => 'Tatsächliche Größe',
+                            'reset-all'    => 'Alles zurücksetzen (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 s zurück',
                             'forward-10s'        => '10 s vor',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Stummschalten (M)',
                             'picture-in-picture' => 'Bild im Bild',
                             'fullscreen'         => 'Vollbild (F)',
+                            'more-actions'       => 'Weitere Aktionen',
+                            'copy-link'          => 'Link kopieren',
+                            'link-copied'        => 'Kopiert!',
+                            'open-in-new-tab'    => 'In neuem Tab öffnen',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Höhe (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Herunterladen',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Original',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Tag existiert bereits',
                     'image-source-not-readable' => 'Bildquelle nicht lesbar',
                     'failed-to-read'            => 'Metadaten des Bildes konnten nicht gelesen werden: :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Breite (px)',
                         'height-px'                  => 'Höhe (px)',
                         'blank-keep-dims'            => 'Leer lassen, um die zugeschnittenen Abmessungen beizubehalten.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Anpassungen',
                         'brightness'                 => 'Helligkeit',
                         'contrast'                   => 'Kontrast',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'KI-Einstellungen',
                         'platform'                   => 'Plattform',
                         'platform-loading'           => 'Wird geladen…',
+                        'no-platforms'               => 'Keine Plattformen',
+                        'color-white'                => 'Weiß',
+                        'color-silver'               => 'Silber',
+                        'color-light-gray'           => 'Hellgrau',
+                        'color-gray'                 => 'Grau',
+                        'color-slate'                => 'Schiefergrau',
+                        'color-dark-gray'            => 'Dunkelgrau',
+                        'color-charcoal'             => 'Anthrazit',
+                        'color-black'                => 'Schwarz',
+                        'color-light-red'            => 'Hellrot',
+                        'color-red'                  => 'Rot',
+                        'color-light-yellow'         => 'Hellgelb',
+                        'color-yellow'               => 'Gelb',
+                        'color-light-green'          => 'Hellgrün',
+                        'color-green'                => 'Grün',
+                        'color-light-cyan'           => 'Hellcyan',
+                        'color-cyan'                 => 'Cyan',
+                        'color-light-blue'           => 'Hellblau',
+                        'color-blue'                 => 'Blau',
+                        'color-light-purple'         => 'Helllila',
+                        'color-purple'               => 'Lila',
+                        'color-light-pink'           => 'Hellrosa',
+                        'color-pink'                 => 'Pink',
+                        'color-light-rose'           => 'Helles Rosa',
+                        'color-rose'                 => 'Rosé',
                         'model'                      => 'Modell',
                         'no-models'                  => 'Keine Modelle',
                         'prompt'                     => 'Eingabe',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Tags wurden erfolgreich hinzugefügt',
                         'create-failure' => 'Fehler beim Erstellen der Tags',
                     ],
+
                     'no-comments'    => 'Noch keine Tags',
                     'found-success'  => 'Tag erfolgreich gefunden',
                     'not-found'      => 'Tags nicht gefunden',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Einige Dateien konnten nicht verarbeitet werden',
                     'file-forbidden-type'                 => 'Die Datei hat einen verbotenen Typ oder eine verbotene Erweiterung.',
                     'file-too-large'                      => 'Die Datei ist zu groß. Die maximal zulässige Größe beträgt :size.',
+                    'storage-upload-failed'               => 'Das Hochladen von ":name" auf den Speicher ist fehlgeschlagen. Überprüfen Sie die Anmeldeinformationen und Berechtigungen.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'ZIP herunterladen',
             'asset-assign'     => 'Asset zuweisen',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'Das Feld :attribute ist erforderlich.',
             ],
+
             'comment' => [
                 'required' => 'Das Kommentarfeld ist erforderlich.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Diese Aktion ist nicht autorisiert.',
         ],

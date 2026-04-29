@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'إدارة الأصول الرقمية',
+                'title' => 'إدارة الأصول الرقمية',
+
                 'datagrid' => [
                     'file-name'      => 'اسم الملف',
                     'tags'           => 'العلامات',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'المسار',
                     'size'           => 'الحجم',
                 ],
+
                 'directory' => [
-                    'title'  => 'الدليل',
-                    'create' => [
+                    'title'        => 'الدليل',
+                    'create'       => [
                         'title'    => 'إنشاء دليل',
                         'name'     => 'الاسم',
                         'save-btn' => 'حفظ الدليل',
                     ],
+
                     'rename' => [
                         'title' => 'إعادة تسمية الدليل',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'إعادة تسمية الأصل',
                             'save-btn' => 'حفظ الأصل',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'حذف',
                         'rename'                    => 'إعادة تسمية',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'الحصول على معرف',
                         'comment'                   => 'تعليق',
                     ],
+
                     'linked-resources'                          => 'الموارد المرتبطة',
                     'not-found'                                 => 'لم يتم العثور على دليل',
                     'created-success'                           => 'تم إنشاء الدليل بنجاح',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'فشل في إنشاء الملف المضغوط.',
                     'not-allowed'                               => 'رفع ملفات السكربت غير مسموح به.',
                 ],
+
+                'title'            => 'إدارة الأصول الرقمية',
                 'description'      => 'الأداة تساعدك على تنظيم وتخزين وإدارة جميع أصولك الرقمية في مكان واحد',
                 'root'             => 'الجذر',
                 'upload'           => 'رفع',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'خصائص الأصل',
                         'create-btn' => 'إنشاء خاصية',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'الاسم',
                             'type'     => 'النوع',
                             'language' => 'اللغة',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'تعديل',
                             'delete'   => 'حذف',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'إنشاء خاصية',
                             'name'     => 'الاسم',
                             'type'     => 'النوع',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'تحرير الأصل',
+                    'previous'              => 'السابق',
+                    'next'                  => 'التالي',
                     'name'                  => 'الاسم',
                     'value'                 => 'القيمة',
                     'back-btn'              => 'رجوع',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'المعاينة غير متاحة لهذا النوع من الملفات.',
                         'download-file'   => 'تنزيل الملف',
                         'download-zip'    => 'تنزيل كملف ZIP',
+                        'close'           => 'إغلاق المعاينة',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'انقر للتفاصيل الكاملة',
+                            'preview'           => 'معاينة',
+                            'edit-image'        => 'تعديل الصورة',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'تدوير لليسار (L)',
+                            'rotate-right' => 'تدوير لليمين (R)',
+                            'zoom-out'     => 'تصغير (-)',
+                            'zoom-in'      => 'تكبير (+)',
+                            'fit-to-screen'=> 'ملاءمة الشاشة',
+                            'actual-size'  => 'الحجم الفعلي',
+                            'reset-all'    => 'إعادة ضبط الكل (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => 'رجوع 10 ثانية',
                             'forward-10s'        => 'تقديم 10 ثانية',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'كتم الصوت (M)',
                             'picture-in-picture' => 'صورة داخل صورة',
                             'fullscreen'         => 'ملء الشاشة (F)',
+                            'more-actions'       => 'المزيد من الإجراءات',
+                            'copy-link'          => 'نسخ الرابط',
+                            'link-copied'        => 'تم النسخ!',
+                            'open-in-new-tab'    => 'فتح في تبويب جديد',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'الارتفاع (بكسل)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'تحميل',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'أصلي',
                         ],
                     ],
+
                     'tag-already-exists'        => 'العلامة موجودة بالفعل',
                     'image-source-not-readable' => 'المصدر غير قابل للقراءة',
                     'failed-to-read'            => 'فشل في قراءة بيانات الصورة: :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'العرض (بكسل)',
                         'height-px'                  => 'الارتفاع (بكسل)',
                         'blank-keep-dims'            => 'اتركه فارغًا للحفاظ على أبعاد القص.',
+                        'auto'                       => 'تلقائي',
                         'adjustments'                => 'التعديلات',
                         'brightness'                 => 'السطوع',
                         'contrast'                   => 'التباين',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'إعدادات الذكاء الاصطناعي',
                         'platform'                   => 'المنصة',
                         'platform-loading'           => 'جارٍ التحميل…',
+                        'no-platforms'               => 'لا توجد منصات',
+                        'color-white'                => 'أبيض',
+                        'color-silver'               => 'فضي',
+                        'color-light-gray'           => 'رمادي فاتح',
+                        'color-gray'                 => 'رمادي',
+                        'color-slate'                => 'رمادي أردوازي',
+                        'color-dark-gray'            => 'رمادي غامق',
+                        'color-charcoal'             => 'فحمي',
+                        'color-black'                => 'أسود',
+                        'color-light-red'            => 'أحمر فاتح',
+                        'color-red'                  => 'أحمر',
+                        'color-light-yellow'         => 'أصفر فاتح',
+                        'color-yellow'               => 'أصفر',
+                        'color-light-green'          => 'أخضر فاتح',
+                        'color-green'                => 'أخضر',
+                        'color-light-cyan'           => 'سماوي فاتح',
+                        'color-cyan'                 => 'سماوي',
+                        'color-light-blue'           => 'أزرق فاتح',
+                        'color-blue'                 => 'أزرق',
+                        'color-light-purple'         => 'بنفسجي فاتح',
+                        'color-purple'               => 'بنفسجي',
+                        'color-light-pink'           => 'وردي فاتح',
+                        'color-pink'                 => 'وردي',
+                        'color-light-rose'           => 'وردي ناعم',
+                        'color-rose'                 => 'وردي غامق',
                         'model'                      => 'النموذج',
                         'no-models'                  => 'لا توجد نماذج',
                         'prompt'                     => 'الأمر',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'تمت إضافة العلامات بنجاح',
                         'create-failure' => 'فشل في إنشاء العلامات',
                     ],
+
                     'no-comments'    => 'لا توجد علامات بعد',
                     'found-success'  => 'تم العثور على العلامة بنجاح',
                     'not-found'      => 'لم يتم العثور على العلامات',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'فشل في معالجة بعض الملفات',
                     'file-forbidden-type'                 => 'الملف يحتوي على نوع أو امتداد محظور.',
                     'file-too-large'                      => 'الملف كبير جدًا. الحد الأقصى للحجم المسموح به هو :size.',
+                    'storage-upload-failed'               => 'فشل رفع ":name" إلى وحدة التخزين. تحقق من بيانات اعتماد القرص والأذونات.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'تحميل كملف مضغوط',
             'asset-assign'     => 'تعيين الأصل',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'حقل :attribute مطلوب.',
             ],
+
             'comment' => [
                 'required' => 'رسالة التعليق مطلوبة.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'هذا الإجراء غير مصرح به.',
         ],

@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => '文件名',
                     'tags'           => '标签',
@@ -39,22 +40,26 @@ return [
                     'path'           => '路径',
                     'size'           => '大小',
                 ],
+
                 'directory' => [
-                    'title'  => '目录',
-                    'create' => [
+                    'title'        => '目录',
+                    'create'       => [
                         'title'    => '创建目录',
                         'name'     => '名称',
                         'save-btn' => '保存目录',
                     ],
+
                     'rename' => [
                         'title' => '重命名目录',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => '重命名资产',
                             'save-btn' => '保存资产',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => '删除',
                         'rename'                    => '重命名',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => '通过 ID 获取',
                         'comment'                   => '评论',
                     ],
+
                     'linked-resources'                          => '链接资源',
                     'not-found'                                 => '未找到目录',
                     'created-success'                           => '目录创建成功',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => '无法创建 zip 文件。',
                     'not-allowed'                               => '不允许上传脚本文件。',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => '该工具可以帮助您在一个地方组织、存储和管理所有的媒体资产。',
                 'root'             => '根目录',
                 'upload'           => '上传',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => '资产属性',
                         'create-btn' => '创建属性',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => '名称',
                             'type'     => '类型',
                             'language' => '语言',
@@ -110,7 +119,8 @@ return [
                             'edit'     => '编辑',
                             'delete'   => '删除',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => '创建属性',
                             'name'     => '名称',
                             'type'     => '类型',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => '编辑资产',
+                    'previous'              => '上一个',
+                    'next'                  => '下一个',
                     'name'                  => '名称',
                     'value'                 => '值',
                     'back-btn'              => '返回',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => '此文件类型不支持预览。',
                         'download-file'   => '下载文件',
                         'download-zip'    => '下载为ZIP',
+                        'close'           => '关闭预览',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => '点击查看完整详情',
+                            'preview'           => '预览',
+                            'edit-image'        => '编辑图片',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => '向左旋转 (L)',
+                            'rotate-right' => '向右旋转 (R)',
+                            'zoom-out'     => '缩小 (-)',
+                            'zoom-in'      => '放大 (+)',
+                            'fit-to-screen'=> '适应屏幕',
+                            'actual-size'  => '实际大小',
+                            'reset-all'    => '重置全部 (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '后退 10 秒',
                             'forward-10s'        => '前进 10 秒',
@@ -200,6 +228,10 @@ return [
                             'mute'               => '静音 (M)',
                             'picture-in-picture' => '画中画',
                             'fullscreen'         => '全屏 (F)',
+                            'more-actions'       => '更多操作',
+                            'copy-link'          => '复制链接',
+                            'link-copied'        => '已复制！',
+                            'open-in-new-tab'    => '在新标签页中打开',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => '高度（px）',
                         'height-placeholder' => '200',
                         'download-btn'       => '下载',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => '原始',
                         ],
                     ],
+
                     'tag-already-exists'        => '标签已存在',
                     'image-source-not-readable' => '无法读取图像源',
                     'failed-to-read'            => '无法读取图像元数据 :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => '宽度 (px)',
                         'height-px'                  => '高度 (px)',
                         'blank-keep-dims'            => '留空以保持裁剪尺寸。',
+                        'auto'                       => '自动',
                         'adjustments'                => '调整',
                         'brightness'                 => '亮度',
                         'contrast'                   => '对比度',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI 设置',
                         'platform'                   => '平台',
                         'platform-loading'           => '加载中…',
+                        'no-platforms'               => '无平台',
+                        'color-white'                => '白色',
+                        'color-silver'               => '银色',
+                        'color-light-gray'           => '浅灰色',
+                        'color-gray'                 => '灰色',
+                        'color-slate'                => '石板灰',
+                        'color-dark-gray'            => '深灰色',
+                        'color-charcoal'             => '炭灰色',
+                        'color-black'                => '黑色',
+                        'color-light-red'            => '浅红色',
+                        'color-red'                  => '红色',
+                        'color-light-yellow'         => '浅黄色',
+                        'color-yellow'               => '黄色',
+                        'color-light-green'          => '浅绿色',
+                        'color-green'                => '绿色',
+                        'color-light-cyan'           => '浅青色',
+                        'color-cyan'                 => '青色',
+                        'color-light-blue'           => '浅蓝色',
+                        'color-blue'                 => '蓝色',
+                        'color-light-purple'         => '浅紫色',
+                        'color-purple'               => '紫色',
+                        'color-light-pink'           => '浅粉色',
+                        'color-pink'                 => '粉色',
+                        'color-light-rose'           => '浅玫瑰色',
+                        'color-rose'                 => '玫瑰色',
                         'model'                      => '模型',
                         'no-models'                  => '无模型',
                         'prompt'                     => '提示',
@@ -312,6 +372,7 @@ return [
                         'create-success' => '标签已成功添加',
                         'create-failure' => '标签创建失败',
                     ],
+
                     'no-comments'    => '尚无标签',
                     'found-success'  => '标签找到成功',
                     'not-found'      => '未找到标签',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => '一些文件处理失败',
                     'file-forbidden-type'                 => '文件类型或扩展名不允许。',
                     'file-too-large'                      => '文件过大。允许的最大大小为 :size。',
+                    'storage-upload-failed'               => '上传":name"到存储失败。请检查磁盘凭据和权限。',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => '下载 Zip',
             'asset-assign'     => '分配资产',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => '字段 :attribute 是必需的。',
             ],
+
             'comment' => [
                 'required' => '评论内容是必需的。',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => '此操作未经授权。',
         ],

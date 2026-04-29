@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Файлын нэр',
                     'tags'           => 'Таг',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Зам',
                     'size'           => 'Хэмжээ',
                 ],
+
                 'directory' => [
-                    'title'  => 'Директор',
-                    'create' => [
+                    'title'        => 'Директор',
+                    'create'       => [
                         'title'    => 'Директор үүсгэх',
                         'name'     => 'Нэр',
                         'save-btn' => 'Директорыг хадгалах',
                     ],
+
                     'rename' => [
                         'title' => 'Директорыг нэрлэх',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Хэрэглэгдэхүүнийг нэрлэх',
                             'save-btn' => 'Хэрэглэгдэхүүн хадгалах',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Устгах',
                         'rename'                    => 'Нэрлэх',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Id-ээр авна уу',
                         'comment'                   => 'Сэтгэгдэл',
                     ],
+
                     'linked-resources'                          => 'Холбоотой нөөцүүд',
                     'not-found'                                 => 'Директор олдсонгүй',
                     'created-success'                           => 'Директор амжилттай үүсгэгдлээ',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'ZIP файл үүсгэхэд алдаа гарлаа.',
                     'not-allowed'                               => 'Скрипт файлуудыг ачаалуулахыг хориглоно.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Тус хэрэгсэл нь таны бүх медиаг нэг газар зохион байгуулж, хадгалахад тусална',
                 'root'             => 'Үндсэн',
                 'upload'           => 'Ачуулах',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Хэрэглэгдэхүүний шинж чанарууд',
                         'create-btn' => 'Шинж чанар үүсгэх',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Нэр',
                             'type'     => 'Төрөл',
                             'language' => 'Хэл',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Засварлах',
                             'delete'   => 'Устгах',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Шинж чанар үүсгэх',
                             'name'     => 'Нэр',
                             'type'     => 'Төрөл',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Хэрэглэгдэхүүнийг Засварлах',
+                    'previous'              => 'Өмнөх',
+                    'next'                  => 'Дараах',
                     'name'                  => 'Нэр',
                     'value'                 => 'Утга',
                     'back-btn'              => 'Буцах',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Энэ файлын төрлийн урьдчилан харалт боломжгүй.',
                         'download-file'   => 'Файл татах',
                         'download-zip'    => 'ZIP файлаар татаж авах',
+                        'close'           => 'Урьдчилан харахыг хаах',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Бүх дэлгэрэнгүй мэдээлэл авахын тулд дарна уу',
+                            'preview'           => 'Урьдчилан харах',
+                            'edit-image'        => 'Зураг засах',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Зүүн тийш эргүүлэх (L)',
+                            'rotate-right' => 'Баруун тийш эргүүлэх (R)',
+                            'zoom-out'     => 'Жижигрүүлэх (-)',
+                            'zoom-in'      => 'Томруулах (+)',
+                            'fit-to-screen'=> 'Дэлгэцэнд тохируулах',
+                            'actual-size'  => 'Бодит хэмжээ',
+                            'reset-all'    => 'Бүгдийг шинэчлэх (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 секунд ухраах',
                             'forward-10s'        => '10 секунд урагшлуулах',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Дуугүй болгох (M)',
                             'picture-in-picture' => 'Зурган дотор зураг',
                             'fullscreen'         => 'Бүтэн дэлгэц (F)',
+                            'more-actions'       => 'Бусад үйлдлүүд',
+                            'copy-link'          => 'Холбоос хуулах',
+                            'link-copied'        => 'Хуулагдлаа!',
+                            'open-in-new-tab'    => 'Шинэ таб дээр нээх',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Өндөр (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Татаж Авах',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Эх хувилбар',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Таг аль хэдийн байгаа',
                     'image-source-not-readable' => 'Зураг эх сурвалжийг уншиж чадахгүй',
                     'failed-to-read'            => 'Зурагны мета мэдээллийг уншихад алдаа гарлаа :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Өргөн (px)',
                         'height-px'                  => 'Өндөр (px)',
                         'blank-keep-dims'            => 'Тайрсан хэмжээсийг хадгалахын тулд хоосон орхино уу.',
+                        'auto'                       => 'автомат',
                         'adjustments'                => 'Тохиргоо',
                         'brightness'                 => 'Тод байдал',
                         'contrast'                   => 'Тод ялгаа',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI тохиргоо',
                         'platform'                   => 'Платформ',
                         'platform-loading'           => 'Ачааллаж байна…',
+                        'no-platforms'               => 'Платформ байхгүй',
+                        'color-white'                => 'Цагаан',
+                        'color-silver'               => 'Мөнгөн',
+                        'color-light-gray'           => 'Цайвар саарал',
+                        'color-gray'                 => 'Саарал',
+                        'color-slate'                => 'Занга саарал',
+                        'color-dark-gray'            => 'Бараан саарал',
+                        'color-charcoal'             => 'Нүүрс хар',
+                        'color-black'                => 'Хар',
+                        'color-light-red'            => 'Цайвар улаан',
+                        'color-red'                  => 'Улаан',
+                        'color-light-yellow'         => 'Цайвар шар',
+                        'color-yellow'               => 'Шар',
+                        'color-light-green'          => 'Цайвар ногоон',
+                        'color-green'                => 'Ногоон',
+                        'color-light-cyan'           => 'Цайвар хөх ногоон',
+                        'color-cyan'                 => 'Хөх ногоон',
+                        'color-light-blue'           => 'Цайвар цэнхэр',
+                        'color-blue'                 => 'Цэнхэр',
+                        'color-light-purple'         => 'Цайвар ягаан',
+                        'color-purple'               => 'Ягаан',
+                        'color-light-pink'           => 'Цайвар ягаан улаан',
+                        'color-pink'                 => 'Ягаан улаан',
+                        'color-light-rose'           => 'Цайвар сарнай',
+                        'color-rose'                 => 'Сарнай',
                         'model'                      => 'Загвар',
                         'no-models'                  => 'Загвар байхгүй',
                         'prompt'                     => 'Заавар',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Таг амжилттай нэмэгдлээ',
                         'create-failure' => 'Таг үүсгэхэд алдаа гарлаа',
                     ],
+
                     'no-comments'    => 'Одоогоор Таг байхгүй',
                     'found-success'  => 'Таг амжилттай олдлоо',
                     'not-found'      => 'Таг олдсонгүй',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Зарим файлуудыг боловсруулахад алдаа гарлаа',
                     'file-forbidden-type'                 => 'Файл нь хориотой төрлийн эсвэл өргөтгөлтэй байна.',
                     'file-too-large'                      => 'Файл хэт том байна. Зөвшөөрөгдсөн дээд хэмжээ нь :size.',
+                    'storage-upload-failed'               => '":name"-г хадгалах сан руу байршуулж чадсангүй. Дискний итгэмжлэл болон зөвшөөрлийг шалгана уу.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'ZIP Татаж Авах',
             'asset-assign'     => 'Хэрэглэгдэхүүн Хуваарилах',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => '":attribute" талбар шаардлагатай.',
             ],
+
             'comment' => [
                 'required' => 'Сэтгэгдэл бичих мессеж шаардлагатай.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Энэ үйлдэлд эрхгүй.',
         ],

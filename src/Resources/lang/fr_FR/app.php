@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Nom du Fichier',
                     'tags'           => 'Étiquettes',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Chemin',
                     'size'           => 'Taille',
                 ],
+
                 'directory' => [
-                    'title'  => 'Répertoire',
-                    'create' => [
+                    'title'        => 'Répertoire',
+                    'create'       => [
                         'title'    => 'Créer un Répertoire',
                         'name'     => 'Nom',
                         'save-btn' => 'Enregistrer le Répertoire',
                     ],
+
                     'rename' => [
                         'title' => 'Renommer le Répertoire',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Renommer l\'Actif',
                             'save-btn' => 'Enregistrer l\'Actif',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Supprimer',
                         'rename'                    => 'Renommer',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Obtenir par identifiant',
                         'comment'                   => 'Commentaire',
                     ],
+
                     'linked-resources'                          => 'Ressources liées',
                     'not-found'                                 => 'Aucun répertoire trouvé',
                     'created-success'                           => 'Répertoire créé avec succès',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Échec de la création du fichier zip.',
                     'not-allowed'                               => 'Le téléchargement de fichiers de script n\'est pas autorisé.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'L\'outil peut vous aider à organiser, stocker et gérer tous vos actifs multimédias au même endroit',
                 'root'             => 'Racine',
                 'upload'           => 'Télécharger',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Propriétés des Actifs',
                         'create-btn' => 'Créer une Propriété',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Nom',
                             'type'     => 'Type',
                             'language' => 'Langue',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Éditer',
                             'delete'   => 'Supprimer',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Créer une Propriété',
                             'name'     => 'Nom',
                             'type'     => 'Type',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Modifier l\'Actif',
+                    'previous'              => 'Précédent',
+                    'next'                  => 'Suivant',
                     'name'                  => 'Nom',
                     'value'                 => 'Valeur',
                     'back-btn'              => 'Retour',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Aperçu non disponible pour ce type de fichier.',
                         'download-file'   => 'Télécharger le fichier',
                         'download-zip'    => 'Télécharger en ZIP',
+                        'close'           => 'Fermer l\'aperçu',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Cliquer pour tous les détails',
+                            'preview'           => 'Aperçu',
+                            'edit-image'        => 'Modifier l\'image',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Pivoter à gauche (L)',
+                            'rotate-right' => 'Pivoter à droite (R)',
+                            'zoom-out'     => 'Dézoomer (-)',
+                            'zoom-in'      => 'Zoomer (+)',
+                            'fit-to-screen'=> 'Ajuster à l\'écran',
+                            'actual-size'  => 'Taille réelle',
+                            'reset-all'    => 'Tout réinitialiser (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => 'Reculer 10 s',
                             'forward-10s'        => 'Avancer 10 s',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Muet (M)',
                             'picture-in-picture' => 'Incrustation vidéo',
                             'fullscreen'         => 'Plein écran (F)',
+                            'more-actions'       => 'Plus d\'actions',
+                            'copy-link'          => 'Copier le lien',
+                            'link-copied'        => 'Copié !',
+                            'open-in-new-tab'    => 'Ouvrir dans un nouvel onglet',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Hauteur (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Télécharger',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Original',
                         ],
                     ],
+
                     'tag-already-exists'        => 'L\'étiquette existe déjà',
                     'image-source-not-readable' => 'Source de l\'image non lisible',
                     'failed-to-read'            => 'Échec de la lecture des métadonnées de l\'image :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Largeur (px)',
                         'height-px'                  => 'Hauteur (px)',
                         'blank-keep-dims'            => 'Laisser vide pour conserver les dimensions recadrées.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Ajustements',
                         'brightness'                 => 'Luminosité',
                         'contrast'                   => 'Contraste',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'Paramètres IA',
                         'platform'                   => 'Plateforme',
                         'platform-loading'           => 'Chargement…',
+                        'no-platforms'               => 'Aucune plateforme',
+                        'color-white'                => 'Blanc',
+                        'color-silver'               => 'Argent',
+                        'color-light-gray'           => 'Gris clair',
+                        'color-gray'                 => 'Gris',
+                        'color-slate'                => 'Gris ardoise',
+                        'color-dark-gray'            => 'Gris foncé',
+                        'color-charcoal'             => 'Gris charbon',
+                        'color-black'                => 'Noir',
+                        'color-light-red'            => 'Rouge clair',
+                        'color-red'                  => 'Rouge',
+                        'color-light-yellow'         => 'Jaune clair',
+                        'color-yellow'               => 'Jaune',
+                        'color-light-green'          => 'Vert clair',
+                        'color-green'                => 'Vert',
+                        'color-light-cyan'           => 'Cyan clair',
+                        'color-cyan'                 => 'Cyan',
+                        'color-light-blue'           => 'Bleu clair',
+                        'color-blue'                 => 'Bleu',
+                        'color-light-purple'         => 'Violet clair',
+                        'color-purple'               => 'Violet',
+                        'color-light-pink'           => 'Rose clair',
+                        'color-pink'                 => 'Rose',
+                        'color-light-rose'           => 'Rose pâle',
+                        'color-rose'                 => 'Rosé',
                         'model'                      => 'Modèle',
                         'no-models'                  => 'Aucun modèle',
                         'prompt'                     => 'Invite',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Les étiquettes ont été ajoutées avec succès',
                         'create-failure' => 'L\'ajout des étiquettes a échoué',
                     ],
+
                     'no-comments'    => 'Pas encore d\'étiquettes',
                     'found-success'  => 'Étiquette trouvée avec succès',
                     'not-found'      => 'Étiquettes non trouvées',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Certains fichiers n\'ont pas pu être traités',
                     'file-forbidden-type'                 => 'Le fichier a un type ou une extension interdite.',
                     'file-too-large'                      => 'Le fichier est trop volumineux. La taille maximale autorisée est :size.',
+                    'storage-upload-failed'               => 'Échec du téléversement de ":name" vers le stockage. Vérifiez les identifiants et les autorisations du disque.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'Télécharger le Zip',
             'asset-assign'     => 'Attribuer un Actif',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'Le champ :attribute est requis.',
             ],
+
             'comment' => [
                 'required' => 'Le message du commentaire est requis.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Cette action est non autorisée.',
         ],
