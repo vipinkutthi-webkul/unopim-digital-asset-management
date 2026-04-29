@@ -80,7 +80,7 @@
                 </button>
                 <input
                     type="range"
-                    class="w-20 h-1.5 accent-violet-600 cursor-pointer"
+                    class="w-20 h-1.5 accent-violet-400 cursor-pointer"
                     min="0"
                     max="1"
                     step="0.01"

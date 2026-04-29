@@ -22,6 +22,8 @@ window._damVideoPlayer = {
         videoSeekTooltipX:       0,
         videoSeekTooltipVisible: false,
         videoSupportsPiP:        typeof document !== 'undefined' && 'pictureInPictureEnabled' in document,
+        videoMenuOpen:           false,
+        videoLinkCopied:         false,
     },
 
     computed: {
@@ -39,6 +41,7 @@ window._damVideoPlayer = {
             this.videoIsMuted = false; this.videoIsLooping = false;
             this.videoIsBuffering = false; this.videoBuffered = 0;
             this.videoClickFlash = false;
+            this.videoMenuOpen = false; this.videoLinkCopied = false;
             try { const sv = parseFloat(localStorage.getItem('dam_video_volume')); if (!isNaN(sv)) this.videoVolume = sv; } catch(_) {}
         },
 
@@ -56,6 +59,7 @@ window._damVideoPlayer = {
         videoStopOnClose() {
             if (this.$refs.videoEl) this.$refs.videoEl.pause();
             this.videoIsPlaying = false;
+            this.videoMenuOpen = false;
             clearTimeout(this.videoControlsTimer);
         },
 
@@ -220,6 +224,30 @@ window._damVideoPlayer = {
         videoOnWaiting() { this.videoIsBuffering = true; },
 
         videoOnCanPlay() { this.videoIsBuffering = false; },
+
+        // ── Action menu ───────────────────────────────────────────────
+        videoCopyLink(url) {
+            url = url || window.location.href;
+            const done = () => {
+                this.videoLinkCopied = true;
+                setTimeout(() => { this.videoLinkCopied = false; this.videoMenuOpen = false; }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done).catch(() => this._videoCopyFallback(url, done));
+            } else {
+                this._videoCopyFallback(url, done);
+            }
+        },
+
+        _videoCopyFallback(text, done) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            try { document.execCommand('copy'); done(); } catch(_) {}
+            document.body.removeChild(ta);
+        },
     },
 };
 </script>

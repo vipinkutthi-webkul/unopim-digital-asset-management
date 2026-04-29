@@ -27,7 +27,7 @@
                 type="button"
                 class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
                 @click="closePreview"
-                aria-label="Close preview"
+                aria-label="{{ trans('dam::app.admin.dam.asset.edit.preview-modal.close') }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -40,13 +40,13 @@
         <div class="flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-50 dark:bg-gray-900">
 
             @if ($asset->file_type === 'video')
-                @include('dam::asset.preview-modal.video-player')
+                @include('dam::asset.preview-modal.video.video-player')
             @elseif ($asset->file_type === 'audio')
-                @include('dam::asset.preview-modal.audio-player')
+                @include('dam::asset.preview-modal.audio.audio-player')
             @elseif ($asset->extension === 'pdf')
-                @include('dam::asset.preview-modal.pdf-viewer')
+                @include('dam::asset.preview-modal.files.pdf-viewer')
             @elseif ($asset->file_type === 'image')
-                @include('dam::asset.preview-modal.image-viewer')
+                @include('dam::asset.preview-modal.image.image-viewer')
             @else
                 @include('dam::asset.preview-modal.fallback')
             @endif
