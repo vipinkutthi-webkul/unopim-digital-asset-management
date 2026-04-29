@@ -42,8 +42,8 @@ return [
                 ],
 
                 'directory' => [
-                    'title'  => 'Каталог',
-                    'create' => [
+                    'title'        => 'Каталог',
+                    'create'       => [
                         'title'    => 'Створити каталог',
                         'name'     => 'Назва',
                         'save-btn' => 'Зберегти каталог',
@@ -111,7 +111,7 @@ return [
                         'title'      => 'Властивості активу',
                         'create-btn' => 'Створити властивість',
 
-                        'datagrid' => [
+                        'datagrid'      => [
                             'name'     => 'Назва',
                             'type'     => 'Тип',
                             'language' => 'Мова',
@@ -120,7 +120,7 @@ return [
                             'delete'   => 'Видалити',
                         ],
 
-                        'create' => [
+                        'create'     => [
                             'title'    => 'Створити властивість',
                             'name'     => 'Назва',
                             'type'     => 'Тип',
@@ -158,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Редагувати актив',
+                    'previous'              => 'Попередній',
+                    'next'                  => 'Наступний',
                     'name'                  => 'Назва',
                     'value'                 => 'Значення',
                     'back-btn'              => 'Назад',
@@ -201,6 +203,22 @@ return [
                         'not-available'   => 'Попередній перегляд недоступний для цього типу файлу.',
                         'download-file'   => 'Завантажити файл',
                         'download-zip'    => 'Завантажити як ZIP',
+                        'close'           => 'Закрити попередній перегляд',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Натисніть для повної інформації',
+                            'preview'           => 'Попередній перегляд',
+                            'edit-image'        => 'Редагувати зображення',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Повернути ліворуч (L)',
+                            'rotate-right' => 'Повернути праворуч (R)',
+                            'zoom-out'     => 'Зменшити (-)',
+                            'zoom-in'      => 'Збільшити (+)',
+                            'fit-to-screen'=> 'За розміром екрана',
+                            'actual-size'  => 'Реальний розмір',
+                            'reset-all'    => 'Скинути все (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 с назад',
                             'forward-10s'        => '10 с вперед',
@@ -210,6 +228,10 @@ return [
                             'mute'               => 'Без звуку (M)',
                             'picture-in-picture' => 'Картинка в картинці',
                             'fullscreen'         => 'На весь екран (F)',
+                            'more-actions'       => 'Більше дій',
+                            'copy-link'          => 'Скопіювати посилання',
+                            'link-copied'        => 'Скопійовано!',
+                            'open-in-new-tab'    => 'Відкрити у новій вкладці',
                         ],
                     ],
 
@@ -256,6 +278,7 @@ return [
                         'width-px'                   => 'Ширина (px)',
                         'height-px'                  => 'Висота (px)',
                         'blank-keep-dims'            => 'Залиште порожнім, щоб зберегти обрізані розміри.',
+                        'auto'                       => 'авто',
                         'adjustments'                => 'Налаштування',
                         'brightness'                 => 'Яскравість',
                         'contrast'                   => 'Контрастність',
@@ -266,6 +289,31 @@ return [
                         'ai-settings'                => 'Налаштування ШІ',
                         'platform'                   => 'Платформа',
                         'platform-loading'           => 'Завантаження…',
+                        'no-platforms'               => 'Немає платформ',
+                        'color-white'                => 'Білий',
+                        'color-silver'               => 'Срібний',
+                        'color-light-gray'           => 'Світло-сірий',
+                        'color-gray'                 => 'Сірий',
+                        'color-slate'                => 'Шиферний',
+                        'color-dark-gray'            => 'Темно-сірий',
+                        'color-charcoal'             => 'Вугільний',
+                        'color-black'                => 'Чорний',
+                        'color-light-red'            => 'Світло-червоний',
+                        'color-red'                  => 'Червоний',
+                        'color-light-yellow'         => 'Світло-жовтий',
+                        'color-yellow'               => 'Жовтий',
+                        'color-light-green'          => 'Світло-зелений',
+                        'color-green'                => 'Зелений',
+                        'color-light-cyan'           => 'Світло-блакитний',
+                        'color-cyan'                 => 'Блакитний',
+                        'color-light-blue'           => 'Світло-синій',
+                        'color-blue'                 => 'Синій',
+                        'color-light-purple'         => 'Світло-фіолетовий',
+                        'color-purple'               => 'Фіолетовий',
+                        'color-light-pink'           => 'Світло-рожевий',
+                        'color-pink'                 => 'Рожевий',
+                        'color-light-rose'           => 'Блідо-рожевий',
+                        'color-rose'                 => 'Рожевий',
                         'model'                      => 'Модель',
                         'no-models'                  => 'Немає моделей',
                         'prompt'                     => 'Запит',
@@ -354,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Не вдалося обробити деякі файли',
                     'file-forbidden-type'                 => 'Файл має заборонений тип або розширення.',
                     'file-too-large'                      => 'Файл занадто великий. Максимально допустимий розмір: :size.',
+                    'storage-upload-failed'               => 'Не вдалося завантажити ":name" до сховища. Перевірте облікові дані диска та дозволи.',
                 ],
             ],
         ],

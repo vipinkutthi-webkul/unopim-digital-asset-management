@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Nama File',
                     'tags'           => 'Tag',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Path',
                     'size'           => 'Ukuran',
                 ],
+
                 'directory' => [
-                    'title'  => 'Direktori',
-                    'create' => [
+                    'title'        => 'Direktori',
+                    'create'       => [
                         'title'    => 'Buat Direktori',
                         'name'     => 'Nama',
                         'save-btn' => 'Simpan Direktori',
                     ],
+
                     'rename' => [
                         'title' => 'Ganti Nama Direktori',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Ganti Nama Aset',
                             'save-btn' => 'Simpan Aset',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Hapus',
                         'rename'                    => 'Ganti Nama',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Dapatkan Berdasarkan Id',
                         'comment'                   => 'Komentar',
                     ],
+
                     'linked-resources'                          => 'Sumber Daya Tertaut',
                     'not-found'                                 => 'Direktori tidak ditemukan',
                     'created-success'                           => 'Direktori berhasil dibuat',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Gagal membuat file zip.',
                     'not-allowed'                               => 'Unggah file skrip tidak diperbolehkan.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Alat ini dapat membantu Anda mengorganisir, menyimpan, dan mengelola semua aset media Anda di satu tempat',
                 'root'             => 'Root',
                 'upload'           => 'Unggah',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Properti Aset',
                         'create-btn' => 'Buat Properti',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Nama',
                             'type'     => 'Tipe',
                             'language' => 'Bahasa',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Edit',
                             'delete'   => 'Hapus',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Buat Properti',
                             'name'     => 'Nama',
                             'type'     => 'Tipe',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Edit Aset',
+                    'previous'              => 'Sebelumnya',
+                    'next'                  => 'Berikutnya',
                     'name'                  => 'Nama',
                     'value'                 => 'Nilai',
                     'back-btn'              => 'Kembali',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Pratinjau tidak tersedia untuk jenis file ini.',
                         'download-file'   => 'Unduh File',
                         'download-zip'    => 'Unduh sebagai ZIP',
+                        'close'           => 'Tutup pratinjau',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Klik untuk detail lengkap',
+                            'preview'           => 'Pratinjau',
+                            'edit-image'        => 'Edit gambar',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Putar kiri (L)',
+                            'rotate-right' => 'Putar kanan (R)',
+                            'zoom-out'     => 'Perkecil (-)',
+                            'zoom-in'      => 'Perbesar (+)',
+                            'fit-to-screen'=> 'Sesuaikan layar',
+                            'actual-size'  => 'Ukuran sebenarnya',
+                            'reset-all'    => 'Reset semua (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => 'Mundur 10 dtk',
                             'forward-10s'        => 'Maju 10 dtk',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Bisukan (M)',
                             'picture-in-picture' => 'Gambar dalam gambar',
                             'fullscreen'         => 'Layar penuh (F)',
+                            'more-actions'       => 'Tindakan lainnya',
+                            'copy-link'          => 'Salin tautan',
+                            'link-copied'        => 'Tersalin!',
+                            'open-in-new-tab'    => 'Buka di tab baru',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Tinggi (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Unduh',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Asli',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Tag sudah ada',
                     'image-source-not-readable' => 'Sumber gambar tidak dapat dibaca',
                     'failed-to-read'            => 'Gagal membaca metadata gambar :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Lebar (px)',
                         'height-px'                  => 'Tinggi (px)',
                         'blank-keep-dims'            => 'Kosongkan untuk mempertahankan dimensi yang dipangkas.',
+                        'auto'                       => 'otomatis',
                         'adjustments'                => 'Penyesuaian',
                         'brightness'                 => 'Kecerahan',
                         'contrast'                   => 'Kontras',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'Pengaturan AI',
                         'platform'                   => 'Platform',
                         'platform-loading'           => 'Memuat…',
+                        'no-platforms'               => 'Tidak ada platform',
+                        'color-white'                => 'Putih',
+                        'color-silver'               => 'Perak',
+                        'color-light-gray'           => 'Abu-abu muda',
+                        'color-gray'                 => 'Abu-abu',
+                        'color-slate'                => 'Abu batu tulis',
+                        'color-dark-gray'            => 'Abu-abu tua',
+                        'color-charcoal'             => 'Arang',
+                        'color-black'                => 'Hitam',
+                        'color-light-red'            => 'Merah muda',
+                        'color-red'                  => 'Merah',
+                        'color-light-yellow'         => 'Kuning muda',
+                        'color-yellow'               => 'Kuning',
+                        'color-light-green'          => 'Hijau muda',
+                        'color-green'                => 'Hijau',
+                        'color-light-cyan'           => 'Sian muda',
+                        'color-cyan'                 => 'Sian',
+                        'color-light-blue'           => 'Biru muda',
+                        'color-blue'                 => 'Biru',
+                        'color-light-purple'         => 'Ungu muda',
+                        'color-purple'               => 'Ungu',
+                        'color-light-pink'           => 'Merah jambu muda',
+                        'color-pink'                 => 'Merah jambu',
+                        'color-light-rose'           => 'Mawar muda',
+                        'color-rose'                 => 'Mawar',
                         'model'                      => 'Model',
                         'no-models'                  => 'Tidak ada model',
                         'prompt'                     => 'Petunjuk',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Tag berhasil ditambahkan',
                         'create-failure' => 'Tag gagal dibuat',
                     ],
+
                     'no-comments'    => 'Belum Ada Tag',
                     'found-success'  => 'Tag Ditemukan Dengan Sukses',
                     'not-found'      => 'Tag Tidak Ditemukan',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Beberapa file gagal diproses',
                     'file-forbidden-type'                 => 'File memiliki tipe atau ekstensi yang terlarang.',
                     'file-too-large'                      => 'Ukuran file terlalu besar. Ukuran maksimum yang diizinkan adalah :size.',
+                    'storage-upload-failed'               => 'Gagal mengunggah ":name" ke penyimpanan. Periksa kredensial disk dan izin.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'Unduh Zip',
             'asset-assign'     => 'Tugaskan Aset',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'Kolom :attribute wajib diisi.',
             ],
+
             'comment' => [
                 'required' => 'Pesan Komentar wajib diisi.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Aksi ini tidak sah.',
         ],

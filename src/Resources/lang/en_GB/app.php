@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'File Name',
                     'tags'           => 'Tags',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Path',
                     'size'           => 'Size',
                 ],
+
                 'directory' => [
-                    'title'  => 'Directory',
-                    'create' => [
+                    'title'        => 'Directory',
+                    'create'       => [
                         'title'    => 'Create Directory',
                         'name'     => 'Name',
                         'save-btn' => 'Save Directory',
                     ],
+
                     'rename' => [
                         'title' => 'Rename Directory',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Rename Asset',
                             'save-btn' => 'Save Asset',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Delete',
                         'rename'                    => 'Rename',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Get By Id',
                         'comment'                   => 'Comment',
                     ],
+
                     'linked-resources'                          => 'Linked Resources',
                     'not-found'                                 => 'No directory found',
                     'created-success'                           => 'Directory created successfully',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Failed to create the zip file.',
                     'not-allowed'                               => 'Uploading script files is not allowed.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Tool can help you organise, store, and manage all your media assets in one place',
                 'root'             => 'Root',
                 'upload'           => 'Upload',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Asset Properties',
                         'create-btn' => 'Create Property',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Name',
                             'type'     => 'Type',
                             'language' => 'Language',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Edit',
                             'delete'   => 'Delete',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Create Property',
                             'name'     => 'Name',
                             'type'     => 'Type',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Edit Asset',
+                    'previous'              => 'Previous',
+                    'next'                  => 'Next',
                     'name'                  => 'Name',
                     'value'                 => 'Value',
                     'back-btn'              => 'Back',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Preview not available for this file type.',
                         'download-file'   => 'Download File',
                         'download-zip'    => 'Download as ZIP',
+                        'close'           => 'Close preview',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Click for full details',
+                            'preview'           => 'Preview',
+                            'edit-image'        => 'Edit image',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Rotate left (L)',
+                            'rotate-right' => 'Rotate right (R)',
+                            'zoom-out'     => 'Zoom out (-)',
+                            'zoom-in'      => 'Zoom in (+)',
+                            'fit-to-screen'=> 'Fit to screen',
+                            'actual-size'  => 'Actual size',
+                            'reset-all'    => 'Reset all (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => 'Back 10s',
                             'forward-10s'        => 'Forward 10s',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Mute (M)',
                             'picture-in-picture' => 'Picture in Picture',
                             'fullscreen'         => 'Fullscreen (F)',
+                            'more-actions'       => 'More Actions',
+                            'copy-link'          => 'Copy Link',
+                            'link-copied'        => 'Copied!',
+                            'open-in-new-tab'    => 'Open in New Tab',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Height (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Download',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Original',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Tag already exists',
                     'image-source-not-readable' => 'Image source not readable',
                     'failed-to-read'            => 'Failed to read image metadata :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Width (px)',
                         'height-px'                  => 'Height (px)',
                         'blank-keep-dims'            => 'Leave blank to keep cropped dimensions.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Adjustments',
                         'brightness'                 => 'Brightness',
                         'contrast'                   => 'Contrast',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI Settings',
                         'platform'                   => 'Platform',
                         'platform-loading'           => 'Loading…',
+                        'no-platforms'               => 'No platforms',
+                        'color-white'                => 'White',
+                        'color-silver'               => 'Silver',
+                        'color-light-gray'           => 'Light Gray',
+                        'color-gray'                 => 'Gray',
+                        'color-slate'                => 'Slate',
+                        'color-dark-gray'            => 'Dark Gray',
+                        'color-charcoal'             => 'Charcoal',
+                        'color-black'                => 'Black',
+                        'color-light-red'            => 'Light Red',
+                        'color-red'                  => 'Red',
+                        'color-light-yellow'         => 'Light Yellow',
+                        'color-yellow'               => 'Yellow',
+                        'color-light-green'          => 'Light Green',
+                        'color-green'                => 'Green',
+                        'color-light-cyan'           => 'Light Cyan',
+                        'color-cyan'                 => 'Cyan',
+                        'color-light-blue'           => 'Light Blue',
+                        'color-blue'                 => 'Blue',
+                        'color-light-purple'         => 'Light Purple',
+                        'color-purple'               => 'Purple',
+                        'color-light-pink'           => 'Light Pink',
+                        'color-pink'                 => 'Pink',
+                        'color-light-rose'           => 'Light Rose',
+                        'color-rose'                 => 'Rose',
                         'model'                      => 'Model',
                         'no-models'                  => 'No models',
                         'prompt'                     => 'Prompt',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Tags have been successfully added',
                         'create-failure' => 'Tags failed to create',
                     ],
+
                     'no-comments'    => 'No Tags Yet',
                     'found-success'  => 'Tag Found Successfully',
                     'not-found'      => 'Tags Not Found',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Some files failed to process',
                     'file-forbidden-type'                 => 'File has forbidden type or extension.',
                     'file-too-large'                      => 'The file is too large. Maximum allowed size is :size.',
+                    'storage-upload-failed'               => 'Failed to upload ":name" to storage. Check disk credentials and permissions.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'Download Zip',
             'asset-assign'     => 'Assign Asset',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'The :attribute field is required.',
             ],
+
             'comment' => [
                 'required' => 'The Comment message is required.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'This action is unauthorised.',
         ],

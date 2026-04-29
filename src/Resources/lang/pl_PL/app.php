@@ -42,8 +42,8 @@ return [
                 ],
 
                 'directory' => [
-                    'title'  => 'Katalog',
-                    'create' => [
+                    'title'        => 'Katalog',
+                    'create'       => [
                         'title'    => 'Utwórz katalog',
                         'name'     => 'Nazwa',
                         'save-btn' => 'Zapisz katalog',
@@ -111,7 +111,7 @@ return [
                         'title'      => 'Właściwości zasobu',
                         'create-btn' => 'Utwórz właściwość',
 
-                        'datagrid' => [
+                        'datagrid'      => [
                             'name'     => 'Nazwa',
                             'type'     => 'Typ',
                             'language' => 'Język',
@@ -120,7 +120,7 @@ return [
                             'delete'   => 'Usuń',
                         ],
 
-                        'create' => [
+                        'create'     => [
                             'title'    => 'Utwórz właściwość',
                             'name'     => 'Nazwa',
                             'type'     => 'Typ',
@@ -158,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Edytuj zasób',
+                    'previous'              => 'Poprzedni',
+                    'next'                  => 'Następny',
                     'name'                  => 'Nazwa',
                     'value'                 => 'Wartość',
                     'back-btn'              => 'Wstecz',
@@ -201,6 +203,22 @@ return [
                         'not-available'   => 'Podgląd niedostępny dla tego typu pliku.',
                         'download-file'   => 'Pobierz Plik',
                         'download-zip'    => 'Pobierz jako ZIP',
+                        'close'           => 'Zamknij podgląd',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Kliknij, aby zobaczyć wszystkie szczegóły',
+                            'preview'           => 'Podgląd',
+                            'edit-image'        => 'Edytuj obraz',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Obróć w lewo (L)',
+                            'rotate-right' => 'Obróć w prawo (R)',
+                            'zoom-out'     => 'Oddal (-)',
+                            'zoom-in'      => 'Przybliż (+)',
+                            'fit-to-screen'=> 'Dopasuj do ekranu',
+                            'actual-size'  => 'Rzeczywisty rozmiar',
+                            'reset-all'    => 'Resetuj wszystko (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 s do tyłu',
                             'forward-10s'        => '10 s do przodu',
@@ -210,6 +228,10 @@ return [
                             'mute'               => 'Wycisz (M)',
                             'picture-in-picture' => 'Obraz w obrazie',
                             'fullscreen'         => 'Pełny ekran (F)',
+                            'more-actions'       => 'Więcej działań',
+                            'copy-link'          => 'Kopiuj link',
+                            'link-copied'        => 'Skopiowano!',
+                            'open-in-new-tab'    => 'Otwórz w nowej karcie',
                         ],
                     ],
 
@@ -256,6 +278,7 @@ return [
                         'width-px'                   => 'Szerokość (px)',
                         'height-px'                  => 'Wysokość (px)',
                         'blank-keep-dims'            => 'Zostaw puste, aby zachować przycięte wymiary.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Dostosowania',
                         'brightness'                 => 'Jasność',
                         'contrast'                   => 'Kontrast',
@@ -266,6 +289,31 @@ return [
                         'ai-settings'                => 'Ustawienia AI',
                         'platform'                   => 'Platforma',
                         'platform-loading'           => 'Ładowanie…',
+                        'no-platforms'               => 'Brak platform',
+                        'color-white'                => 'Biały',
+                        'color-silver'               => 'Srebrny',
+                        'color-light-gray'           => 'Jasny szary',
+                        'color-gray'                 => 'Szary',
+                        'color-slate'                => 'Łupkowy',
+                        'color-dark-gray'            => 'Ciemny szary',
+                        'color-charcoal'             => 'Antracyt',
+                        'color-black'                => 'Czarny',
+                        'color-light-red'            => 'Jasny czerwony',
+                        'color-red'                  => 'Czerwony',
+                        'color-light-yellow'         => 'Jasny żółty',
+                        'color-yellow'               => 'Żółty',
+                        'color-light-green'          => 'Jasny zielony',
+                        'color-green'                => 'Zielony',
+                        'color-light-cyan'           => 'Jasny cyjan',
+                        'color-cyan'                 => 'Cyjan',
+                        'color-light-blue'           => 'Jasny niebieski',
+                        'color-blue'                 => 'Niebieski',
+                        'color-light-purple'         => 'Jasny fioletowy',
+                        'color-purple'               => 'Fioletowy',
+                        'color-light-pink'           => 'Jasny różowy',
+                        'color-pink'                 => 'Różowy',
+                        'color-light-rose'           => 'Jasna róża',
+                        'color-rose'                 => 'Różany',
                         'model'                      => 'Model',
                         'no-models'                  => 'Brak modeli',
                         'prompt'                     => 'Polecenie',
@@ -354,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Nie udało się przetworzyć niektórych plików',
                     'file-forbidden-type'                 => 'Plik ma zabroniony typ lub rozszerzenie.',
                     'file-too-large'                      => 'Plik jest za duży. Maksymalny dozwolony rozmiar to :size.',
+                    'storage-upload-failed'               => 'Nie udało się przesłać ":name" do magazynu. Sprawdź dane uwierzytelniające dysku i uprawnienia.',
                 ],
             ],
         ],

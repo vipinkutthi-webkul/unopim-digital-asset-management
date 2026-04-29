@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'ファイル名',
                     'tags'           => 'タグ',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'パス',
                     'size'           => 'サイズ',
                 ],
+
                 'directory' => [
-                    'title'  => 'ディレクトリ',
-                    'create' => [
+                    'title'        => 'ディレクトリ',
+                    'create'       => [
                         'title'    => 'ディレクトリを作成',
                         'name'     => '名前',
                         'save-btn' => 'ディレクトリを保存',
                     ],
+
                     'rename' => [
                         'title' => 'ディレクトリ名を変更',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'アセット名を変更',
                             'save-btn' => 'アセットを保存',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => '削除',
                         'rename'                    => '名前変更',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'IDで取得',
                         'comment'                   => 'コメント',
                     ],
+
                     'linked-resources'                          => 'リンクされたリソース',
                     'not-found'                                 => 'ディレクトリが見つかりません',
                     'created-success'                           => 'ディレクトリが正常に作成されました',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'ZIPファイルの作成に失敗しました。',
                     'not-allowed'                               => 'スクリプトファイルのアップロードは許可されていません。',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'このツールは、すべてのメディアアセットを一箇所で整理、保存、管理するのに役立ちます。',
                 'root'             => 'ルート',
                 'upload'           => 'アップロード',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'アセットプロパティ',
                         'create-btn' => 'プロパティ作成',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => '名前',
                             'type'     => 'タイプ',
                             'language' => '言語',
@@ -110,7 +119,8 @@ return [
                             'edit'     => '編集',
                             'delete'   => '削除',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'プロパティ作成',
                             'name'     => '名前',
                             'type'     => 'タイプ',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'アセット編集',
+                    'previous'              => '前へ',
+                    'next'                  => '次へ',
                     'name'                  => '名前',
                     'value'                 => '値',
                     'back-btn'              => '戻る',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'このファイルタイプはプレビューに対応していません。',
                         'download-file'   => 'ファイルをダウンロード',
                         'download-zip'    => 'ZIPでダウンロード',
+                        'close'           => 'プレビューを閉じる',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => '詳細を見るにはクリック',
+                            'preview'           => 'プレビュー',
+                            'edit-image'        => '画像を編集',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => '左に回転 (L)',
+                            'rotate-right' => '右に回転 (R)',
+                            'zoom-out'     => 'ズームアウト (-)',
+                            'zoom-in'      => 'ズームイン (+)',
+                            'fit-to-screen'=> '画面に合わせる',
+                            'actual-size'  => '実際のサイズ',
+                            'reset-all'    => 'すべてリセット (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10秒戻る',
                             'forward-10s'        => '10秒進む',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'ミュート (M)',
                             'picture-in-picture' => 'ピクチャー・イン・ピクチャー',
                             'fullscreen'         => 'フルスクリーン (F)',
+                            'more-actions'       => 'その他の操作',
+                            'copy-link'          => 'リンクをコピー',
+                            'link-copied'        => 'コピーしました!',
+                            'open-in-new-tab'    => '新しいタブで開く',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => '高さ (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'ダウンロード',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'オリジナル',
                         ],
                     ],
+
                     'tag-already-exists'        => 'タグは既に存在します',
                     'image-source-not-readable' => '画像ソースは読み取れません',
                     'failed-to-read'            => '画像のメタデータの読み取りに失敗しました :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => '幅 (px)',
                         'height-px'                  => '高さ (px)',
                         'blank-keep-dims'            => 'トリミングした寸法を保持するには空白にしてください。',
+                        'auto'                       => '自動',
                         'adjustments'                => '調整',
                         'brightness'                 => '明るさ',
                         'contrast'                   => 'コントラスト',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI設定',
                         'platform'                   => 'プラットフォーム',
                         'platform-loading'           => '読み込み中…',
+                        'no-platforms'               => 'プラットフォームなし',
+                        'color-white'                => '白',
+                        'color-silver'               => 'シルバー',
+                        'color-light-gray'           => 'ライトグレー',
+                        'color-gray'                 => 'グレー',
+                        'color-slate'                => 'スレートグレー',
+                        'color-dark-gray'            => 'ダークグレー',
+                        'color-charcoal'             => 'チャコール',
+                        'color-black'                => '黒',
+                        'color-light-red'            => 'ライトレッド',
+                        'color-red'                  => '赤',
+                        'color-light-yellow'         => 'ライトイエロー',
+                        'color-yellow'               => '黄',
+                        'color-light-green'          => 'ライトグリーン',
+                        'color-green'                => '緑',
+                        'color-light-cyan'           => 'ライトシアン',
+                        'color-cyan'                 => 'シアン',
+                        'color-light-blue'           => 'ライトブルー',
+                        'color-blue'                 => '青',
+                        'color-light-purple'         => 'ライトパープル',
+                        'color-purple'               => 'パープル',
+                        'color-light-pink'           => 'ライトピンク',
+                        'color-pink'                 => 'ピンク',
+                        'color-light-rose'           => 'ライトローズ',
+                        'color-rose'                 => 'ローズ',
                         'model'                      => 'モデル',
                         'no-models'                  => 'モデルなし',
                         'prompt'                     => 'プロンプト',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'タグが正常に追加されました',
                         'create-failure' => 'タグの作成に失敗しました',
                     ],
+
                     'no-comments'    => 'タグはまだありません',
                     'found-success'  => 'タグが正常に見つかりました',
                     'not-found'      => 'タグが見つかりません',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => '一部のファイルの処理に失敗しました',
                     'file-forbidden-type'                 => 'ファイルのタイプまたは拡張子が禁止されています。',
                     'file-too-large'                      => 'ファイルが大きすぎます。最大許容サイズは :size です。',
+                    'storage-upload-failed'               => '":name" のストレージへのアップロードに失敗しました。ディスクの認証情報と権限を確認してください。',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'ZIPをダウンロード',
             'asset-assign'     => 'アセットを割り当て',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'フィールド :attribute は必須です。',
             ],
+
             'comment' => [
                 'required' => 'コメントメッセージは必須です。',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'この操作は認証されていません。',
         ],

@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'Bestandsnaam',
                     'tags'           => 'Tags',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'Pad',
                     'size'           => 'Grootte',
                 ],
+
                 'directory' => [
-                    'title'  => 'Map',
-                    'create' => [
+                    'title'        => 'Map',
+                    'create'       => [
                         'title'    => 'Maak Map Aan',
                         'name'     => 'Naam',
                         'save-btn' => 'Map Opslaan',
                     ],
+
                     'rename' => [
                         'title' => 'Hernoem Map',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'Hernoem Asset',
                             'save-btn' => 'Asset Opslaan',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'Verwijderen',
                         'rename'                    => 'Hernoemen',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'Kom langs, ID',
                         'comment'                   => 'Opmerking',
                     ],
+
                     'linked-resources'                          => 'Gekoppelde bronnen',
                     'not-found'                                 => 'Geen map gevonden',
                     'created-success'                           => 'Map succesvol aangemaakt',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'Mislukt om het zipbestand te maken.',
                     'not-allowed'                               => 'Het uploaden van scriptbestanden is niet toegestaan.',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'Deze tool helpt je om al je mediabestanden op één plaats te organiseren, op te slaan en te beheren.',
                 'root'             => 'Root',
                 'upload'           => 'Uploaden',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'Asset Eigenschappen',
                         'create-btn' => 'Maak Eigenschap Aan',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'Naam',
                             'type'     => 'Type',
                             'language' => 'Taal',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'Bewerken',
                             'delete'   => 'Verwijderen',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'Maak Eigenschap Aan',
                             'name'     => 'Naam',
                             'type'     => 'Type',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'Bewerk Asset',
+                    'previous'              => 'Vorige',
+                    'next'                  => 'Volgende',
                     'name'                  => 'Naam',
                     'value'                 => 'Waarde',
                     'back-btn'              => 'Terug',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'Voorbeeld niet beschikbaar voor dit bestandstype.',
                         'download-file'   => 'Bestand Downloaden',
                         'download-zip'    => 'Downloaden als ZIP',
+                        'close'           => 'Voorbeeld sluiten',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'Klik voor volledige details',
+                            'preview'           => 'Voorbeeld',
+                            'edit-image'        => 'Afbeelding bewerken',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'Linksom draaien (L)',
+                            'rotate-right' => 'Rechtsom draaien (R)',
+                            'zoom-out'     => 'Uitzoomen (-)',
+                            'zoom-in'      => 'Inzoomen (+)',
+                            'fit-to-screen'=> 'Aanpassen aan scherm',
+                            'actual-size'  => 'Werkelijke grootte',
+                            'reset-all'    => 'Alles resetten (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 s terug',
                             'forward-10s'        => '10 s vooruit',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'Dempen (M)',
                             'picture-in-picture' => 'Beeld in beeld',
                             'fullscreen'         => 'Volledig scherm (F)',
+                            'more-actions'       => 'Meer acties',
+                            'copy-link'          => 'Link kopiëren',
+                            'link-copied'        => 'Gekopieerd!',
+                            'open-in-new-tab'    => 'Openen in nieuw tabblad',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'Hoogte (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'Downloaden',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'Origineel',
                         ],
                     ],
+
                     'tag-already-exists'        => 'Tag bestaat al',
                     'image-source-not-readable' => 'Afbeeldingsbron niet leesbaar',
                     'failed-to-read'            => 'Het lezen van de afbeelding is mislukt :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'Breedte (px)',
                         'height-px'                  => 'Hoogte (px)',
                         'blank-keep-dims'            => 'Leeg laten om de bijgesneden afmetingen te behouden.',
+                        'auto'                       => 'auto',
                         'adjustments'                => 'Aanpassingen',
                         'brightness'                 => 'Helderheid',
                         'contrast'                   => 'Contrast',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI-instellingen',
                         'platform'                   => 'Platform',
                         'platform-loading'           => 'Laden…',
+                        'no-platforms'               => 'Geen platforms',
+                        'color-white'                => 'Wit',
+                        'color-silver'               => 'Zilver',
+                        'color-light-gray'           => 'Lichtgrijs',
+                        'color-gray'                 => 'Grijs',
+                        'color-slate'                => 'Leisteengrijs',
+                        'color-dark-gray'            => 'Donkergrijs',
+                        'color-charcoal'             => 'Houtskool',
+                        'color-black'                => 'Zwart',
+                        'color-light-red'            => 'Lichtrood',
+                        'color-red'                  => 'Rood',
+                        'color-light-yellow'         => 'Lichtgeel',
+                        'color-yellow'               => 'Geel',
+                        'color-light-green'          => 'Lichtgroen',
+                        'color-green'                => 'Groen',
+                        'color-light-cyan'           => 'Lichtcyaan',
+                        'color-cyan'                 => 'Cyaan',
+                        'color-light-blue'           => 'Lichtblauw',
+                        'color-blue'                 => 'Blauw',
+                        'color-light-purple'         => 'Lichtpaars',
+                        'color-purple'               => 'Paars',
+                        'color-light-pink'           => 'Lichtroze',
+                        'color-pink'                 => 'Roze',
+                        'color-light-rose'           => 'Lichtrose',
+                        'color-rose'                 => 'Rose',
                         'model'                      => 'Model',
                         'no-models'                  => 'Geen modellen',
                         'prompt'                     => 'Opdracht',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'Tags zijn succesvol toegevoegd',
                         'create-failure' => 'Tags konden niet worden aangemaakt',
                     ],
+
                     'no-comments'    => 'Nog geen Tags',
                     'found-success'  => 'Tag succesvol gevonden',
                     'not-found'      => 'Tags niet gevonden',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'Sommige bestanden konden niet worden verwerkt',
                     'file-forbidden-type'                 => 'Bestand heeft een verboden type of extensie.',
                     'file-too-large'                      => 'Het bestand is te groot. De maximaal toegestane grootte is :size.',
+                    'storage-upload-failed'               => 'Uploaden van ":name" naar opslag mislukt. Controleer de schijfreferenties en machtigingen.',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'Download Zip',
             'asset-assign'     => 'Wijs Asset toe',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => 'Het veld :attribute is verplicht.',
             ],
+
             'comment' => [
                 'required' => 'Het bericht van de Opmerking is verplicht.',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'Deze actie is niet toegestaan.',
         ],

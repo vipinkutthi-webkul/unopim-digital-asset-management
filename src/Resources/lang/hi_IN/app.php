@@ -27,7 +27,8 @@ return [
         ],
         'dam' => [
             'index' => [
-                'title'    => 'DAM',
+                'title' => 'DAM',
+
                 'datagrid' => [
                     'file-name'      => 'फाइल का नाम',
                     'tags'           => 'टैग',
@@ -39,22 +40,26 @@ return [
                     'path'           => 'पथ',
                     'size'           => 'आकार',
                 ],
+
                 'directory' => [
-                    'title'  => 'निर्देशिका',
-                    'create' => [
+                    'title'        => 'निर्देशिका',
+                    'create'       => [
                         'title'    => 'निर्देशिका बनाएँ',
                         'name'     => 'नाम',
                         'save-btn' => 'निर्देशिका सहेजें',
                     ],
+
                     'rename' => [
                         'title' => 'निर्देशिका का नाम बदलें',
                     ],
+
                     'asset' => [
                         'rename' => [
                             'title'    => 'संपत्ति का नाम बदलें',
                             'save-btn' => 'संपत्ति सहेजें',
                         ],
                     ],
+
                     'actions' => [
                         'delete'                    => 'हटाएँ',
                         'rename'                    => 'नाम बदलें',
@@ -68,6 +73,7 @@ return [
                         'get-by-id'                 => 'ID द्वारा प्राप्त करें',
                         'comment'                   => 'टिप्पणी',
                     ],
+
                     'linked-resources'                          => 'लिंक की गई संसाधन',
                     'not-found'                                 => 'कोई निर्देशिका नहीं मिली',
                     'created-success'                           => 'निर्देशिका सफलतापूर्वक बनाई गई',
@@ -90,6 +96,8 @@ return [
                     'failed-download-directory'                 => 'ज़िप फ़ाइल बनाने में विफल',
                     'not-allowed'                               => 'स्क्रिप्ट फाइलें अपलोड करना अनुमति नहीं है।',
                 ],
+
+                'title'            => 'DAM',
                 'description'      => 'यह उपकरण आपको सभी मीडिया संपत्तियों को एक स्थान पर व्यवस्थित, संग्रहित और प्रबंधित करने में मदद करेगा',
                 'root'             => 'मूल',
                 'upload'           => 'अपलोड करें',
@@ -102,7 +110,8 @@ return [
                     'index' => [
                         'title'      => 'संपत्ति गुण',
                         'create-btn' => 'गुणवत्ता बनाएँ',
-                        'datagrid'   => [
+
+                        'datagrid'      => [
                             'name'     => 'नाम',
                             'type'     => 'प्रकार',
                             'language' => 'भाषा',
@@ -110,7 +119,8 @@ return [
                             'edit'     => 'संपादित करें',
                             'delete'   => 'हटाएँ',
                         ],
-                        'create' => [
+
+                        'create'     => [
                             'title'    => 'गुणवत्ता बनाएँ',
                             'name'     => 'नाम',
                             'type'     => 'प्रकार',
@@ -148,6 +158,8 @@ return [
                 ],
                 'edit' => [
                     'title'                 => 'संपत्ति संपादित करें',
+                    'previous'              => 'पिछला',
+                    'next'                  => 'अगला',
                     'name'                  => 'नाम',
                     'value'                 => 'मान',
                     'back-btn'              => 'वापस',
@@ -191,6 +203,22 @@ return [
                         'not-available'   => 'इस फ़ाइल प्रकार के लिए पूर्वावलोकन उपलब्ध नहीं है।',
                         'download-file'   => 'फ़ाइल डाउनलोड करें',
                         'download-zip'    => 'ZIP के रूप में डाउनलोड करें',
+                        'close'           => 'पूर्वावलोकन बंद करें',
+                        'mime'            => 'MIME',
+                        'card'            => [
+                            'click-for-details' => 'पूर्ण विवरण के लिए क्लिक करें',
+                            'preview'           => 'पूर्वावलोकन',
+                            'edit-image'        => 'छवि संपादित करें',
+                        ],
+                        'image-viewer'    => [
+                            'rotate-left'  => 'बाईं ओर घुमाएं (L)',
+                            'rotate-right' => 'दाईं ओर घुमाएं (R)',
+                            'zoom-out'     => 'ज़ूम आउट (-)',
+                            'zoom-in'      => 'ज़ूम इन (+)',
+                            'fit-to-screen'=> 'स्क्रीन पर फ़िट करें',
+                            'actual-size'  => 'वास्तविक आकार',
+                            'reset-all'    => 'सब रीसेट करें (0)',
+                        ],
                         'video-player'    => [
                             'back-10s'           => '10 सेकंड पीछे',
                             'forward-10s'        => '10 सेकंड आगे',
@@ -200,6 +228,10 @@ return [
                             'mute'               => 'म्यूट (M)',
                             'picture-in-picture' => 'पिक्चर इन पिक्चर',
                             'fullscreen'         => 'पूर्ण स्क्रीन (F)',
+                            'more-actions'       => 'अधिक क्रियाएँ',
+                            'copy-link'          => 'लिंक कॉपी करें',
+                            'link-copied'        => 'कॉपी हो गया!',
+                            'open-in-new-tab'    => 'नए टैब में खोलें',
                         ],
                     ],
 
@@ -211,7 +243,8 @@ return [
                         'height'             => 'ऊंचाई (px)',
                         'height-placeholder' => '200',
                         'download-btn'       => 'डाउनलोड करें',
-                        'extension-types'    => [
+
+                        'extension-types' => [
                             'jpg'      => 'JPG',
                             'png'      => 'PNG',
                             'jpeg'     => 'JPEG',
@@ -219,6 +252,7 @@ return [
                             'original' => 'मूल',
                         ],
                     ],
+
                     'tag-already-exists'        => 'टैग पहले से मौजूद है',
                     'image-source-not-readable' => 'चित्र स्रोत पढ़ा नहीं जा सका',
                     'failed-to-read'            => 'चित्र मेटाडेटा पढ़ने में विफल :exception',
@@ -244,6 +278,7 @@ return [
                         'width-px'                   => 'चौड़ाई (px)',
                         'height-px'                  => 'ऊंचाई (px)',
                         'blank-keep-dims'            => 'क्रॉप किए गए आयाम बनाए रखने के लिए खाली छोड़ें।',
+                        'auto'                       => 'स्वतः',
                         'adjustments'                => 'समायोजन',
                         'brightness'                 => 'चमक',
                         'contrast'                   => 'कंट्रास्ट',
@@ -254,6 +289,31 @@ return [
                         'ai-settings'                => 'AI सेटिंग्स',
                         'platform'                   => 'प्लेटफॉर्म',
                         'platform-loading'           => 'लोड हो रहा है…',
+                        'no-platforms'               => 'कोई प्लेटफ़ॉर्म नहीं',
+                        'color-white'                => 'सफ़ेद',
+                        'color-silver'               => 'चाँदी',
+                        'color-light-gray'           => 'हल्का ग्रे',
+                        'color-gray'                 => 'ग्रे',
+                        'color-slate'                => 'स्लेट',
+                        'color-dark-gray'            => 'गहरा ग्रे',
+                        'color-charcoal'             => 'चारकोल',
+                        'color-black'                => 'काला',
+                        'color-light-red'            => 'हल्का लाल',
+                        'color-red'                  => 'लाल',
+                        'color-light-yellow'         => 'हल्का पीला',
+                        'color-yellow'               => 'पीला',
+                        'color-light-green'          => 'हल्का हरा',
+                        'color-green'                => 'हरा',
+                        'color-light-cyan'           => 'हल्का सियान',
+                        'color-cyan'                 => 'सियान',
+                        'color-light-blue'           => 'हल्का नीला',
+                        'color-blue'                 => 'नीला',
+                        'color-light-purple'         => 'हल्का बैंगनी',
+                        'color-purple'               => 'बैंगनी',
+                        'color-light-pink'           => 'हल्का गुलाबी',
+                        'color-pink'                 => 'गुलाबी',
+                        'color-light-rose'           => 'हल्का गुलाब',
+                        'color-rose'                 => 'गुलाब',
                         'model'                      => 'मॉडल',
                         'no-models'                  => 'कोई मॉडल नहीं',
                         'prompt'                     => 'प्रॉम्प्ट',
@@ -312,6 +372,7 @@ return [
                         'create-success' => 'टैग सफलतापूर्वक जोड़े गए',
                         'create-failure' => 'टैग जोड़ने में विफल',
                     ],
+
                     'no-comments'    => 'अभी तक कोई टैग नहीं हैं',
                     'found-success'  => 'टैग सफलतापूर्वक मिला',
                     'not-found'      => 'टैग नहीं मिला',
@@ -341,6 +402,7 @@ return [
                     'file-process-failed'                 => 'कुछ फाइलें प्रोसेस करने में विफल',
                     'file-forbidden-type'                 => 'फाइल का प्रकार या विस्तार निषिद्ध है।',
                     'file-too-large'                      => 'फाइल बहुत बड़ी है। अधिकतम अनुमत आकार :size है।',
+                    'storage-upload-failed'               => '":name" को स्टोरेज पर अपलोड करने में विफलता। डिस्क क्रेडेंशियल और अनुमतियाँ जाँचें।',
                 ],
             ],
         ],
@@ -383,10 +445,12 @@ return [
             'download-zip'     => 'ज़िप डाउनलोड करें',
             'asset-assign'     => 'संपत्ति सौंपें',
         ],
+
         'validation' => [
             'asset' => [
                 'required' => ':attribute फ़ील्ड आवश्यक है।',
             ],
+
             'comment' => [
                 'required' => 'टिप्पणी संदेश आवश्यक है।',
             ],
@@ -405,6 +469,7 @@ return [
                 ],
             ],
         ],
+
         'errors' => [
             '401' => 'यह क्रिया अस्वीकृत है।',
         ],
