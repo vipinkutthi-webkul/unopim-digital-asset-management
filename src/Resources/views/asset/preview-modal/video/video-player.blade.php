@@ -10,6 +10,7 @@
         <video
             ref="videoEl"
             autoplay
+            @contextmenu.prevent
             class="max-w-full max-h-full"
             @timeupdate="videoOnTimeUpdate"
             @loadedmetadata="videoOnLoadedMeta"
