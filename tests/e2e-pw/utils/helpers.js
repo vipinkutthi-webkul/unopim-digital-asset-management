@@ -13,7 +13,18 @@ async function navigateTo(page, route) {
   if (!url) throw new Error(`Unknown route: "${route}". Available: ${Object.keys(ROUTES).join(', ')}`);
   // domcontentloaded — not networkidle. The DAM page has constant background
   // traffic (queue polling, completeness updates) that prevents network idle.
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  // One retry: artisan serve is single-threaded; Chrome's parallel sub-resource
+  // requests can cause ERR_ABORTED on the first attempt.
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  } catch (e) {
+    if (e.message.includes('ERR_ABORTED') || e.message.includes('net::ERR_')) {
+      await page.waitForTimeout(1500).catch(() => {});
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    } else {
+      throw e;
+    }
+  }
   await page.locator('#app').waitFor({ state: 'visible', timeout: 30000 });
   // Sentinel: the toolbar's Search input only mounts after the Vue grid component
   // is interactive. Far cheaper than networkidle and doesn't deadlock.
@@ -119,6 +130,54 @@ async function ensureAssetExists(page) {
   await page.locator('.image-card').first().waitFor({ state: 'visible', timeout: 20000 });
 }
 
+/**
+ * Ensure an asset with the given filename exists in DAM. Uploads filePath if missing.
+ * Searches by searchName (no extension matching needed, just a substring).
+ */
+async function ensureAssetOfTypeExists(page, filePath, searchName) {
+  await navigateTo(page, 'dam');
+  await page.waitForTimeout(500);
+
+  await searchInDataGrid(page, searchName);
+  await page.waitForTimeout(500);
+
+  const exists = await page.locator('.image-card').first().isVisible({ timeout: 3000 }).catch(() => false);
+
+  // Navigate fresh to clear the search filter regardless of result
+  await navigateTo(page, 'dam');
+  await page.waitForTimeout(300);
+
+  if (exists) return;
+
+  const fileInput = page.locator('input[type="file"][name="files[]"]');
+  await fileInput.waitFor({ state: 'attached', timeout: 15000 });
+  await fileInput.setInputFiles(filePath);
+
+  await Promise.race([
+    page.locator('#app').getByText(/uploaded successfully/i).first()
+      .waitFor({ state: 'visible', timeout: 30000 }),
+    page.locator('.image-card').first().waitFor({ state: 'visible', timeout: 30000 }),
+  ]).catch(() => {});
+
+  await navigateTo(page, 'dam');
+}
+
+/**
+ * Search for an asset by name in the DAM grid and navigate to its edit page.
+ */
+async function navigateToAssetEditByName(page, searchName) {
+  await navigateTo(page, 'dam');
+  await searchInDataGrid(page, searchName);
+
+  const card = page.locator('.image-card').first();
+  await card.waitFor({ state: 'visible', timeout: 15000 });
+  await card.hover({ force: true });
+  await page.waitForTimeout(300);
+  await card.locator('.icon-edit').first().click({ force: true });
+  await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+}
+
 module.exports = {
   ROUTES,
   navigateTo,
@@ -130,4 +189,6 @@ module.exports = {
   clickSaveAndExpect,
   generateUid,
   ensureAssetExists,
+  ensureAssetOfTypeExists,
+  navigateToAssetEditByName,
 };

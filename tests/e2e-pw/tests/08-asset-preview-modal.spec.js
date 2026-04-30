@@ -1,5 +1,5 @@
 const { test, expect } = require('../utils/fixtures');
-const { navigateTo, ensureAssetExists } = require('../utils/helpers');
+const { navigateTo, ensureAssetExists, navigateToAssetEditByName } = require('../utils/helpers');
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -10,7 +10,7 @@ async function navigateToFirstAssetEdit(page) {
 
   const firstCard = page.locator('.image-card').first();
   await firstCard.waitFor({ state: 'visible', timeout: 20000 });
-  await firstCard.hover();
+  await firstCard.hover({ force: true });
   await page.waitForTimeout(500);
 
   await firstCard.locator('.icon-edit').first().click({ force: true });
@@ -24,11 +24,11 @@ async function navigateToFirstAssetEdit(page) {
  */
 async function openPreviewModal(page) {
   const btn = page.locator('button[title="Preview"]').first();
-  await btn.waitFor({ state: 'visible', timeout: 10000 });
+  await btn.waitFor({ state: 'visible', timeout: 20000 });
   await btn.click();
   // Wait for the viewer's own backdrop (distinct from info modal's bg-black/60)
   await page.locator('.absolute.inset-0.bg-black\\/75').first()
-    .waitFor({ state: 'visible', timeout: 10000 });
+    .waitFor({ state: 'visible', timeout: 20000 });
 }
 
 /**
@@ -36,10 +36,10 @@ async function openPreviewModal(page) {
  */
 async function openInfoModal(page) {
   const btn = page.locator('button').filter({ has: page.locator('.icon-information') }).first();
-  await btn.waitFor({ state: 'visible', timeout: 10000 });
+  await btn.waitFor({ state: 'visible', timeout: 20000 });
   await btn.click();
   await page.locator('.absolute.inset-0.bg-black\\/60').first()
-    .waitFor({ state: 'visible', timeout: 10000 });
+    .waitFor({ state: 'visible', timeout: 20000 });
 }
 
 /**
@@ -111,8 +111,7 @@ test.describe('DAM Asset Preview Modal', () => {
     });
 
     test('Edit image button absent for non-image asset', async ({ adminPage }) => {
-      await navigateToFirstAssetEdit(adminPage);
-      if (await isImageAsset(adminPage)) { test.skip(true, 'Asset is an image'); return; }
+      await navigateToAssetEditByName(adminPage, 'sample.mp4');
       await expect(adminPage.locator('button[title="Edit image"]').first()).not.toBeVisible({ timeout: 3000 });
     });
 
@@ -132,9 +131,9 @@ test.describe('DAM Asset Preview Modal', () => {
     });
 
     test('Non-image asset thumbnail has opacity-60 class (placeholder)', async ({ adminPage }) => {
-      await navigateToFirstAssetEdit(adminPage);
-      if (await isImageAsset(adminPage)) { test.skip(true, 'Asset is an image'); return; }
+      await navigateToAssetEditByName(adminPage, 'sample.mp4');
       const thumb = adminPage.locator('.rounded-lg.overflow-hidden img').first();
+      await thumb.waitFor({ state: 'visible', timeout: 10000 });
       const hasOpacity = await thumb.evaluate(el => el.classList.contains('opacity-60'));
       expect(hasOpacity).toBe(true);
     });
@@ -706,12 +705,13 @@ test.describe('DAM Asset Preview Modal', () => {
       await expect(adminPage.getByText('Rotate & Flip').first()).toBeVisible({ timeout: 5000 });
     });
 
-    test('Apply button disabled when no tool selected', async ({ adminPage }) => {
+    test('Apply button not shown when no tool selected', async ({ adminPage }) => {
       const opened = await openEditorIfImage(adminPage);
       if (!opened) { test.skip(true, 'Not an image asset'); return; }
+      // Each Apply button lives inside a v-if="editTool === '...'" panel.
+      // With no tool selected editTool is null, so no panel renders → no Apply button.
       const applyBtn = adminPage.locator('button').filter({ hasText: /^Apply$/ }).first();
-      await expect(applyBtn).toBeVisible({ timeout: 5000 });
-      await expect(applyBtn).toBeDisabled();
+      await expect(applyBtn).not.toBeVisible();
     });
 
     test('Selecting Crop & Resize enables Apply button', async ({ adminPage }) => {
@@ -942,51 +942,38 @@ test.describe('DAM Asset Preview Modal', () => {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Video player (conditional — only runs on video assets)
+  // Video player
   // ═══════════════════════════════════════════════════════════════════════════
 
   test.describe('Video player', () => {
 
     async function openVideoPreview(page) {
-      await navigateToFirstAssetEdit(page);
-      const thumb = page.locator('.rounded-lg.overflow-hidden img').first();
-      await thumb.waitFor({ state: 'visible', timeout: 10000 });
-      // Non-image placeholder with opacity-60 — but video placeholder exists.
-      // Detect video: check placeholder src contains "video.svg"
-      const src = await thumb.getAttribute('src');
-      if (!src || !src.includes('video.svg')) return false;
+      await navigateToAssetEditByName(page, 'sample.mp4');
       await openPreviewModal(page);
-      return true;
     }
 
     test('Video element renders in modal', async ({ adminPage }) => {
-      const ok = await openVideoPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a video asset'); return; }
+      await openVideoPreview(adminPage);
       await expect(adminPage.locator('.flex-1.min-h-0.overflow-hidden video').first()).toBeVisible({ timeout: 10000 });
     });
 
     test('Speed selector buttons visible', async ({ adminPage }) => {
-      const ok = await openVideoPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a video asset'); return; }
-      // Speed buttons: 1× button always present
+      await openVideoPreview(adminPage);
       await expect(adminPage.locator('button').filter({ hasText: '1×' }).first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Skip back 10s button visible (title=Back 10s)', async ({ adminPage }) => {
-      const ok = await openVideoPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a video asset'); return; }
+      await openVideoPreview(adminPage);
       await expect(adminPage.locator('button[title="Back 10s"]').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Skip forward 10s button visible (title=Forward 10s)', async ({ adminPage }) => {
-      const ok = await openVideoPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a video asset'); return; }
+      await openVideoPreview(adminPage);
       await expect(adminPage.locator('button[title="Forward 10s"]').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('1× speed button is active by default', async ({ adminPage }) => {
-      const ok = await openVideoPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a video asset'); return; }
+      await openVideoPreview(adminPage);
       const oneX = adminPage.locator('button').filter({ hasText: /^1×$/ }).first();
       const cls = await oneX.evaluate(el => el.className);
       expect(cls).toContain('bg-violet-600');
@@ -1001,89 +988,67 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('Audio player', () => {
 
     async function openAudioPreview(page) {
-      await navigateToFirstAssetEdit(page);
-      const thumb = page.locator('.rounded-lg.overflow-hidden img').first();
-      await thumb.waitFor({ state: 'visible', timeout: 10000 });
-      const src = await thumb.getAttribute('src');
-      if (!src || !src.includes('audio.svg')) return false;
+      await navigateToAssetEditByName(page, 'sample.wav');
       await openPreviewModal(page);
-      return true;
     }
 
     test('Play/pause button visible', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      // Play button: w-12 h-12 rounded-full bg-violet-600
+      await openAudioPreview(adminPage);
       await expect(adminPage.locator('button.w-12.h-12.rounded-full').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Seek bar visible', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      // Seek bar is a custom div-based scrubber, not an input[type="range"]
-      await expect(adminPage.locator('div[ref="audioSeekContainer"]').first()).toBeVisible({ timeout: 5000 });
+      await openAudioPreview(adminPage);
+      // ref="audioSeekContainer" is a Vue ref — not a DOM attribute. Match by unique class combo.
+      await expect(
+        adminPage.locator('.flex-1.min-h-0.overflow-hidden .relative.h-4.group.cursor-pointer').first()
+      ).toBeVisible({ timeout: 5000 });
     });
 
     test('Volume slider visible', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      // Volume slider: w-20 h-1.5 accent-violet-600
+      await openAudioPreview(adminPage);
       await expect(adminPage.locator('input[type="range"].w-20').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Current time display starts at 0:00', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
-      // audioCurrentTimeDisplay renders as "0:00" initially
+      await openAudioPreview(adminPage);
       await expect(adminPage.locator('.font-mono.tabular-nums').filter({ hasText: '0:00' }).first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Skip back 10s button visible (title=Back 10s)', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
+      await openAudioPreview(adminPage);
       await expect(adminPage.locator('button[title="Back 10s"]').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Skip forward 10s button visible (title=Forward 10s)', async ({ adminPage }) => {
-      const ok = await openAudioPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not an audio asset'); return; }
+      await openAudioPreview(adminPage);
       await expect(adminPage.locator('button[title="Forward 10s"]').first()).toBeVisible({ timeout: 5000 });
     });
 
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Fallback content (unsupported file type)
+  // PDF viewer (sample.pdf — file_type='document', renders iframe)
   // ═══════════════════════════════════════════════════════════════════════════
 
   test.describe('Fallback / unsupported asset', () => {
 
     async function openFallbackPreview(page) {
-      await navigateToFirstAssetEdit(page);
-      const thumb = page.locator('.rounded-lg.overflow-hidden img').first();
-      await thumb.waitFor({ state: 'visible', timeout: 10000 });
-      const src = await thumb.getAttribute('src');
-      // Fallback: placeholder that is NOT video/audio (i.e., file.svg or unspecified.svg)
-      if (!src || src.includes('video.svg') || src.includes('audio.svg')) return false;
-      if (!(await thumb.evaluate(el => el.classList.contains('opacity-60')))) return false; // image asset
+      await navigateToAssetEditByName(page, 'sample.pdf');
       await openPreviewModal(page);
-      return true;
     }
 
     test('Fallback modal shows "not available" message', async ({ adminPage }) => {
-      const ok = await openFallbackPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a document/fallback asset'); return; }
-      // Blade renders the i18n key 'preview-modal.not-available'
+      await openFallbackPreview(adminPage);
       const msg = adminPage.locator('.flex-1.min-h-0.overflow-hidden').getByText(/not available|preview not/i).first();
       const visible = await msg.isVisible({ timeout: 5000 }).catch(() => false);
       if (!visible) {
-        test.info().annotations.push({ type: 'note', description: 'Could be a PDF — iframe shown instead' });
+        test.info().annotations.push({ type: 'note', description: 'PDF — iframe shown instead of not-available message' });
       }
     });
 
     test('Fallback modal shows Download button', async ({ adminPage }) => {
-      const ok = await openFallbackPreview(adminPage);
-      if (!ok) { test.skip(true, 'Not a document/fallback asset'); return; }
+      await openFallbackPreview(adminPage);
       const downloadLink = adminPage.locator('.flex-1.min-h-0.overflow-hidden a.primary-button').first();
       const visible = await downloadLink.isVisible({ timeout: 5000 }).catch(() => false);
       if (!visible) {

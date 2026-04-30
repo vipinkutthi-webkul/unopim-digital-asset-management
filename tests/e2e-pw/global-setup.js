@@ -1,14 +1,23 @@
-const { request } = require('@playwright/test');
+const { request, chromium } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 
 const STORAGE_PATH = path.resolve(__dirname, '.state/admin-auth.json');
+
+const SEED_ASSETS = [
+  { filePath: path.resolve(__dirname, 'assets/sample.mp4'), searchName: 'sample.mp4' },
+  { filePath: path.resolve(__dirname, 'assets/sample.wav'), searchName: 'sample.wav' },
+  { filePath: path.resolve(__dirname, 'assets/sample.pdf'), searchName: 'sample.pdf' },
+];
 
 /**
  * Authenticate via the API request context (server-to-server, no chromium UI),
  * so the captured cookies come from a real, completed POST /admin/login → 302
  * round-trip — not from an in-flight UI form submission. Then pin session-cookie
  * expiry so chromium doesn't drop them on reload as already-expired.
+ *
+ * After auth, seeds non-image test assets (mp4/wav/pdf) via a real Chromium
+ * browser so they exist for every spec regardless of --grep or CI sharding.
  */
 module.exports = async function globalSetup(config) {
   fs.mkdirSync(path.dirname(STORAGE_PATH), { recursive: true });
@@ -59,4 +68,33 @@ module.exports = async function globalSetup(config) {
     }
   }
   if (mutated) fs.writeFileSync(STORAGE_PATH, JSON.stringify(state, null, 2));
+
+  // Seed non-image test assets via real Chromium so they exist for every spec.
+  await seedNonImageAssets(baseURL);
 };
+
+async function seedNonImageAssets(baseURL) {
+  const { ensureAssetOfTypeExists } = require('./utils/helpers');
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+  });
+
+  try {
+    const context = await browser.newContext({ storageState: STORAGE_PATH, baseURL });
+    const page = await context.newPage();
+
+    for (const { filePath, searchName } of SEED_ASSETS) {
+      try {
+        await ensureAssetOfTypeExists(page, filePath, searchName);
+      } catch (err) {
+        console.warn(`global-setup: seed "${searchName}" failed — ${err.message}`);
+      }
+    }
+
+    await context.close().catch(() => {});
+  } finally {
+    await browser.close().catch(() => {});
+  }
+}
