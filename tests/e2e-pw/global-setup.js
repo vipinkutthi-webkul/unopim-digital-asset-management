@@ -5,6 +5,7 @@ const path = require('path');
 const STORAGE_PATH = path.resolve(__dirname, '.state/admin-auth.json');
 
 const SEED_ASSETS = [
+  { filePath: path.resolve(__dirname, 'assets/floral.jpg'), searchName: 'floral.jpg' },
   { filePath: path.resolve(__dirname, 'assets/sample.mp4'), searchName: 'sample.mp4' },
   { filePath: path.resolve(__dirname, 'assets/sample.wav'), searchName: 'sample.wav' },
   { filePath: path.resolve(__dirname, 'assets/sample.pdf'), searchName: 'sample.pdf' },
@@ -69,11 +70,11 @@ module.exports = async function globalSetup(config) {
   }
   if (mutated) fs.writeFileSync(STORAGE_PATH, JSON.stringify(state, null, 2));
 
-  // Seed non-image test assets via real Chromium so they exist for every spec.
-  await seedNonImageAssets(baseURL);
+  // Seed test assets (floral.jpg + mp4/wav/pdf) via real Chromium so they exist for every spec.
+  await seedAssets(baseURL);
 };
 
-async function seedNonImageAssets(baseURL) {
+async function seedAssets(baseURL) {
   const { ensureAssetOfTypeExists } = require('./utils/helpers');
 
   const browser = await chromium.launch({
