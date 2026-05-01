@@ -28,6 +28,7 @@ window._damAudioPlayer = {
             this.audioDuration = 0; this.audioVolume = 1; this.audioEnded = false;
             this.audioIsLooping = false; this.audioIsMuted = false; this.audioSpeed = 1;
             this.audioSeekTooltipVisible = false;
+            this.audioStopViz();
             try { const sa = parseFloat(localStorage.getItem('dam_audio_volume')); if (!isNaN(sa)) this.audioVolume = sa; } catch(_) {}
         },
 
@@ -38,6 +39,7 @@ window._damAudioPlayer = {
                 this.$refs.audioEl.volume = this.audioVolume;
                 this.$refs.audioEl.loop = false;
             }
+            this._audioDrawRing();
         },
 
         audioStopOnClose() {
@@ -50,8 +52,14 @@ window._damAudioPlayer = {
             const el = this.$refs.audioEl;
             if (!el) return;
             if (this.audioEnded) { el.currentTime = 0; this.audioCurrentTime = 0; this.audioEnded = false; }
-            if (el.paused) { el.play(); this.audioIsPlaying = true; }
-            else           { el.pause(); this.audioIsPlaying = false; }
+            if (el.paused) {
+                el.play();
+                this.audioIsPlaying = true;
+            } else {
+                el.pause();
+                this.audioIsPlaying = false;
+                this.$nextTick(() => this._audioDrawRing());
+            }
         },
 
         audioSkip(sec) {
@@ -138,6 +146,46 @@ window._damAudioPlayer = {
         audioOnEnded() {
             this.audioIsPlaying = false;
             this.audioEnded = true;
+            this.$nextTick(() => this._audioDrawRing());
+        },
+
+        // ── Ring canvas ───────────────────────────────────────────────
+        _audioDrawRing() {
+            const canvas = this.$refs.visualizerCanvas;
+            if (!canvas) return;
+            const size   = 208;
+            canvas.width  = size;
+            canvas.height = size;
+            const ctx    = canvas.getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            const cx     = size / 2;
+            const cy     = size / 2;
+            const innerR = size * 0.33;
+            const bins   = 128;
+            const lineW  = Math.max(1.5, (2 * Math.PI * innerR / bins) * 0.68);
+            const barH   = isDark ? 2.5 : 3.5;
+            const light  = isDark ? 65 : 48;
+
+            ctx.clearRect(0, 0, size, size);
+            ctx.lineWidth  = lineW;
+            ctx.lineCap    = 'round';
+            ctx.shadowBlur = 0;
+
+            for (let i = 0; i < bins; i++) {
+                const angle = (i / bins) * Math.PI * 2 - Math.PI / 2;
+                const cos   = Math.cos(angle);
+                const sin   = Math.sin(angle);
+                ctx.strokeStyle = `hsla(260, 78%, ${light}%, ${isDark ? 0.4 : 0.65})`;
+                ctx.beginPath();
+                ctx.moveTo(cx + cos * innerR,          cy + sin * innerR);
+                ctx.lineTo(cx + cos * (innerR + barH), cy + sin * (innerR + barH));
+                ctx.stroke();
+            }
+        },
+
+        audioStopViz() {
+            const canvas = this.$refs.visualizerCanvas;
+            if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         },
     },
 };

@@ -1,10 +1,92 @@
-<div class="flex flex-col items-center justify-center gap-6 w-full h-full p-8">
-    <img
-        src="{{ $placeholderSvg }}"
-        alt="{{ $asset->file_name }}"
-        class="h-28 w-28 object-contain opacity-50"
-    />
-    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-xl text-center">{{ $asset->file_name }}</p>
+@pushOnce('styles')
+<style>
+@keyframes audio-pulse-out {
+    0%   { transform: scale(0.54); opacity: 1;   background: rgba(139, 92, 246, 0.15);
+           border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    25%  { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    50%  { border-radius: 50% 60% 30% 70% / 40% 50% 70% 30%; opacity: 0.45; }
+    75%  { border-radius: 70% 30% 50% 60% / 30% 70% 40% 60%; }
+    100% { transform: scale(0.76); opacity: 0;   background: rgba(139, 92, 246, 0);
+           border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+@keyframes audio-pulse-out-2 {
+    0%   { transform: scale(0.54); opacity: 1;   background: rgba(139, 92, 246, 0.15);
+           border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; }
+    25%  { border-radius: 70% 30% 40% 60% / 60% 40% 70% 30%; }
+    50%  { border-radius: 30% 70% 60% 40% / 70% 30% 50% 60%; opacity: 0.45; }
+    75%  { border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; }
+    100% { transform: scale(0.76); opacity: 0;   background: rgba(139, 92, 246, 0);
+           border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; }
+}
+.audio-ring-1,
+.audio-ring-2 {
+    position: absolute;
+    width: 208px;
+    height: 208px;
+    top: 50%;
+    left: 50%;
+    margin-top: -104px;
+    margin-left: -104px;
+    border: 3px solid rgba(139, 92, 246, 1);
+    box-shadow: 0 0 20px 6px rgba(139, 92, 246, 0.75), inset 0 0 8px rgba(139, 92, 246, 0.2);
+    pointer-events: none;
+}
+.dark .audio-ring-1,
+.dark .audio-ring-2 {
+    box-shadow: 0 0 16px 4px rgba(139, 92, 246, 0.55), inset 0 0 8px rgba(139, 92, 246, 0.2);
+}
+.audio-ring-1 { animation: audio-pulse-out   2.2s ease-in-out infinite;      animation-fill-mode: backwards; }
+.audio-ring-2 { animation: audio-pulse-out-2 2.2s ease-in-out infinite 1.1s; animation-fill-mode: backwards; }
+@keyframes disc-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.audio-disc-spinning {
+    animation: disc-spin 8s linear infinite;
+}
+.audio-canvas-ring { transition: opacity 0.4s ease; }
+.audio-blob-rings  { transition: opacity 0.4s ease; }
+</style>
+@endPushOnce
+
+<div class="relative flex flex-col items-center justify-center gap-4 w-full h-full p-6 mt-4">
+    <div class="absolute inset-x-0 top-0 h-48 pointer-events-none" style="background: linear-gradient(to bottom, rgba(139,92,246,0.07) 0%, transparent 100%);"></div>
+    <!-- Circular disc -->
+    <div class="flex items-center justify-center h-52 w-52 shrink-0">
+
+        <!-- Canvas ring + pulse rings -->
+        <div class="relative flex items-center justify-center h-52 w-52">
+            <!-- Ambient glow -->
+            <div
+                class="absolute inset-0 rounded-full pointer-events-none"
+                :style="{ background: audioIsPlaying ? 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)' }"
+            ></div>
+            <canvas
+                v-show="!audioIsPlaying"
+                ref="visualizerCanvas"
+                class="audio-canvas-ring absolute pointer-events-none"
+                style="top:50%;left:50%;transform:translate(-50%,-50%);width:208px;height:208px;clip-path:circle(50%);"
+                width="208"
+                height="208"
+            ></canvas>
+            <div class="audio-blob-rings" v-show="audioIsPlaying">
+                <span class="audio-ring-1"></span>
+                <span class="audio-ring-2"></span>
+            </div>
+
+            <!-- Fallback image — circular disc (front) -->
+            <div class="relative z-10 h-28 w-28 rounded-full bg-violet-50 dark:bg-gray-800 ring-2 ring-violet-200 dark:ring-violet-900 shadow-lg flex items-center justify-center overflow-hidden" :class="audioIsPlaying ? 'audio-disc-spinning' : ''">
+                <img
+                    src="{{ $coverArtUrl ?? $placeholderSvg }}"
+                    alt="{{ $asset->file_name }}"
+                    class="h-full w-full object-cover{{ $coverArtUrl ? '' : ' opacity-75' }}"
+                    @if(! $coverArtUrl) style="transform: scale(1.2);" @endif
+                />
+            </div>
+        </div>
+    </div>
+
+    <p class="text-sm font-medium mt-6 text-gray-700 dark:text-gray-300 truncate max-w-xl text-center">{{ $asset->file_name }}</p>
 
     <!-- Hidden native audio element driven by Vue -->
     <audio
@@ -80,7 +162,7 @@
                 </button>
                 <input
                     type="range"
-                    class="w-20 h-1.5 accent-violet-400 cursor-pointer"
+                    class="w-20 h-1 accent-violet-400 cursor-pointer"
                     min="0"
                     max="1"
                     step="0.01"
@@ -105,7 +187,7 @@
             <!-- Play / Pause -->
             <button
                 type="button"
-                class="flex items-center justify-center w-12 h-12 rounded-full bg-violet-600 hover:bg-violet-700 text-white shadow-md transition-colors shrink-0"
+                class="flex items-center justify-center w-14 h-14 rounded-full bg-violet-600 hover:bg-violet-700 text-white shadow-md transition-colors shrink-0"
                 @click="audioTogglePlay"
             >
                 <svg v-if="audioIsPlaying" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
