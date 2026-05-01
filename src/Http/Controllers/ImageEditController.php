@@ -238,6 +238,245 @@ class ImageEditController
         return $this->runBgEdit($asset, $platform, $aiProvider, $validated['model'], $instruction, []);
     }
 
+    public function bgColorNormal(Request $request, int $id): JsonResponse
+    {
+        $asset = Asset::findOrFail($id);
+
+        $validated = $request->validate([
+            'color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+        ]);
+
+        $hex = ltrim($validated['color'], '#');
+        $tr = hexdec(substr($hex, 0, 2));
+        $tg = hexdec(substr($hex, 2, 2));
+        $tb = hexdec(substr($hex, 4, 2));
+
+        $disk = Directory::getAssetDisk();
+        $imageData = Storage::disk($disk)->get($asset->path);
+        $gd = @imagecreatefromstring($imageData);
+
+        if (! $gd) {
+            return response()->json(['message' => trans('dam::app.admin.dam.asset.edit.image-editor.error-operation')], 422);
+        }
+
+        // Large images need more memory: bitfield + queue can hit default limits.
+        ini_set('memory_limit', '512M');
+
+        $w = imagesx($gd);
+        $h = imagesy($gd);
+
+        $sumR = $sumG = $sumB = 0;
+        foreach ([[0, 0], [$w - 1, 0], [0, $h - 1], [$w - 1, $h - 1]] as [$cx, $cy]) {
+            $cp = imagecolorat($gd, $cx, $cy);
+            $sumR += ($cp >> 16) & 0xFF;
+            $sumG += ($cp >> 8) & 0xFF;
+            $sumB += $cp & 0xFF;
+        }
+        $bgR = (int) round($sumR / 4);
+        $bgG = (int) round($sumG / 4);
+        $bgB = (int) round($sumB / 4);
+
+        $tolerance = 22;
+        $fillColor = imagecolorallocate($gd, (int) $tr, (int) $tg, (int) $tb);
+
+        // String bitfield: 8× smaller than bool array (1.1 MB vs ~350 MB for 8.9M pixels).
+        $visited = str_repeat("\0", (int) ceil($w * $h / 8));
+        // Queue stores flat pixel indices (int) instead of [x,y] pairs — less memory.
+        $queue = [];
+        $qHead = 0;
+
+        // Seed BFS from every edge pixel that matches background.
+        for ($ex = 0; $ex < $w; $ex++) {
+            foreach ([0, $h - 1] as $ey) {
+                $idx = $ey * $w + $ex;
+                if (! (ord($visited[$idx >> 3]) & (1 << ($idx & 7)))) {
+                    $ep = imagecolorat($gd, $ex, $ey);
+                    if (sqrt((($ep >> 16 & 0xFF) - $bgR) ** 2 + (($ep >> 8 & 0xFF) - $bgG) ** 2 + (($ep & 0xFF) - $bgB) ** 2) <= $tolerance) {
+                        $visited[$idx >> 3] = chr(ord($visited[$idx >> 3]) | (1 << ($idx & 7)));
+                        $queue[] = $idx;
+                    }
+                }
+            }
+        }
+        for ($ey = 1; $ey < $h - 1; $ey++) {
+            foreach ([0, $w - 1] as $ex) {
+                $idx = $ey * $w + $ex;
+                if (! (ord($visited[$idx >> 3]) & (1 << ($idx & 7)))) {
+                    $ep = imagecolorat($gd, $ex, $ey);
+                    if (sqrt((($ep >> 16 & 0xFF) - $bgR) ** 2 + (($ep >> 8 & 0xFF) - $bgG) ** 2 + (($ep & 0xFF) - $bgB) ** 2) <= $tolerance) {
+                        $visited[$idx >> 3] = chr(ord($visited[$idx >> 3]) | (1 << ($idx & 7)));
+                        $queue[] = $idx;
+                    }
+                }
+            }
+        }
+
+        while ($qHead < count($queue)) {
+            $pidx = $queue[$qHead++];
+            $x = $pidx % $w;
+            $y = intdiv($pidx, $w);
+
+            $pixel = imagecolorat($gd, $x, $y);
+            $r = ($pixel >> 16) & 0xFF;
+            $g = ($pixel >> 8) & 0xFF;
+            $b = $pixel & 0xFF;
+
+            if (sqrt(($r - $bgR) ** 2 + ($g - $bgG) ** 2 + ($b - $bgB) ** 2) > $tolerance) {
+                continue;
+            }
+
+            imagesetpixel($gd, $x, $y, $fillColor);
+
+            foreach ([[$x - 1, $y], [$x + 1, $y], [$x, $y - 1], [$x, $y + 1]] as [$nx, $ny]) {
+                if ($nx < 0 || $nx >= $w || $ny < 0 || $ny >= $h) {
+                    continue;
+                }
+                $nidx = $ny * $w + $nx;
+                if (! (ord($visited[$nidx >> 3]) & (1 << ($nidx & 7)))) {
+                    $visited[$nidx >> 3] = chr(ord($visited[$nidx >> 3]) | (1 << ($nidx & 7)));
+                    $queue[] = $nidx;
+                }
+            }
+        }
+
+        unset($queue, $visited);
+
+        ob_start();
+        imagepng($gd);
+        $pngData = ob_get_clean();
+        imagedestroy($gd);
+
+        Storage::disk($disk)->put($asset->path, $pngData);
+        $this->clearCache($asset->path, $disk);
+
+        return response()->json(['message' => trans('dam::app.admin.dam.asset.edit.image-editor.success-updated')]);
+    }
+
+    public function bgPreview(Request $request, int $id): JsonResponse
+    {
+        $asset = Asset::findOrFail($id);
+
+        $validated = $request->validate([
+            'color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+        ]);
+
+        $hex = ltrim($validated['color'], '#');
+        $tr = hexdec(substr($hex, 0, 2));
+        $tg = hexdec(substr($hex, 2, 2));
+        $tb = hexdec(substr($hex, 4, 2));
+
+        $disk = Directory::getAssetDisk();
+        $imageData = Storage::disk($disk)->get($asset->path);
+        $gd = @imagecreatefromstring($imageData);
+
+        if (! $gd) {
+            return response()->json(['error' => 'Cannot decode image'], 422);
+        }
+
+        $origW = imagesx($gd);
+        $origH = imagesy($gd);
+
+        if ($origW > 600) {
+            $scale = 600 / $origW;
+            $newW = 600;
+            $newH = (int) round($origH * $scale);
+            $thumb = imagecreatetruecolor($newW, $newH);
+            imagecopyresampled($thumb, $gd, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+            imagedestroy($gd);
+            $gd = $thumb;
+        }
+
+        $w = imagesx($gd);
+        $h = imagesy($gd);
+
+        // Average all 4 corners for a stable background reference — one corner
+        // occupied by the subject would skew a single-pixel sample badly.
+        $sumR = $sumG = $sumB = 0;
+        foreach ([[0, 0], [$w - 1, 0], [0, $h - 1], [$w - 1, $h - 1]] as [$cx, $cy]) {
+            $cp = imagecolorat($gd, $cx, $cy);
+            $sumR += ($cp >> 16) & 0xFF;
+            $sumG += ($cp >> 8) & 0xFF;
+            $sumB += $cp & 0xFF;
+        }
+        $bgR = (int) round($sumR / 4);
+        $bgG = (int) round($sumG / 4);
+        $bgB = (int) round($sumB / 4);
+
+        // JPEG block quantization drifts background ±30-40 RGB units from the
+        // reference; PNG is lossless so the background is nearly exact.
+        $ext = strtolower(pathinfo($asset->path, PATHINFO_EXTENSION));
+        $tolerance = in_array($ext, ['jpg', 'jpeg', 'jfif']) ? 40 : 22;
+
+        $fillColor = imagecolorallocate($gd, (int) $tr, (int) $tg, (int) $tb);
+
+        $visited = array_fill(0, $w * $h, false);
+        $queue = [];
+        $qHead = 0;
+
+        // Seed BFS from every edge pixel that matches the background — not just
+        // the 4 corners. This skips corners occupied by the subject and seeds
+        // from all actual background edge pixels simultaneously.
+        for ($ex = 0; $ex < $w; $ex++) {
+            foreach ([0, $h - 1] as $ey) {
+                $ep = imagecolorat($gd, $ex, $ey);
+                $idx = $ey * $w + $ex;
+                if (! $visited[$idx] && sqrt((($ep >> 16 & 0xFF) - $bgR) ** 2 + (($ep >> 8 & 0xFF) - $bgG) ** 2 + (($ep & 0xFF) - $bgB) ** 2) <= $tolerance) {
+                    $visited[$idx] = true;
+                    $queue[] = [$ex, $ey];
+                }
+            }
+        }
+        for ($ey = 1; $ey < $h - 1; $ey++) {
+            foreach ([0, $w - 1] as $ex) {
+                $ep = imagecolorat($gd, $ex, $ey);
+                $idx = $ey * $w + $ex;
+                if (! $visited[$idx] && sqrt((($ep >> 16 & 0xFF) - $bgR) ** 2 + (($ep >> 8 & 0xFF) - $bgG) ** 2 + (($ep & 0xFF) - $bgB) ** 2) <= $tolerance) {
+                    $visited[$idx] = true;
+                    $queue[] = [$ex, $ey];
+                }
+            }
+        }
+
+        $dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+        while ($qHead < count($queue)) {
+            [$x, $y] = $queue[$qHead++];
+
+            $pixel = imagecolorat($gd, $x, $y);
+            $r = ($pixel >> 16) & 0xFF;
+            $g = ($pixel >> 8) & 0xFF;
+            $b = $pixel & 0xFF;
+
+            if (sqrt(($r - $bgR) ** 2 + ($g - $bgG) ** 2 + ($b - $bgB) ** 2) > $tolerance) {
+                continue;
+            }
+
+            imagesetpixel($gd, $x, $y, $fillColor);
+
+            foreach ($dirs as [$dx, $dy]) {
+                $nx = $x + $dx;
+                $ny = $y + $dy;
+                $nidx = $ny * $w + $nx;
+
+                if ($nx >= 0 && $nx < $w && $ny >= 0 && $ny < $h && ! $visited[$nidx]) {
+                    $visited[$nidx] = true;
+                    $queue[] = [$nx, $ny];
+                }
+            }
+        }
+
+        unset($queue, $visited);
+
+        ob_start();
+        imagejpeg($gd, null, 82);
+        $jpegData = ob_get_clean();
+        imagedestroy($gd);
+
+        return response()->json([
+            'dataUrl' => 'data:image/jpeg;base64,'.base64_encode($jpegData),
+        ]);
+    }
+
     // ── Shared helpers ─────────────────────────────────────────────────────
 
     private function resolveImagePlatform(int $platformId): array

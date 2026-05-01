@@ -38,7 +38,7 @@
             >
                 <img
                     ref="editImg"
-                    src="{{ $asset->previewPath }}"
+                    :src="(editTool === 'edit-bg' && bgSubTab === 'color' && bgPreviewDataUrl) ? bgPreviewDataUrl : '{{ $asset->previewPath }}'"
                     alt="{{ $asset->file_name }}"
                     class="block max-h-full max-w-full transition-all duration-200"
                     :style="{
@@ -47,6 +47,17 @@
                     }"
                     draggable="false"
                 />
+
+                <!-- bg preview spinner -->
+                <div
+                    v-if="editTool === 'edit-bg' && bgSubTab === 'color' && bgPreviewLoading"
+                    class="absolute inset-0 flex items-center justify-center bg-gray-50/70 dark:bg-gray-950/70 pointer-events-none"
+                >
+                    <svg class="animate-spin w-6 h-6 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                    </svg>
+                </div>
 
                 <!-- Crop overlay -->
                 <div
@@ -130,12 +141,15 @@
 
                         <!-- Flash error (no platforms / no models) -->
                         <div
-                            v-if="bgPlatformError"
+                            v-if="bgPlatformError && !(bgSubTab === 'color' && bgColorMode === 'normal')"
                             class="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                             <span class="text-xs text-red-600 dark:text-red-400">@{{ bgPlatformError }}</span>
                         </div>
+
+                        <!-- Platform + model: hidden when color sub-tab is in Normal mode -->
+                        <template v-if="bgSubTab !== 'color' || bgColorMode === 'ai'">
 
                         <!-- Platform select -->
                         <div>
@@ -165,6 +179,8 @@
 
                         <!-- Divider -->
                         <div class="border-t border-gray-100 dark:border-gray-700"></div>
+
+                        </template>
 
                         <!-- Sub-tab switcher -->
                         <div class="flex gap-0.5 p-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
@@ -196,28 +212,61 @@
 
                         <!-- Color tab -->
                         <div v-if="bgSubTab === 'color'" class="flex flex-col gap-3">
+
+                            @if ($asset->extension === 'png')
+                            <!-- Normal / AI mode toggle (PNG only) -->
+                            <div class="flex gap-0.5 p-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
+                                <button
+                                    type="button"
+                                    class="flex-1 py-1 text-xs font-semibold rounded-md transition-all"
+                                    :class="bgColorMode === 'normal'
+                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                                    @click="bgColorMode = 'normal'"
+                                >{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-color-mode-normal') }}</button>
+                                <button
+                                    type="button"
+                                    class="flex-1 py-1 text-xs font-semibold rounded-md transition-all"
+                                    :class="bgColorMode === 'ai'
+                                        ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                                    @click="bgColorMode = 'ai'; loadBgPlatforms()"
+                                >{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-color-mode-ai') }}</button>
+                            </div>
+                            @endif
+
                             <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-color-label') }}</p>
                             <div class="grid grid-cols-8 gap-2">
                                 <button
                                     v-for="swatch in bgSwatches"
-                                    :key="swatch.hex"
+                                    :key="swatch.hex ?? 'none'"
                                     type="button"
-                                    class="w-7 h-7 rounded-full border-2 transition-all hover:scale-110"
-                                    :style="{ backgroundColor: swatch.hex }"
-                                    :class="bgColor === swatch.hex
-                                        ? 'border-rose-500 ring-2 ring-rose-300 dark:ring-rose-700 scale-110'
-                                        : 'border-gray-200 dark:border-gray-600'"
+                                    class="w-7 h-7 rounded-full border-2 transition-all hover:scale-110 overflow-hidden"
+                                    :style="swatch.hex ? { backgroundColor: swatch.hex } : {}"
+                                    :class="[
+                                        bgColor === swatch.hex
+                                            ? 'border-rose-500 ring-2 ring-rose-300 dark:ring-rose-700 scale-110'
+                                            : 'border-gray-200 dark:border-gray-600',
+                                        swatch.hex === null ? 'bg-white dark:bg-gray-800' : ''
+                                    ]"
                                     :title="swatch.name"
-                                    @click="bgColor = swatch.hex"
-                                ></button>
+                                    @click="swatch.hex !== null
+                                        ? (bgColor = swatch.hex, scheduleBgPreview(swatch.hex))
+                                        : (bgColor = null, bgPreviewDataUrl = null, clearTimeout(bgPreviewTimer))"
+                                >
+                                    <svg v-if="swatch.hex === null" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" class="w-full h-full pointer-events-none">
+                                        <line x1="5" y1="5" x2="23" y2="23" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
                             </div>
                             <div class="flex items-center gap-2 pt-1">
                                 <input
                                     type="color"
-                                    v-model="bgColor"
+                                    :value="bgColor || '#ffffff'"
                                     class="w-7 h-7 rounded cursor-pointer border border-gray-200 dark:border-gray-600 p-0.5 bg-white dark:bg-gray-800"
+                                    @input="bgColor = $event.target.value; scheduleBgPreview($event.target.value)"
                                 />
-                                <span class="text-xs font-mono text-gray-600 dark:text-gray-300">@{{ bgColor }}</span>
+                                <span class="text-xs font-mono text-gray-600 dark:text-gray-300">@{{ bgColor || '—' }}</span>
                                 <span class="text-xs text-gray-400 dark:text-gray-500">{{ trans('dam::app.admin.dam.asset.edit.image-editor.bg-custom-color') }}</span>
                             </div>
                         </div>
@@ -262,8 +311,8 @@
                         <button
                             type="button"
                             class="w-full primary-button justify-center"
-                            :disabled="editApplying || !bgPlatforms.length || !bgSelectedModel"
-                            :class="(editApplying || !bgPlatforms.length || !bgSelectedModel) ? 'opacity-60 cursor-not-allowed' : ''"
+                            :disabled="editApplying || (bgSubTab === 'color' && bgColorMode === 'normal' ? false : (!bgPlatforms.length || !bgSelectedModel))"
+                            :class="(editApplying || (bgSubTab === 'color' && bgColorMode === 'normal' ? false : (!bgPlatforms.length || !bgSelectedModel))) ? 'opacity-60 cursor-not-allowed' : ''"
                             @click="applyEdit"
                         >
                             <template v-if="editApplying">

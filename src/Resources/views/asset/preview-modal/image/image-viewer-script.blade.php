@@ -29,7 +29,11 @@ window._damImageViewer = {
 
         // Edit Background
         bgSubTab:             'color',
-        bgColor:              '#ffffff',
+        bgColorMode:          '{{ $asset->extension === "png" ? "normal" : "ai" }}',
+        bgColor:              null,
+        bgPreviewDataUrl:     null,
+        bgPreviewLoading:     false,
+        bgPreviewTimer:       null,
         bgUploadFile:         null,
         bgAiPrompt:           '',
         bgPlatforms:          [],
@@ -37,6 +41,7 @@ window._damImageViewer = {
         bgSelectedModel:      null,
         bgPlatformError:      null,
         bgSwatches: {!! json_encode([
+            ['hex' => null,      'name' => trans('dam::app.admin.dam.asset.edit.image-editor.color-none')],
             ['hex' => '#ffffff', 'name' => trans('dam::app.admin.dam.asset.edit.image-editor.color-white')],
             ['hex' => '#f3f4f6', 'name' => trans('dam::app.admin.dam.asset.edit.image-editor.color-silver')],
             ['hex' => '#e5e7eb', 'name' => trans('dam::app.admin.dam.asset.edit.image-editor.color-light-gray')],
@@ -143,6 +148,12 @@ window._damImageViewer = {
             window.addEventListener('mouseup',   this.imgOnMouseUp);
             window.addEventListener('mousemove', this.cropMouseMove);
             window.addEventListener('mouseup',   this.cropMouseUp);
+
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('_img')) {
+                url.searchParams.delete('_img');
+                history.replaceState(null, '', url.toString());
+            }
         },
 
         imgBeforeUnmount() {
@@ -303,12 +314,37 @@ window._damImageViewer = {
             this.flipH           = false;
             this.flipV           = false;
             this.bgSubTab        = 'color';
-            this.bgColor         = '#ffffff';
+            this.bgColorMode     = '{{ $asset->extension === "png" ? "normal" : "ai" }}';
+            this.bgColor         = null;
             this.bgUploadFile    = null;
             this.bgAiPrompt      = '';
             this.bgPlatformError = null;
-            if (tool === 'crop')     this.initCropBox();
-            if (tool === 'edit-bg')  this.loadBgPlatforms();
+            this.bgPreviewDataUrl = null;
+            this.bgPreviewLoading = false;
+            clearTimeout(this.bgPreviewTimer);
+            if (tool === 'crop')    this.initCropBox();
+            if (tool === 'edit-bg' && !(this.bgSubTab === 'color' && this.bgColorMode === 'normal')) this.loadBgPlatforms();
+        },
+
+        scheduleBgPreview(color) {
+            clearTimeout(this.bgPreviewTimer);
+            this.bgPreviewTimer = setTimeout(() => this.fetchBgPreview(color), 400);
+        },
+
+        async fetchBgPreview(color) {
+            if (!/^#[0-9a-fA-F]{6}$/.test(color)) return;
+            this.bgPreviewLoading = true;
+            try {
+                const res = await window.axios.post(
+                    '{{ route('admin.dam.assets.image_edit.bg_preview', $asset->id) }}',
+                    { color }
+                );
+                this.bgPreviewDataUrl = res.data.dataUrl;
+            } catch (_) {
+                // silent — original image stays visible
+            } finally {
+                this.bgPreviewLoading = false;
+            }
         },
 
         async loadBgPlatforms() {
@@ -372,7 +408,8 @@ window._damImageViewer = {
             let postRoute, postBody;
 
             if (this.editTool === 'edit-bg') {
-                if (!this.bgSelectedPlatformId || !this.bgSelectedModel) {
+                const needsPlatform = !(this.bgSubTab === 'color' && this.bgColorMode === 'normal');
+                if (needsPlatform && (!this.bgSelectedPlatformId || !this.bgSelectedModel)) {
                     this.editError    = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.error-platforms') }}';
                     this.editApplying = false;
                     return;
@@ -382,9 +419,20 @@ window._damImageViewer = {
                     upload: '{{ route('admin.dam.assets.image_edit.bg_upload', ['id' => $asset->id]) }}',
                     ai:     '{{ route('admin.dam.assets.image_edit.bg_ai',     ['id' => $asset->id]) }}',
                 };
-                postRoute = bgRoutes[this.bgSubTab];
+                if (this.bgSubTab !== 'color') postRoute = bgRoutes[this.bgSubTab];
                 if (this.bgSubTab === 'color') {
-                    postBody = { color: this.bgColor, platform_id: this.bgSelectedPlatformId, model: this.bgSelectedModel };
+                    if (!this.bgColor) {
+                        this.editError    = '{{ trans('dam::app.admin.dam.asset.edit.image-editor.error-select-color') }}';
+                        this.editApplying = false;
+                        return;
+                    }
+                    if (this.bgColorMode === 'normal') {
+                        postRoute = '{{ route('admin.dam.assets.image_edit.bg_color_normal', ['id' => $asset->id]) }}';
+                        postBody  = { color: this.bgColor };
+                    } else {
+                        postRoute = bgRoutes.color;
+                        postBody  = { color: this.bgColor, platform_id: this.bgSelectedPlatformId, model: this.bgSelectedModel };
+                    }
                 } else if (this.bgSubTab === 'upload') {
                     const fd = new FormData();
                     fd.append('image',       this.bgUploadFile);
