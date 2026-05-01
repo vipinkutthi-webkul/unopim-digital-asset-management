@@ -1,5 +1,22 @@
+const path = require('path');
 const { test, expect } = require('../utils/fixtures');
-const { ensureAssetExists, navigateToAssetEditByName } = require('../utils/helpers');
+const { ensureAssetExists, ensureAssetOfTypeExists, navigateTo, searchInDataGrid } = require('../utils/helpers');
+
+const ASSETS = path.resolve(__dirname, '../assets');
+
+// Navigate to the edit page of the first asset whose filename contains `ext`.
+// Extension-based search (e.g. '.mp4') matches 'sample(1).mp4', 'sample(5).mp4', etc.
+async function navigateToFirstAssetWithExt(page, ext) {
+  await navigateTo(page, 'dam');
+  await searchInDataGrid(page, ext);
+  const card = page.locator('.image-card').first();
+  await card.waitFor({ state: 'visible', timeout: 20000 });
+  await card.hover({ force: true });
+  await page.waitForTimeout(300);
+  await card.locator('.icon-edit').first().click({ force: true });
+  await page.waitForURL(/admin\/dam\/assets\/edit\/\d+/, { timeout: 30000 });
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+}
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -31,7 +48,7 @@ async function openInfoModal(page) {
  * Opens the editor modal for floral.jpg (always an image) and waits for close button.
  */
 async function openEditorModal(page) {
-  await navigateToAssetEditByName(page, 'floral.jpg');
+  await navigateToFirstAssetWithExt(page, '.jpg');
   const btn = page.locator('button[title="Edit image"]').first();
   await btn.waitFor({ state: 'visible', timeout: 10000 });
   await btn.click();
@@ -45,6 +62,9 @@ test.describe('DAM Asset Preview Modal', () => {
 
   test.beforeEach(async ({ adminPage }) => {
     await ensureAssetExists(adminPage);
+    await ensureAssetOfTypeExists(adminPage, `${ASSETS}/sample.mp4`, '.mp4');
+    await ensureAssetOfTypeExists(adminPage, `${ASSETS}/sample.wav`, '.wav');
+    await ensureAssetOfTypeExists(adminPage, `${ASSETS}/sample.pdf`, '.pdf');
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -54,7 +74,7 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('Video player', () => {
 
     async function openVideoPreview(page) {
-      await navigateToAssetEditByName(page, 'sample.mp4');
+      await navigateToFirstAssetWithExt(page, '.mp4');
       await openPreviewModal(page);
     }
 
@@ -94,20 +114,20 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('Audio player', () => {
 
     async function openAudioPreview(page) {
-      await navigateToAssetEditByName(page, 'sample.wav');
+      await navigateToFirstAssetWithExt(page, '.wav');
       await openPreviewModal(page);
     }
 
     test('Play/pause button visible', async ({ adminPage }) => {
       await openAudioPreview(adminPage);
-      await expect(adminPage.locator('button.w-12.h-12.rounded-full').first()).toBeVisible({ timeout: 5000 });
+      await expect(adminPage.locator('button.w-14.h-14.rounded-full').first()).toBeVisible({ timeout: 5000 });
     });
 
     test('Seek bar visible', async ({ adminPage }) => {
       await openAudioPreview(adminPage);
       // ref="audioSeekContainer" is a Vue ref — not a DOM attribute. Match by unique class combo.
       await expect(
-        adminPage.locator('.flex-1.min-h-0.overflow-hidden .relative.h-4.group.cursor-pointer').first()
+        adminPage.locator('.relative.h-4.group.cursor-pointer').first()
       ).toBeVisible({ timeout: 5000 });
     });
 
@@ -140,7 +160,7 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('Fallback / unsupported asset', () => {
 
     async function openFallbackPreview(page) {
-      await navigateToAssetEditByName(page, 'sample.pdf');
+      await navigateToFirstAssetWithExt(page, '.pdf');
       await openPreviewModal(page);
     }
 
@@ -171,7 +191,7 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('Escape key priority', () => {
 
     test('Escape closes info modal first when preview is also open', async ({ adminPage }) => {
-      await navigateToAssetEditByName(adminPage, 'floral.jpg');
+      await navigateToFirstAssetWithExt(adminPage, '.jpg');
       await openPreviewModal(adminPage);
 
       // dispatchEvent bypasses browser hit-testing (unlike force:true which still routes
@@ -192,7 +212,7 @@ test.describe('DAM Asset Preview Modal', () => {
     });
 
     test('Second Escape closes preview modal after info is already dismissed', async ({ adminPage }) => {
-      await navigateToAssetEditByName(adminPage, 'floral.jpg');
+      await navigateToFirstAssetWithExt(adminPage, '.jpg');
       await openPreviewModal(adminPage);
 
       const infoBtn = adminPage.locator('button').filter({ has: adminPage.locator('.icon-information') }).first();
@@ -220,7 +240,7 @@ test.describe('DAM Asset Preview Modal', () => {
     });
 
     test('Escape with nothing open does not navigate away', async ({ adminPage }) => {
-      await navigateToAssetEditByName(adminPage, 'floral.jpg');
+      await navigateToFirstAssetWithExt(adminPage, '.jpg');
       await adminPage.keyboard.press('Escape');
       await adminPage.waitForTimeout(300);
       await expect(adminPage).toHaveURL(/admin\/dam\/assets\/edit\/\d+/);
@@ -235,7 +255,7 @@ test.describe('DAM Asset Preview Modal', () => {
   test.describe('State reset on re-open', () => {
 
     test('Image zoom resets to 100% when preview reopened', async ({ adminPage }) => {
-      await navigateToAssetEditByName(adminPage, 'floral.jpg');
+      await navigateToFirstAssetWithExt(adminPage, '.jpg');
       await openPreviewModal(adminPage);
 
       const zoomInBtn = adminPage.locator('button[title="Zoom in (+)"]').first();
@@ -256,7 +276,7 @@ test.describe('DAM Asset Preview Modal', () => {
     });
 
     test('Image rotation resets to 0 when preview reopened', async ({ adminPage }) => {
-      await navigateToAssetEditByName(adminPage, 'floral.jpg');
+      await navigateToFirstAssetWithExt(adminPage, '.jpg');
       await openPreviewModal(adminPage);
 
       const img = adminPage.locator('.flex-1.min-h-0.overflow-hidden img').first();
