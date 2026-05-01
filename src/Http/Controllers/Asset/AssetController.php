@@ -246,7 +246,7 @@ class AssetController extends Controller
 
                     if ($isOverwrite) {
                         Storage::disk($disk)->delete($existingAsset->path);
-                        $this->clearAssetCache($existingAsset->path, $disk);
+                        $this->clearAssetCache($existingAsset->path, $disk, $existingAsset->id);
 
                         $filePath = $this->fileStorer->store(
                             path: $directoryPath,
@@ -268,6 +268,16 @@ class AssetController extends Controller
                         ]);
 
                         $asset = $existingAsset;
+
+                        if (str_starts_with($file->getMimeType() ?? '', 'audio/') && $localFilePath && file_exists($localFilePath)) {
+                            $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
+                            if ($coverData) {
+                                $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
+                                if ($coverPath) {
+                                    $asset->update(['meta_data' => array_merge($metaData, ['cover_art_path' => $coverPath])]);
+                                }
+                            }
+                        }
                     } else {
                         $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
 
@@ -290,6 +300,16 @@ class AssetController extends Controller
                             'path'      => $filePath,
                             'meta_data' => $metaData,
                         ]);
+
+                        if (str_starts_with($file->getMimeType() ?? '', 'audio/') && $localFilePath && file_exists($localFilePath)) {
+                            $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
+                            if ($coverData) {
+                                $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
+                                if ($coverPath) {
+                                    $asset->update(['meta_data' => array_merge($metaData, ['cover_art_path' => $coverPath])]);
+                                }
+                            }
+                        }
                     }
 
                     // Only queue new assets for directory association; overwrites are already linked.
@@ -369,7 +389,7 @@ class AssetController extends Controller
             $disk = Directory::getAssetDisk();
             $oldPath = $asset->path;
             Storage::disk($disk)->delete($oldPath);
-            $this->clearAssetCache($oldPath, $disk);
+            $this->clearAssetCache($oldPath, $disk, $asset->id);
 
             $originalName = $file->getClientOriginalName();
             $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
@@ -384,6 +404,16 @@ class AssetController extends Controller
 
             $localFilePath = $file->getRealPath();
             $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
+            if (str_starts_with($file->getMimeType() ?? '', 'audio/') && $localFilePath && file_exists($localFilePath)) {
+                $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
+                if ($coverData) {
+                    $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
+                    if ($coverPath) {
+                        $metaData = array_merge($metaData, ['cover_art_path' => $coverPath]);
+                    }
+                }
+            }
 
             $filePath = $this->fileStorer->store(
                 path: $directoryPath,
@@ -841,13 +871,19 @@ class AssetController extends Controller
     /**
      * Format a kilobyte value into a human readable string (e.g. "50 MB").
      */
-    private function clearAssetCache(string $path, string $disk): void
+    private function clearAssetCache(string $path, string $disk, ?int $assetId = null): void
     {
         Storage::disk($disk)->delete('thumbnails/'.$path);
 
         foreach (Storage::disk($disk)->allFiles('preview') as $previewFile) {
             if (str_ends_with($previewFile, '/'.$path)) {
                 Storage::disk($disk)->delete($previewFile);
+            }
+        }
+
+        if ($assetId !== null) {
+            foreach (['jpg', 'png', 'gif', 'webp'] as $ext) {
+                Storage::disk($disk)->delete('covers/'.$assetId.'.'.$ext);
             }
         }
     }

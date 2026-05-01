@@ -376,6 +376,96 @@ class MetadataExtractionService
     }
 
     /**
+     * Check whether the exiftool binary is available on this system.
+     * Result is cached for the lifetime of the request.
+     */
+    public function exiftoolExists(): bool
+    {
+        static $exists = null;
+
+        if ($exists !== null) {
+            return $exists;
+        }
+
+        exec('exiftool -ver 2>/dev/null', $out, $code);
+
+        return $exists = ($code === 0 && ! empty($out));
+    }
+
+    /**
+     * Extract the embedded cover-art image from a local audio file.
+     * Returns the raw binary image data, or null when exiftool is absent
+     * or the file has no embedded picture frame.
+     *
+     * The caller always supplies a local path — for S3 assets at upload time
+     * this is the PHP temp file (still present because FileStorer copies, not moves it).
+     */
+    public function extractCoverArtData(string $localPath): ?string
+    {
+        if (! $this->exiftoolExists() || ! file_exists($localPath)) {
+            return null;
+        }
+
+        $tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'dam_cover_'.uniqid('', true).'.tmp';
+
+        try {
+            exec(sprintf(
+                'exiftool -b -Picture %s > %s 2>/dev/null',
+                escapeshellarg($localPath),
+                escapeshellarg($tmpFile)
+            ));
+
+            if (! file_exists($tmpFile) || filesize($tmpFile) === 0) {
+                return null;
+            }
+
+            return file_get_contents($tmpFile) ?: null;
+        } finally {
+            if (file_exists($tmpFile)) {
+                @unlink($tmpFile);
+            }
+        }
+    }
+
+    /**
+     * Persist cover-art binary data to the asset disk under covers/{assetId}.{ext}
+     * and return the storage-relative path.  Works for both local and S3 disks
+     * because it uses Storage::disk()->put() in both cases.
+     * Returns null on empty data or storage failure.
+     */
+    public function storeCoverArt(string $imageData, int $assetId, string $disk): ?string
+    {
+        if (empty($imageData)) {
+            return null;
+        }
+
+        // Detect mime from the raw bytes via a short-lived temp file.
+        $sniffFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'dam_cover_sniff_'.uniqid('', true).'.tmp';
+        file_put_contents($sniffFile, $imageData);
+        $mime = @mime_content_type($sniffFile) ?: 'image/jpeg';
+        @unlink($sniffFile);
+
+        $ext = match ($mime) {
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+            default      => 'jpg',
+        };
+
+        $storagePath = 'covers/'.$assetId.'.'.$ext;
+
+        try {
+            Storage::disk($disk)->put($storagePath, $imageData);
+
+            return $storagePath;
+        } catch (\Exception $e) {
+            \Log::error('DAM: cover art storage failed for asset '.$assetId.': '.$e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
      * Cleanup temporary files.
      */
     protected function cleanupTempFile(?string $tempPath, string $disk): void

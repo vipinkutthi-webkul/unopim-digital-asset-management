@@ -73,6 +73,8 @@ Route::group([
             Route::post('/bg-color/{id}', 'bgColor')->name('admin.dam.assets.image_edit.bg_color')->where('id', '[0-9]+');
             Route::post('/bg-upload/{id}', 'bgUpload')->name('admin.dam.assets.image_edit.bg_upload')->where('id', '[0-9]+');
             Route::post('/bg-ai/{id}', 'bgAi')->name('admin.dam.assets.image_edit.bg_ai')->where('id', '[0-9]+');
+            Route::post('/bg-preview/{id}', 'bgPreview')->name('admin.dam.assets.image_edit.bg_preview')->where('id', '[0-9]+');
+            Route::post('/bg-color-normal/{id}', 'bgColorNormal')->name('admin.dam.assets.image_edit.bg_color_normal')->where('id', '[0-9]+');
             Route::post('/filters/{id}', 'filters')->name('admin.dam.assets.image_edit.filters')->where('id', '[0-9]+');
         });
 
@@ -88,6 +90,7 @@ Route::group([
         Route::get('/fetch/{path}', 'fetchFile')->where('path', '^assets/.*')->name('admin.dam.file.fetch')->withoutMiddleware(['admin', 'dam']);
         Route::get('/thumbnail', 'thumbnail')->name('admin.dam.file.thumbnail');
         Route::get('/preview/', 'preview')->name('admin.dam.file.preview');
+        Route::get('/cover-art/{assetId}', 'coverArt')->name('admin.dam.file.cover-art');
     });
 
     Route::controller(DirectoryController::class)->prefix('directory')->group(function () {

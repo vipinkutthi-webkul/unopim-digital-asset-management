@@ -56,6 +56,12 @@
             alt="{{ $asset->file_name }}"
             class="max-h-full max-w-full object-contain"
         />
+    @elseif ($coverArtUrl)
+        <img
+            src="{{ $coverArtUrl }}"
+            alt="{{ $asset->file_name }}"
+            class="max-h-full max-w-full object-cover rounded-lg"
+        />
     @else
         <img
             src="{{ $placeholderSvg }}"

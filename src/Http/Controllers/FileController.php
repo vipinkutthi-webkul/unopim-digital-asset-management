@@ -14,6 +14,7 @@ use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Webkul\DAM\Helpers\AssetHelper;
+use Webkul\DAM\Models\Asset;
 use Webkul\DAM\Models\Directory;
 
 /**
@@ -120,6 +121,15 @@ class FileController
         }
 
         $path = urldecode(request()->path);
+
+        $asset = Asset::where('path', $path)->first();
+        if ($asset && $asset->file_type === 'audio') {
+            $coverPath = $asset->meta_data['cover_art_path'] ?? null;
+            if ($coverPath && Storage::disk($disk)->exists($coverPath)) {
+                return $this->getFileResponse($coverPath);
+            }
+        }
+
         $thumbnailPath = 'thumbnails/'.$path;
         if ($this->isImageFile($thumbnailPath, true)) {
             return $this->getFileResponse($thumbnailPath);
@@ -329,6 +339,32 @@ class FileController
         }
 
         return response()->json(['error' => trans('Placeholder not found')], 404);
+    }
+
+    /**
+     * Serve the extracted cover art for an audio asset.
+     * Returns 404 when the asset has no stored cover art.
+     */
+    public function coverArt(int $assetId)
+    {
+        if (! Auth::check()) {
+            return abort(403, 'Unauthorized');
+        }
+
+        $disk = Directory::getAssetDisk();
+        $asset = Asset::find($assetId);
+
+        if (! $asset) {
+            return abort(404);
+        }
+
+        $path = $asset->meta_data['cover_art_path'] ?? null;
+
+        if (! $path || ! Storage::disk($disk)->exists($path)) {
+            return abort(404);
+        }
+
+        return $this->getFileResponse($path);
     }
 
     /**
