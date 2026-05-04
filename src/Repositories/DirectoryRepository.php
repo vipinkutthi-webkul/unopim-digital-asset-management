@@ -210,7 +210,10 @@ class DirectoryRepository extends Repository
      */
     public function getDirectoryTreeOnly()
     {
-        return $this->model->get()->toTree();
+        // `withCount('assets')` adds an `assets_count` column without loading
+        // the actual asset rows. The tree uses this to render the expand
+        // chevron on directories that have assets but no child directories.
+        return $this->model->withCount('assets')->get()->toTree();
     }
 
     /**

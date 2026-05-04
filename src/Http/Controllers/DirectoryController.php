@@ -63,7 +63,11 @@ class DirectoryController
      */
     public function directoryAssets(int $id): JsonResponse
     {
-        $directory = $this->directoryRepository->getDirectoryTree($id)->first();
+        // `getDirectoryTree($id)` returns a single Directory model (or null) when
+        // an id is supplied — calling `->first()` on it proxied to a fresh query
+        // and silently returned the table's first row, which is the wrong
+        // directory. Use the model directly.
+        $directory = $this->directoryRepository->getDirectoryTree($id);
 
         if (! $directory) {
             return new JsonResponse([
