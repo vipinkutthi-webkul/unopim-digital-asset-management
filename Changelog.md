@@ -1,14 +1,6 @@
 # CHANGELOG for unopim-digital-asset-management
 
-## Version 2.0.2 - Bug Fix
-
-### Fixed
-
-- DB prefix — Asset datagrid query
-Fixed unprefixed `dam_directories` and `dam_asset_directory` references in raw `MIN()` expressions that broke the asset datagrid when `DB_PREFIX` was set.
-
 ## Version 2.1.0 - Features & Enhancements
-Compatible with UnoPim v2.0.0
 
 ### Features & Enhancements
 
@@ -40,6 +32,13 @@ the tree. The tree now rebuilds exclusively from the server response.
 - meta_data double-encoding
 Fixed a regression where the `meta_data` JSON field was serialised twice on asset store,
 producing a string-wrapped JSON value instead of a plain object.
+
+## Version 2.0.2 - Bug Fix
+
+### Fixed
+
+- DB prefix — Asset datagrid query
+Fixed unprefixed `dam_directories` and `dam_asset_directory` references in raw `MIN()` expressions that broke the asset datagrid when `DB_PREFIX` was set.
 
 ## Version 2.0.1 - Bug Fix Release
 Compatible with UnoPim v2.0.0
