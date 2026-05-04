@@ -5,13 +5,15 @@
 @pushOnce('scripts')
 <!-- asset name template -->
 <script type="text/x-template" id="v-asset-item-template">
-    <div 
-        class="tree-container-assets-details" 
-    >    
+    <div
+        class="tree-container-assets-details"
+    >
         <div
-            class="flex gap-1 w-full p-1 cursor-pointer"
-            @click.stop="setFilters(item)"
-            @contextmenu.prevent.stop="showContextMenu($event, item)"
+            class="flex gap-1 w-full p-1"
+            :class="treeLocked ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer'"
+            :aria-disabled="treeLocked"
+            @click.stop="treeLocked ? null : setFilters(item)"
+            @contextmenu.prevent.stop="treeLocked ? null : showContextMenu($event, item)"
         >
             <span>
                 <i 
@@ -32,6 +34,10 @@
         props: {
             item: Object,
             selectedItem: Object,
+            treeLocked: {
+                type: Boolean,
+                default: false,
+            },
         },
         mounted() {
             this.$emitter.on('update-current-item', (data) => {
@@ -109,7 +115,7 @@
             </span>
             <span>
                 <svg
-                    v-if="isBusy"
+                    v-if="isSelfBusy"
                     class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -161,7 +167,7 @@
                         <v-tree-item
                             class="sub-tree-item"
                             :item="element"
-                            :key="index"
+                            :key="element.id"
                             @right-click-item="showContextMenu"
                             @set-filters="setFilters"
                             @on-merge-items="onMergeItems"
@@ -170,18 +176,19 @@
                             :movingDirectoryId="movingDirectoryId"
                             :deletingDirectoryId="deletingDirectoryId"
                             :copyingDirectoryId="copyingDirectoryId"
+                            :treeLocked="treeLocked"
                         ></v-tree-item>
                     </div>
                 </template>
             </draggable>
 
             <!-- Asset -->
-            <draggable 
+            <draggable
                 id="assets-items"
                 ghost-class="draggable-ghost"
                 handle=".tree-container-assets-details"
-                v-bind="{animation: 200}"
-                :list="item.assets"
+                v-bind="{ animation: 200 }"
+                :list="localAssets"
                 item-key="id"
                 :sort='false'
                 group="itemsAssets"
@@ -197,6 +204,7 @@
                             :selectedItem="selectedItem"
                             @on-merge-items="onMergeItems"
                             @on-drag-start="onDragStart"
+                            :treeLocked="treeLocked"
                         />
                     </div>
                 </template>
@@ -223,14 +231,14 @@
         </template>
     </draggable>
     <!-- Asset -->
-    <draggable 
+    <draggable
         v-if="!isAssets"
         id="assets-items"
         class="mb-1 itemsAssets ml-6"
         ghost-class="draggable-ghost"
         handle=".tree-container-assets-details"
-        v-bind="{animation: 200}"
-        :list="item.assets"
+        v-bind="{ animation: 200 }"
+        :list="localAssets"
         item-key="id"
         :sort='false'
         group="itemsAssets"
@@ -260,6 +268,10 @@
                 type: [String, Number],
                 default: null,
             },
+            treeLocked: {
+                type: Boolean,
+                default: false,
+            },
         },
         data: function() {
             return {
@@ -269,50 +281,51 @@
                 assetsLoaded: false,
                 assetsLoading: false,
                 assetsStale: false,
+                // Local reactive asset list — own data, never reassigned, so
+                // vuedraggable's Sortable stays bound to a stable array ref
+                // for the lifetime of this component instance. Avoids the
+                // race where the prop's `assets` is undefined at first paint
+                // and the draggable orphans onto undefined.
+                localAssets: [],
             };
         },
         mounted() {
-            // Backend may omit `assets` (directory.index returns dirs only).
-            // Initialize to [] so vuedraggable can bind to a real array even
-            // before the lazy fetch resolves; otherwise `:list` is undefined
-            // and the asset drop zone is broken.
-            if (! Array.isArray(this.item.assets)) {
-                this.item.assets = [];
+            // Seed local list from prop if backend happened to include assets
+            // (picker path with `with_assets=1`). Splice keeps the same ref.
+            if (Array.isArray(this.item.assets) && this.item.assets.length) {
+                this.localAssets.splice(0, 0, ...this.item.assets);
             }
 
             this.$emitter.on('current-item-expanded', (data) => {
-                if (data.id === this.item.id) {
-                    this.isOpen = true;
-                    if (! this.assetsLoaded && ! this.assetsLoading) {
-                        this.loadDirectoryAssets();
-                    }
+                if (data.id !== this.item.id) return;
+                this.isOpen = true;
+                if (! this.assetsLoaded && ! this.assetsLoading) {
+                    this.loadDirectoryAssets();
                 }
             });
 
             this.$emitter.on('update-current-item', (data) => {
-                if (data.id === this.item.id) {
-                    this.item = data;
-                }
+                if (data.id === this.item.id) this.item = data;
             });
 
+            // `dirId === null` means "invalidate all"; otherwise scoped to id.
             this.$emitter.on('invalidate-dir-assets', (dirId) => {
-                if (dirId == this.item.id) {
+                if (dirId == null || dirId == this.item.id) {
                     this.invalidateAssetCache();
                 }
             });
-
-            this.$emitter.on('invalidate-all-dir-assets', () => {
-                this.invalidateAssetCache();
-            });
         },
         watch: {
-            // When parent reloads the tree (`loadDirectories`), this component
-            // may receive a fresh item object without an `assets` array. Reset
-            // cache flags so the next open re-fetches.
+            // When parent reloads the tree (`loadDirectories`), this instance
+            // may be reused for a different directory entirely (only with a
+            // non-id key — id-based keys force re-mount). Reset flags and
+            // empty the local list in place so vuedraggable's bound ref
+            // survives.
             'item.id'() {
                 this.assetsLoaded = false;
                 this.assetsLoading = false;
                 this.assetsStale = false;
+                this.localAssets.splice(0, this.localAssets.length);
             },
         },
         computed: {
@@ -322,12 +335,9 @@
 
             isAssets: function() {
                 // True when the directory actually has assets to render:
-                //   - initial payload included assets (picker path), or
-                //   - backend hint `assets_count > 0`, or
-                //   - lazy fetch resolved with at least one asset.
-                // Empty `assetsLoaded` does NOT count — a leaf dir with no
-                // assets must not show a chevron after expand attempt.
-                return (this.item.assets && Object.keys(this.item.assets).length)
+                //   - lazy fetch resolved with at least one asset, or
+                //   - backend hint `assets_count > 0`.
+                return this.localAssets.length > 0
                     || (this.item.assets_count && this.item.assets_count > 0);
             },
 
@@ -355,8 +365,17 @@
                     && this.item.id == this.copyingDirectoryId;
             },
 
-            isBusy: function() {
+            isSelfBusy: function() {
+                // True only when THIS directory has an active mutation (its own
+                // delete/move/copy). Drives the per-node spinner so it shows on
+                // the affected dir alone.
                 return this.isMoving || this.isDeleting || this.isCopying;
+            },
+
+            isBusy: function() {
+                // True when the row should be non-interactive — either this dir
+                // is being mutated, or any other dir is (treeLocked broadcast).
+                return this.isSelfBusy || this.treeLocked;
             },
         },
         methods: {
@@ -381,6 +400,13 @@
                 this.$emit("set-filters", item);
             },
 
+            // Replace contents of `localAssets` in place. vuedraggable's
+            // Sortable holds the original array reference from mount; splice
+            // keeps the same ref with new contents.
+            replaceAssetsInPlace(fresh) {
+                this.localAssets.splice(0, this.localAssets.length, ...fresh);
+            },
+
             loadDirectoryAssets() {
                 if (this.assetsLoading) {
                     this.assetsStale = true;
@@ -390,7 +416,7 @@
                 this.$axios
                     .get(`{{ route('admin.dam.directory.assets', ':id') }}`.replace(':id', this.item.id))
                     .then((response) => {
-                        this.item.assets = response.data.data || [];
+                        this.replaceAssetsInPlace(response.data.data || []);
                         this.assetsLoaded = true;
                         this.assetsLoading = false;
                         if (this.assetsStale) {
@@ -449,11 +475,16 @@
             ref="treeContainer"
             v-if="formattedItems"
         >
-            <div class="tree-container text-nowrap overflow-hidden text-ellipsis">
+            <div
+                class="tree-container text-nowrap overflow-hidden text-ellipsis"
+                :class="treeBusy ? 'cursor-not-allowed' : ''"
+            >
                 <div
-                    class="flex gap-1 w-full p-1 text-nowrap cursor-pointer"
-                    @click.stop="resetFilters(formattedItems[0])"
-                    @contextmenu.prevent.stop="showContextMenu($event, formattedItems[0])"
+                    class="flex gap-1 w-full p-1 text-nowrap"
+                    :class="treeBusy ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer'"
+                    :aria-disabled="treeBusy"
+                    @click.stop="treeBusy ? null : resetFilters(formattedItems[0])"
+                    @contextmenu.prevent.stop="treeBusy ? null : showContextMenu($event, formattedItems[0])"
                 >
                     <span>
                         <i class="icon-dam-folder text-xl transition-all group-hover:text-gray-800 dark:group-hover:text-white cursor-grab"></i>
@@ -483,7 +514,7 @@
                             <v-tree-item
                                 class="item"
                                 :item="element"
-                                :key="index"
+                                :key="element.id"
                                 @right-click-item="showContextMenu"
                                 @set-filters="setFilters"
                                 @on-merge-items="onMergeItems"
@@ -492,16 +523,17 @@
                                 :movingDirectoryId="movingDirectoryId"
                                 :deletingDirectoryId="deletingDirectoryId"
                                 :copyingDirectoryId="copyingDirectoryId"
+                                :treeLocked="treeBusy"
                             ></v-tree-item>
                         </div>
                     </template>
                 </draggable>
 
-                <draggable 
+                <draggable
                     id="assets-items"
                     ghost-class="draggable-ghost"
                     handle=".tree-container-assets-details"
-                    v-bind="{animation: 200}"
+                    v-bind="{ animation: 200 }"
                     :list="formattedItems[0].assets"
                     item-key="id"
                     :sort="false"
@@ -518,10 +550,11 @@
                                 @on-drag-start="onDragStart"
                                 @right-click-item="showContextMenu"
                                 :selectedItem="selectedItem"
+                                :treeLocked="treeBusy"
                             />
                         </div>
-                        
-                    </template> 
+
+                    </template>
                 </draggable>
             </div>
 
@@ -853,6 +886,7 @@
                 movingDirectoryId: null,
                 deletingDirectoryId: null,
                 copyingDirectoryId: null,
+                gridBusy: false,
             };
         },
 
@@ -861,14 +895,48 @@
                 this.setAssets(data);
             });
 
-            this.$emitter.on('delete-assets', (data) => {
+            this.$emitter.on('delete-assets', () => {
                 // Mass-delete from grid — tree structure unchanged, refresh
                 // asset caches without reloading the whole directory tree.
-                this.$emitter.emit('invalidate-all-dir-assets');
-                this.loadRootAssets();
+                this.invalidateAllAssetCaches();
+            });
+
+            // Grid-side mutations (upload in progress, mass-selection active)
+            // freeze the tree so users can't move folders out from under an
+            // in-flight grid action.
+            this.$emitter.on('dam:grid-busy', (busy) => {
+                this.gridBusy = !! busy;
             });
 
             this.loadDirectories();
+        },
+
+        computed: {
+            // Aggregate "an async tree mutation is in flight" — drives the
+            // grid lockout so user can't act on assets while a directory
+            // delete/move/copy job is still running.
+            treeMutating() {
+                return !! (
+                    this.deletingDirectoryId
+                    || this.movingDirectoryId
+                    || this.copyingDirectoryId
+                );
+            },
+            // Tree row interaction lock — true when this side is mutating OR
+            // grid is busy on the other side. Drives `treeLocked` prop chain.
+            treeBusy() {
+                return this.treeMutating || this.gridBusy;
+            },
+        },
+
+        watch: {
+            // Only broadcast TREE-side mutations to the grid. Including
+            // `gridBusy` here would create a feedback loop: grid emits busy →
+            // tree treeBusy=true → tree emits dam:tree-busy → grid locks
+            // itself mid-upload.
+            treeMutating(value) {
+                this.$emitter.emit('dam:tree-busy', value);
+            },
         },
 
         methods: {
@@ -992,7 +1060,7 @@
                 let formData = new FormData(this.$refs.directoryCreateOrRenameForm);
                 this.$axios.post(this.directoryCreate ? "{{ route('admin.dam.directory.store') }}" : "{{ route('admin.dam.directory.update') }}", formData)
                     .then((response) => {
-                        this.$refs.directoryCreateOrRenameModal.close();
+                        this.$refs.directoryCreateOrRenameModal?.close();
                         if (this.directoryCreate) {
                             if (!this.selectedItem.children) {
                                 this.selectedItem.children = [];
@@ -1048,7 +1116,7 @@
                 let formData = new FormData(this.$refs.assetRenameForm);
                 this.$axios.post("{{ route('admin.dam.assets.rename') }}", formData)
                     .then((response) => {
-                        this.$refs.assetRenameModal.close();
+                        this.$refs.assetRenameModal?.close();
                         this.$emitter.emit('add-flash', {
                             type: 'success',
                             message: response.data.message
@@ -1108,10 +1176,9 @@
                         this.$axios.delete(`{{ route('admin.dam.assets.destroy', ':id') }}`.replace(':id', this.selectedItem.id))
                             .then(response => {
                                 // Asset delete — tree structure unchanged, just
-                                // invalidate asset caches so the deleted asset
+                                // refresh asset caches so the deleted asset
                                 // disappears from the tree.
-                                this.$emitter.emit('invalidate-all-dir-assets');
-                                this.loadRootAssets();
+                                this.invalidateAllAssetCaches();
 
                                 this.$emitter.emit('data-grid:refresh');
 
@@ -1224,11 +1291,15 @@
                     }
                 }
 
-                if (moved  && type == 'asset') {
-                    // @TODO: this is hot fixed, need to improve
-                    let {item} = this.findItemAssetById(this.formattedItems, moved.element.id);
-                    if (parent) {
-                        this.addedItems(moved.element, item.id, type);
+                if (moved && type == 'asset') {
+                    // Only the `added` half of the cross-list change (target
+                    // dir gained the asset) drives the move. The `removed`
+                    // half (source dir lost the asset) fires too — ignore it
+                    // to avoid a duplicate API call.
+                    // `directoryId` here is the target dir's id, supplied by
+                    // the receiving draggable's `@change` binding.
+                    if (added) {
+                        this.addedItems(moved.element, directoryId, type);
                     }
                 }
             },
@@ -1293,11 +1364,10 @@
                         } else {
                             this.isLoading = false;
                             this.actionStatus = null;
-                            // Asset drag-move — invalidate both source and target
-                            // by broadcasting; tree structure unchanged so no
-                            // need to reload directory list.
-                            this.$emitter.emit('invalidate-all-dir-assets');
-                            this.loadRootAssets();
+                            // Asset drag-move — refresh source and target asset
+                            // caches; tree structure unchanged so no need to
+                            // reload the directory list.
+                            this.invalidateAllAssetCaches();
                         }
                     })
                     .catch(error => {
@@ -1318,56 +1388,32 @@
             },
 
             handleFileChange(event) {
-                let fileInput = event.target.files;
-                if (fileInput.length > 0) {
-                    let formData = new FormData();
+                const fileInput = event.target.files;
+                if (! fileInput || fileInput.length === 0) return;
 
-                    for (let index = 0; index < fileInput.length; index++) {
-                        formData.append('files[]', fileInput[index]);
-                    }
-
-                    formData.append('directory_id', this.selectedItem.id);
-
-                    this.$axios.post("{{ route('admin.dam.assets.upload') }}", formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        }
-                    }).then((response) => {
-                        this.$emitter.emit('uploaded-assets', response.data.files);
-                        this.$emitter.emit('data-grid:refresh');
-                        this.$emitter.emit('add-flash', {
-                            type: 'success',
-                            message: response.data.message
-                        });
-                    }).catch((error) => {
-                        console.log(error);
-                        this.$emitter.emit('add-flash', {
-                            type: 'error',
-                            message: error.response.data.message
-                        });
-                        console.error('Upload failed:', error);
-                    });
+                const formData = new FormData();
+                for (let i = 0; i < fileInput.length; i++) {
+                    formData.append('files[]', fileInput[i]);
                 }
+                formData.append('directory_id', this.selectedItem.id);
+
+                // Route through v-dam-upload's pipeline so the upload spinner,
+                // cancel button, and error/large-file handling kick in. Owning
+                // the axios call here would skip those affordances.
+                this.$emitter.emit('dam:upload-files', formData);
+
+                event.target.value = null;
             },
 
             setAssets(data) {
-                if (!this.selectedItem.assets) {
-                    this.selectedItem.assets = [];
-                }
+                if (! this.selectedItem.assets) this.selectedItem.assets = [];
+                if (! this.selectedItem.children) this.selectedItem.children = [];
 
-                if (!this.selectedItem.children) {
-                    this.selectedItem.children = [];
-                }
-
-                // Asset upload — tree structure unchanged, so skip the full
-                // `loadDirectories()` reload. Just invalidate the target dir's
-                // asset cache so its lazy-loaded list refetches.
-                if (this.formattedItems && this.formattedItems[0]
-                    && this.selectedItem.id == this.formattedItems[0].id) {
-                    this.loadRootAssets();
-                } else {
-                    this.$emitter.emit('invalidate-dir-assets', this.selectedItem.id);
-                }
+                // Asset upload — tree structure unchanged, just refresh the
+                // target dir's lazy-loaded asset cache. Root is handled below
+                // via the same broadcast, since root assets are managed by
+                // this component (not a v-tree-item).
+                this.invalidateDirAssetCache(this.selectedItem.id);
 
                 this.$nextTick(() => {
                     this.$emitter.emit('current-item-expanded', this.selectedItem);
@@ -1376,10 +1422,44 @@
                 });
             },
 
+            isRootDir(id) {
+                return this.formattedItems
+                    && this.formattedItems[0]
+                    && id == this.formattedItems[0].id;
+            },
+
+            invalidateDirAssetCache(dirId) {
+                if (this.isRootDir(dirId)) {
+                    this.loadRootAssets();
+                } else {
+                    this.$emitter.emit('invalidate-dir-assets', dirId);
+                }
+            },
+
+            invalidateAllAssetCaches() {
+                // Broadcast to every v-tree-item (id=null = match all) and
+                // refresh root's own list.
+                this.$emitter.emit('invalidate-dir-assets', null);
+                this.loadRootAssets();
+            },
+
             loadDirectories() {
                 this.$axios.get("{{ route('admin.dam.directory.index') }}")
                         .then((response) => {
-                            this.formattedItems = response.data.data;
+                            const tree = response.data.data;
+
+                            // Default Root.assets to an empty array synchronously
+                            // so the root `<draggable :list>` binds to a valid
+                            // array; without this, vuedraggable wires up against
+                            // `undefined` for the brief window before
+                            // `loadRootAssets` resolves and never re-binds when
+                            // the array later replaces undefined — leaving the
+                            // root asset list blank until a manual page reload.
+                            if (tree && tree[0] && ! Array.isArray(tree[0].assets)) {
+                                tree[0].assets = [];
+                            }
+
+                            this.formattedItems = tree;
 
                             this.$nextTick(() => {
                                 if (this.selectedItem) {
@@ -1389,10 +1469,6 @@
                                     this.setDefaultSeletedItem();
                                 }
 
-                                // Lazy-load Root's own assets — Root is always
-                                // visible (not a v-tree-item), so its asset list
-                                // needs an explicit fetch since directory.index
-                                // returns directories only.
                                 if (this.formattedItems && this.formattedItems[0]) {
                                     this.loadRootAssets();
                                 }
@@ -1409,7 +1485,17 @@
                 this.$axios
                     .get(`{{ route('admin.dam.directory.assets', ':id') }}`.replace(':id', root.id))
                     .then((response) => {
-                        root.assets = response.data.data || [];
+                        const fresh = response.data.data || [];
+                        // Mutate in place so vuedraggable's Sortable instance,
+                        // which holds the original array reference from initial
+                        // mount, sees the new contents. Reassigning `root.assets`
+                        // creates a new array that the already-mounted Sortable
+                        // does not pick up.
+                        if (Array.isArray(root.assets)) {
+                            root.assets.splice(0, root.assets.length, ...fresh);
+                        } else {
+                            root.assets = fresh;
+                        }
                     })
                     .catch(() => {});
             },
