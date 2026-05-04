@@ -1,5 +1,12 @@
 # CHANGELOG for unopim-digital-asset-management
 
+## Version 2.0.2 - Bug Fix
+
+### Fixed
+
+- DB prefix — Asset datagrid query
+Fixed unprefixed `dam_directories` and `dam_asset_directory` references in raw `MIN()` expressions that broke the asset datagrid when `DB_PREFIX` was set.
+
 ## Version 2.0.1 - Bug Fix Release
 Compatible with UnoPim v2.0.0
 
