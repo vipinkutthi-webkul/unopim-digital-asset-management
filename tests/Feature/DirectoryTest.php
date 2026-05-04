@@ -59,12 +59,6 @@ it('returns assets of the directory when directory exists (many-to-many)', funct
 
     $directory->assets()->attach($assets->pluck('id')->toArray());
 
-    $this->mock(DirectoryRepository::class, function ($mock) use ($directory) {
-        $mock->shouldReceive('getDirectoryTree')
-            ->with($directory->id)
-            ->andReturn(collect([$directory]));
-    });
-
     $response = $this->getJson(route('admin.dam.directory.assets', ['id' => $directory->id]));
 
     $response->assertStatus(200);
@@ -252,12 +246,6 @@ it('should return 404 when directory not found for children', function () {
 });
 
 it('should return 404 when directory not found for assets', function () {
-    $this->mock(DirectoryRepository::class, function ($mock) {
-        $mock->shouldReceive('getDirectoryTree')
-            ->with(99999)
-            ->andReturn(collect([]));
-    });
-
     $response = $this->getJson(route('admin.dam.directory.assets', 99999));
 
     $response->assertStatus(404)
@@ -307,4 +295,66 @@ it('should respond successfully to legacy directory copy endpoint', function () 
 
     $response->assertOk()
         ->assertJson(['message' => 'Folder copy successfully.', 'data' => null]);
+});
+
+// ── Lazy assets endpoint (tree) ──────────────────────────────────────────
+
+it('directory.index without with_assets does NOT eager-load assets', function () {
+    $directory = Directory::factory()->create();
+    $asset = Asset::factory()->create();
+    $directory->assets()->attach($asset->id);
+
+    $response = $this->getJson(route('admin.dam.directory.index'));
+
+    $response->assertOk();
+    $payload = $response->json('data');
+
+    $found = collect($payload)->firstWhere('id', $directory->id);
+
+    // assets key absent OR present-but-empty are both acceptable for opt-in skip.
+    if ($found !== null && array_key_exists('assets', $found)) {
+        expect($found['assets'])->toBeEmpty();
+    } else {
+        expect(true)->toBeTrue();
+    }
+});
+
+it('directory.index with with_assets=1 eager-loads assets (picker path preserved)', function () {
+    $directory = Directory::factory()->create();
+    $asset = Asset::factory()->create();
+    $directory->assets()->attach($asset->id);
+
+    $response = $this->getJson(route('admin.dam.directory.index', ['with_assets' => 1]));
+
+    $response->assertOk();
+    $payload = $response->json('data');
+
+    $found = collect($payload)->firstWhere('id', $directory->id);
+    expect($found)->not->toBeNull();
+    expect($found['assets'] ?? [])->not->toBeEmpty();
+    expect(collect($found['assets'])->pluck('id')->all())->toContain($asset->id);
+});
+
+it('directory.assets/{id} returns only that directory\'s assets', function () {
+    $dirA = Directory::factory()->create();
+    $dirB = Directory::factory()->create();
+
+    $assetInA = Asset::factory()->create();
+    $assetInB = Asset::factory()->create();
+
+    $dirA->assets()->attach($assetInA->id);
+    $dirB->assets()->attach($assetInB->id);
+
+    $response = $this->getJson(route('admin.dam.directory.assets', ['id' => $dirA->id]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($assetInA->id);
+    expect($ids)->not->toContain($assetInB->id);
+});
+
+it('directory.index requires authentication', function () {
+    auth('admin')->logout();
+    $response = $this->getJson(route('admin.dam.directory.index'));
+    expect(in_array($response->status(), [302, 401, 403], true))->toBeTrue();
 });

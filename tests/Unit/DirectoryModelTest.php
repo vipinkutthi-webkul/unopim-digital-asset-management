@@ -2,6 +2,7 @@
 
 use Webkul\DAM\Models\Asset;
 use Webkul\DAM\Models\Directory;
+use Webkul\DAM\Repositories\DirectoryRepository;
 
 it('can create a directory using factory', function () {
     $directory = Directory::factory()->create();
@@ -155,4 +156,31 @@ it('returns false when the disk throws an exception', function () {
     $dir = new Directory;
     // Non-configured disk name → Storage::disk() will throw
     expect($dir->privateSupport('any/path', 'disk_that_does_not_exist_xyz'))->toBeFalse();
+});
+
+// ── DirectoryRepository: tree asset-load behavior ────────────────────────
+
+it('getDirectoryTreeOnly returns directories without assets relation loaded', function () {
+    $dir = Directory::factory()->create();
+    $asset = Asset::factory()->create();
+    $dir->assets()->attach($asset->id);
+
+    $tree = app(DirectoryRepository::class)->getDirectoryTreeOnly();
+
+    expect($tree)->not->toBeEmpty();
+    foreach ($tree as $node) {
+        expect($node->relationLoaded('assets'))->toBeFalse();
+    }
+});
+
+it('getDirectoryTree eager-loads assets relation', function () {
+    $dir = Directory::factory()->create();
+    $asset = Asset::factory()->create();
+    $dir->assets()->attach($asset->id);
+
+    $tree = app(DirectoryRepository::class)->getDirectoryTree();
+
+    $node = collect($tree)->firstWhere('id', $dir->id);
+    expect($node)->not->toBeNull();
+    expect($node->relationLoaded('assets'))->toBeTrue();
 });

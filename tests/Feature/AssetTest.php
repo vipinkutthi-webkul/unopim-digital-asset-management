@@ -503,3 +503,81 @@ it('should return error when asset has no metadata and file is missing', functio
         ->assertOk()
         ->assertJson(['success' => false]);
 });
+
+// ── Drag-Move (tree) ──────────────────────────────────────────────────────
+
+function seedAssetMove(): array
+{
+    $src = Directory::factory()->create();
+    $dst = Directory::factory()->create();
+
+    $disk = Directory::getAssetDisk();
+    Storage::disk($disk)->makeDirectory('assets');
+    Storage::disk($disk)->makeDirectory('assets/'.$src->generatePath());
+    Storage::disk($disk)->makeDirectory('assets/'.$dst->generatePath());
+
+    $fileName = 'sample.jpg';
+    $assetPath = sprintf('assets/%s/%s', $src->generatePath(), $fileName);
+    Storage::disk($disk)->put($assetPath, 'fake-content');
+
+    $asset = Asset::factory()->create([
+        'file_name' => $fileName,
+        'path'      => $assetPath,
+    ]);
+    $src->assets()->attach($asset->id);
+
+    return [$src, $dst, $asset];
+}
+
+it('moves a single asset from one directory to another (drag-move)', function () {
+    [$src, $dst, $asset] = seedAssetMove();
+
+    $response = $this->postJson(route('admin.dam.assets.moved'), [
+        'move_item_id'  => $asset->id,
+        'new_parent_id' => $dst->id,
+    ]);
+
+    $response->assertOk();
+
+    $asset->refresh();
+    $linkedDirectoryIds = $asset->directories()->pluck('dam_directories.id')->all();
+    expect($linkedDirectoryIds)->toContain($dst->id);
+    expect($linkedDirectoryIds)->not->toContain($src->id);
+});
+
+it('after drag-move, source directory.assets no longer lists the asset', function () {
+    [$src, $dst, $asset] = seedAssetMove();
+
+    $this->postJson(route('admin.dam.assets.moved'), [
+        'move_item_id'  => $asset->id,
+        'new_parent_id' => $dst->id,
+    ])->assertOk();
+
+    $srcResp = $this->getJson(route('admin.dam.directory.assets', ['id' => $src->id]));
+    $srcResp->assertOk();
+    $srcIds = collect($srcResp->json('data'))->pluck('id')->all();
+    expect($srcIds)->not->toContain($asset->id);
+});
+
+it('after drag-move, target directory.assets includes the asset', function () {
+    [$src, $dst, $asset] = seedAssetMove();
+
+    $this->postJson(route('admin.dam.assets.moved'), [
+        'move_item_id'  => $asset->id,
+        'new_parent_id' => $dst->id,
+    ])->assertOk();
+
+    $dstResp = $this->getJson(route('admin.dam.directory.assets', ['id' => $dst->id]));
+    $dstResp->assertOk();
+    $dstIds = collect($dstResp->json('data'))->pluck('id')->all();
+    expect($dstIds)->toContain($asset->id);
+});
+
+it('drag-move requires authentication', function () {
+    auth('admin')->logout();
+    $response = $this->postJson(route('admin.dam.assets.moved'), [
+        'move_item_id'  => 1,
+        'new_parent_id' => 1,
+    ]);
+    expect(in_array($response->status(), [302, 401, 403], true))->toBeTrue();
+});
