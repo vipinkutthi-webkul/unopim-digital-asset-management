@@ -7,6 +7,7 @@ use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\DAM\Contracts\Asset;
 use Webkul\DAM\DataGrids\Asset\PickerDataGrid;
 use Webkul\DAM\Helpers\AssetHelper;
+use Webkul\DAM\Models\Directory;
 use Webkul\DAM\Repositories\AssetRepository;
 
 class AssetPickerController extends Controller
@@ -61,9 +62,13 @@ class AssetPickerController extends Controller
 
         $filePath = $asset->path;
 
+        $url = Directory::getAssetDisk() === Directory::ASSETS_DISK_AWS
+            ? AssetHelper::getPreviewUrl($filePath)
+            : route('admin.dam.file.thumbnail', ['path' => urlencode($filePath)]);
+
         return [
             'id'                => $assetId,
-            'url'               => route('admin.dam.file.thumbnail', ['path' => urlencode($filePath)]),
+            'url'               => $url,
             'value'             => $assetId,
             'file_name'         => AssetHelper::getDisplayFileName($asset->file_name),
             'file_type'         => $asset->file_type,

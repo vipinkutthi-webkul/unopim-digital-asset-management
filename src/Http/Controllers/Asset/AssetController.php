@@ -636,6 +636,20 @@ class AssetController extends Controller
             abort(404);
         }
 
+        if ($disk === Directory::ASSETS_DISK_AWS) {
+            try {
+                $url = Storage::disk($disk)->temporaryUrl(
+                    $asset->path,
+                    now()->addMinutes(10),
+                    ['ResponseContentDisposition' => 'attachment; filename="'.$asset->file_name.'"']
+                );
+
+                return redirect()->away($url);
+            } catch (\Throwable $e) {
+                // fall through to streaming download
+            }
+        }
+
         return Storage::disk($disk)->download($asset->path);
     }
 
