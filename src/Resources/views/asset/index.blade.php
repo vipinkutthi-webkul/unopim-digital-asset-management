@@ -99,14 +99,14 @@
                                 name="files[]"
                                 id="file-upload"
                                 class="hidden"
-                                :disabled="isUploading"
+                                :disabled="isUploading || treeBusy"
                                 @change="onFileChange"
                             />
                             <label
                                 for="file-upload"
                                 class="secondary-button cursor-pointer"
-                                :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading }"
-                                :aria-disabled="isUploading"
+                                :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isUploading || treeBusy }"
+                                :aria-disabled="isUploading || treeBusy"
                             >
                                 <svg
                                     v-if="isUploading"
@@ -149,14 +149,19 @@
                 </div>
     
                 {!! view_render_event('unopim.admin.dam.assets.list.before') !!}
-                
+
                 @if (bouncer()->hasPermission('dam.asset.view'))
-                    <x-dam::datagrid.dam 
-                        :src="route('admin.dam.assets.index')"
-                        ref="datagrid"
-                    />
+                    <div
+                        :class="{ 'pointer-events-none opacity-60': treeBusy }"
+                        :aria-busy="treeBusy"
+                    >
+                        <x-dam::datagrid.dam
+                            :src="route('admin.dam.assets.index')"
+                            ref="datagrid"
+                        />
+                    </div>
                 @endif
-    
+
                 {!! view_render_event('unopim.admin.dam.assets.list.after') !!}
             </div>
     
@@ -173,6 +178,7 @@
                     currentDirectory: null,
                     isUploading: false,
                     abortController: null,
+                    treeBusy: false,
                 }
             },
 
@@ -180,6 +186,30 @@
                 this.$emitter.on('current-directory', (data) => {
                     this.currentDirectory = data;
                 });
+
+                // Tree broadcasts busy when an async dir mutation
+                // (delete/move/copy) is in flight — gate the asset grid
+                // so user can't act on assets mid-job.
+                this.$emitter.on('dam:tree-busy', (busy) => {
+                    this.treeBusy = !! busy;
+                });
+
+                // Tree's right-click "Upload Files" routes through here so
+                // the spinner, cancel button, and error handling stay unified
+                // with the toolbar upload.
+                this.$emitter.on('dam:upload-files', (formData) => {
+                    if (this.isUploading) return;
+                    this.handleFileUpload(formData);
+                });
+            },
+
+            watch: {
+                // Mirror tree-lock direction: when an upload is running, freeze
+                // the directory tree so the user can't move folders out from
+                // under the in-flight upload target.
+                isUploading(value) {
+                    this.$emitter.emit('dam:grid-busy', !! value);
+                },
             },
 
             methods: {
