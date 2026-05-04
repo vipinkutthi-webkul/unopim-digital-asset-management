@@ -188,6 +188,25 @@ it('should allow downloading the asset file', function () {
     $response->assertHeader('Content-Disposition');
 });
 
+it('should redirect to s3 presigned url on download when disk is aws', function () {
+    config()->set('filesystems.default', Directory::ASSETS_DISK_AWS);
+    Storage::fake(Directory::ASSETS_DISK_AWS);
+
+    $fileName = 'sample-'.uniqid().'.pdf';
+    $filePath = 'assets/Root/'.$fileName;
+    Storage::disk(Directory::ASSETS_DISK_AWS)->put($filePath, 'dummy content');
+
+    $asset = Asset::factory()->create([
+        'file_name' => $fileName,
+        'path'      => $filePath,
+    ]);
+
+    $response = $this->get(route('admin.dam.assets.download', $asset->id));
+
+    $response->assertRedirect();
+    expect($response->headers->get('Location'))->not->toBeEmpty();
+});
+
 // Custom Download Asset
 it('should allow custom downloading of the asset', function () {
     $assetDisk = Directory::getAssetDisk();

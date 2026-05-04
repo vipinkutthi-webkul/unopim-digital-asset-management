@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Webkul\DAM\Models\Asset;
+use Webkul\DAM\Models\Directory;
 
 beforeEach(function () {
     $this->loginAsAdmin();
@@ -39,4 +42,35 @@ it('should fetch a single asset by id', function () {
     $response->assertOk();
     $response->assertJsonCount(1);
     $response->assertJsonFragment(['id' => $asset->id]);
+});
+
+it('should return local thumbnail url when disk is private', function () {
+    Config::set('filesystems.default', Directory::ASSETS_DISK_PRIVATE);
+
+    $asset = Asset::factory()->create(['path' => 'assets/Root/sample.jpg']);
+
+    $response = $this->getJson(route('admin.dam.asset_picker.get_assets', ['assetIds' => (string) $asset->id]));
+
+    $response->assertOk();
+    $url = $response->json('0.url');
+
+    expect($url)->toContain('/file/thumbnail');
+});
+
+it('should return s3 url when disk is aws', function () {
+    Config::set('filesystems.default', Directory::ASSETS_DISK_AWS);
+    Storage::fake(Directory::ASSETS_DISK_AWS);
+
+    $path = 'assets/Root/sample-'.uniqid().'.jpg';
+    Storage::disk(Directory::ASSETS_DISK_AWS)->put($path, 'dummy');
+
+    $asset = Asset::factory()->create(['path' => $path]);
+
+    $response = $this->getJson(route('admin.dam.asset_picker.get_assets', ['assetIds' => (string) $asset->id]));
+
+    $response->assertOk();
+    $url = $response->json('0.url');
+
+    expect($url)->not->toContain('admin.dam.file.thumbnail');
+    expect($url)->not->toContain(route('admin.dam.file.thumbnail', ['path' => urlencode($path)]));
 });
