@@ -63,6 +63,7 @@
             data() {
                 return {
                     isLoading: false,
+                    actionInFlight: false,
 
                     available: {
                         id: null,
@@ -113,6 +114,22 @@
                         },
                     },
                 };
+            },
+
+            computed: {
+                // Freeze the directory tree only while a destructive request
+                // is actually in flight (mass-delete / mass-action / per-row
+                // delete). Selection alone does NOT lock — the user should be
+                // free to click around until they confirm the action.
+                gridBusy() {
+                    return !! this.actionInFlight;
+                },
+            },
+
+            watch: {
+                gridBusy(value) {
+                    this.$emitter.emit('dam:grid-busy', value);
+                },
             },
 
             mounted() {
@@ -211,7 +228,7 @@
 
                     this.isLoading = true;
 
-                    this.$refs['filterDrawer'].close();
+                    this.$refs['filterDrawer']?.close();
 
                     this.$axios
                         .get(this.src, {
@@ -666,6 +683,7 @@
                                 case 'post':
                                 case 'put':
                                 case 'patch':
+                                    this.actionInFlight = true;
                                     this.$axios[method](action.url, {
                                             indices: this.applied.massActions.indices,
                                             value: this.applied.massActions.value,
@@ -685,11 +703,15 @@
                                                 type: 'error',
                                                 message: error.response.data.message
                                             });
+                                        })
+                                        .finally(() => {
+                                            this.actionInFlight = false;
                                         });
 
                                     break;
 
                                 case 'delete':
+                                    this.actionInFlight = true;
                                     this.$axios[method](action.url, {
                                             indices: this.applied.massActions.indices
                                         })
@@ -706,6 +728,9 @@
                                                 type: 'error',
                                                 message: error.response.data.message
                                             });
+                                        })
+                                        .finally(() => {
+                                            this.actionInFlight = false;
                                         });
 
                                     break;
@@ -804,6 +829,7 @@
                         case 'delete':
                             this.$emitter.emit('delete' === method ? 'open-delete-modal' : 'open-confirm-modal', {
                                 agree: () => {
+                                    this.actionInFlight = true;
                                     this.$axios[method](action.url)
                                         .then(response => {
                                             this.$emitter.emit('add-flash', {
@@ -818,6 +844,9 @@
                                                 type: 'error',
                                                 message: error.response.data.message
                                             });
+                                        })
+                                        .finally(() => {
+                                            this.actionInFlight = false;
                                         });
                                 }
                             });
