@@ -98,6 +98,8 @@
             :aria-disabled="isBusy"
             @click.stop="isBusy ? null : toggle(item)"
             @contextmenu.prevent.stop="isBusy ? null : showContextMenu($event, item)"
+            @dragenter.prevent="isBusy ? null : onDragEnter()"
+            @dragover.prevent
         >
             <span
                 class="text-xl text-zinc-600 dark:text-white"
@@ -137,7 +139,7 @@
         </div>
         <div
             v-show="isOpen"
-            v-if="isDirectory || isAssets"
+            v-if="hasDropZone"
             class="flex flex-col pl-6"
         >
             <!-- Directories -->
@@ -262,18 +264,28 @@
         data: function() {
             return {
                 isOpen: false,
-                showContextMenuFlag: false, // To control menu visibility
-                contextMenuPosition: {
-                    x: 0,
-                    y: 0
-                }, // Store menu position
-                // selectedItem: null, // To store selected item
+                showContextMenuFlag: false,
+                contextMenuPosition: { x: 0, y: 0 },
+                assetsLoaded: false,
+                assetsLoading: false,
+                assetsStale: false,
             };
         },
         mounted() {
+            // Backend may omit `assets` (directory.index returns dirs only).
+            // Initialize to [] so vuedraggable can bind to a real array even
+            // before the lazy fetch resolves; otherwise `:list` is undefined
+            // and the asset drop zone is broken.
+            if (! Array.isArray(this.item.assets)) {
+                this.item.assets = [];
+            }
+
             this.$emitter.on('current-item-expanded', (data) => {
                 if (data.id === this.item.id) {
                     this.isOpen = true;
+                    if (! this.assetsLoaded && ! this.assetsLoading) {
+                        this.loadDirectoryAssets();
+                    }
                 }
             });
 
@@ -282,6 +294,26 @@
                     this.item = data;
                 }
             });
+
+            this.$emitter.on('invalidate-dir-assets', (dirId) => {
+                if (dirId == this.item.id) {
+                    this.invalidateAssetCache();
+                }
+            });
+
+            this.$emitter.on('invalidate-all-dir-assets', () => {
+                this.invalidateAssetCache();
+            });
+        },
+        watch: {
+            // When parent reloads the tree (`loadDirectories`), this component
+            // may receive a fresh item object without an `assets` array. Reset
+            // cache flags so the next open re-fetches.
+            'item.id'() {
+                this.assetsLoaded = false;
+                this.assetsLoading = false;
+                this.assetsStale = false;
+            },
         },
         computed: {
             isDirectory: function() {
@@ -289,7 +321,20 @@
             },
 
             isAssets: function() {
-                return this.item.assets && Object.keys(this.item.assets).length;
+                // True when the directory actually has assets to render:
+                //   - initial payload included assets (picker path), or
+                //   - backend hint `assets_count > 0`, or
+                //   - lazy fetch resolved with at least one asset.
+                // Empty `assetsLoaded` does NOT count — a leaf dir with no
+                // assets must not show a chevron after expand attempt.
+                return (this.item.assets && Object.keys(this.item.assets).length)
+                    || (this.item.assets_count && this.item.assets_count > 0);
+            },
+
+            // Used to mount the inner wrapper so the asset drop target exists
+            // even on empty leaf dirs that the user has expanded once.
+            hasDropZone: function() {
+                return this.isDirectory || this.isAssets || this.assetsLoaded;
             },
 
             isMoving: function() {
@@ -324,11 +369,61 @@
             },
 
             toggle: function(item) {
-                if (this.isDirectory || this.isAssets) {
-                    this.isOpen = !this.isOpen;
+                const willOpen = ! this.isOpen;
+                if (this.isDirectory || this.isAssets || ! this.assetsLoaded) {
+                    this.isOpen = willOpen;
+                }
+
+                if (willOpen && ! this.assetsLoaded && ! this.assetsLoading) {
+                    this.loadDirectoryAssets();
                 }
 
                 this.$emit("set-filters", item);
+            },
+
+            loadDirectoryAssets() {
+                if (this.assetsLoading) {
+                    this.assetsStale = true;
+                    return;
+                }
+                this.assetsLoading = true;
+                this.$axios
+                    .get(`{{ route('admin.dam.directory.assets', ':id') }}`.replace(':id', this.item.id))
+                    .then((response) => {
+                        this.item.assets = response.data.data || [];
+                        this.assetsLoaded = true;
+                        this.assetsLoading = false;
+                        if (this.assetsStale) {
+                            this.assetsStale = false;
+                            this.loadDirectoryAssets();
+                        }
+                    })
+                    .catch(() => {
+                        this.assetsLoading = false;
+                    });
+            },
+
+            // Auto-expand collapsed dir on dragenter so the inner asset draggable
+            // mounts and can accept the drop. Mirrors Windows Explorer hover-expand.
+            onDragEnter() {
+                if (this.assetsLoading) return;
+                if (! this.isOpen) {
+                    this.isOpen = true;
+                }
+                if (! this.assetsLoaded) {
+                    this.loadDirectoryAssets();
+                }
+            },
+
+            invalidateAssetCache() {
+                if (this.assetsLoading) {
+                    this.assetsStale = true;
+                    return;
+                }
+                this.assetsLoaded = false;
+                if (this.isOpen) {
+                    this.loadDirectoryAssets();
+                }
             },
 
             setFilters: function(item, type = 'directory') {
@@ -767,12 +862,10 @@
             });
 
             this.$emitter.on('delete-assets', (data) => {
-                // @TODO: Need to implement in future
-                // if (data.actionType == 'single-action') {
-                //     this.setFilters(this.parentItem);
-                // }
-
-                this.loadDirectories()
+                // Mass-delete from grid — tree structure unchanged, refresh
+                // asset caches without reloading the whole directory tree.
+                this.$emitter.emit('invalidate-all-dir-assets');
+                this.loadRootAssets();
             });
 
             this.loadDirectories();
@@ -1014,7 +1107,11 @@
                     agree: () => {
                         this.$axios.delete(`{{ route('admin.dam.assets.destroy', ':id') }}`.replace(':id', this.selectedItem.id))
                             .then(response => {
-                                this.loadDirectories();
+                                // Asset delete — tree structure unchanged, just
+                                // invalidate asset caches so the deleted asset
+                                // disappears from the tree.
+                                this.$emitter.emit('invalidate-all-dir-assets');
+                                this.loadRootAssets();
 
                                 this.$emitter.emit('data-grid:refresh');
 
@@ -1196,7 +1293,11 @@
                         } else {
                             this.isLoading = false;
                             this.actionStatus = null;
-                            this.loadDirectories();
+                            // Asset drag-move — invalidate both source and target
+                            // by broadcasting; tree structure unchanged so no
+                            // need to reload directory list.
+                            this.$emitter.emit('invalidate-all-dir-assets');
+                            this.loadRootAssets();
                         }
                     })
                     .catch(error => {
@@ -1258,7 +1359,15 @@
                     this.selectedItem.children = [];
                 }
 
-                this.loadDirectories();
+                // Asset upload — tree structure unchanged, so skip the full
+                // `loadDirectories()` reload. Just invalidate the target dir's
+                // asset cache so its lazy-loaded list refetches.
+                if (this.formattedItems && this.formattedItems[0]
+                    && this.selectedItem.id == this.formattedItems[0].id) {
+                    this.loadRootAssets();
+                } else {
+                    this.$emitter.emit('invalidate-dir-assets', this.selectedItem.id);
+                }
 
                 this.$nextTick(() => {
                     this.$emitter.emit('current-item-expanded', this.selectedItem);
@@ -1279,11 +1388,30 @@
                                 } else {
                                     this.setDefaultSeletedItem();
                                 }
+
+                                // Lazy-load Root's own assets — Root is always
+                                // visible (not a v-tree-item), so its asset list
+                                // needs an explicit fetch since directory.index
+                                // returns directories only.
+                                if (this.formattedItems && this.formattedItems[0]) {
+                                    this.loadRootAssets();
+                                }
                             });
                         })
                         .catch((error) => {
                             console.error('Error fetching directories:', error);
                         });
+            },
+
+            loadRootAssets() {
+                const root = this.formattedItems[0];
+                if (! root) return;
+                this.$axios
+                    .get(`{{ route('admin.dam.directory.assets', ':id') }}`.replace(':id', root.id))
+                    .then((response) => {
+                        root.assets = response.data.data || [];
+                    })
+                    .catch(() => {});
             },
 
             loadDirectoryChildrens() {
