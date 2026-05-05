@@ -214,120 +214,100 @@ class AssetController extends Controller
 
         $uploadFiles = [];
         $assetIds = [];
+        $disk = Directory::getAssetDisk();
+
+        // Writability is request-scoped (same directory for every file in the
+        // batch), so check once up front rather than re-checking inside the loop.
+        if (! $directory->isWritable($directoryPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.dam.index.directory.not-writable', [
+                    'type'       => 'file',
+                    'actionType' => 'create',
+                    'path'       => $directoryPath,
+                ]),
+            ], 500);
+        }
+
+        // Pre-fetch any existing assets that match the incoming filenames in
+        // this directory. Avoids N round-trips for an N-file batch.
+        $candidatePaths = [];
+        foreach ($files as $f) {
+            if ($f instanceof UploadedFile) {
+                $candidatePaths[] = $directoryPath.'/'.$f->getClientOriginalName();
+            }
+        }
+        $existingByPath = $candidatePaths
+            ? Asset::whereIn('path', $candidatePaths)->get()->keyBy('path')
+            : collect();
 
         try {
             foreach ($files as $file) {
-                if ($file instanceof UploadedFile) {
-
-                    $extension = strtolower($file->getClientOriginalExtension());
-                    $mimeType = $file->getMimeType();
-
-                    if (AssetHelper::isForbiddenFile($extension, $mimeType)) {
-                        throw new \Exception(trans('dam::app.admin.dam.index.directory.not-allowed'));
-                    }
-
-                    $originalName = $file->getClientOriginalName();
-
-                    if (! $directory->isWritable($directoryPath)) {
-                        throw new \Exception(trans('dam::app.admin.dam.index.directory.not-writable', [
-                            'type'       => 'file',
-                            'actionType' => 'create',
-                            'path'       => $directoryPath,
-                        ]));
-                    }
-
-                    $disk = Directory::getAssetDisk();
-
-                    // If an asset with the same filename already exists in this directory,
-                    // overwrite its file instead of creating a renamed duplicate.
-                    $existingPath = $directoryPath.'/'.$originalName;
-                    $existingAsset = Asset::where('path', $existingPath)->first();
-                    $isOverwrite = (bool) $existingAsset;
-
-                    if ($isOverwrite) {
-                        Storage::disk($disk)->delete($existingAsset->path);
-                        $this->clearAssetCache($existingAsset->path, $disk, $existingAsset->id);
-
-                        $filePath = $this->fileStorer->store(
-                            path: $directoryPath,
-                            file: $file,
-                            fileName: $originalName,
-                            options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
-                        );
-                        $localFilePath = $file->getRealPath();
-                        $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
-
-                        $existingAsset->update([
-                            'file_name' => $originalName,
-                            'file_type' => AssetHelper::getFileType($file),
-                            'file_size' => $file->getSize(),
-                            'mime_type' => $file->getMimeType(),
-                            'extension' => $file->getClientOriginalExtension(),
-                            'path'      => $filePath,
-                            'meta_data' => $metaData,
-                        ]);
-
-                        $asset = $existingAsset;
-
-                        if (str_starts_with($file->getMimeType() ?? '', 'audio/') && $localFilePath && file_exists($localFilePath)) {
-                            $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
-                            if ($coverData) {
-                                $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
-                                if ($coverPath) {
-                                    $asset->update(['meta_data' => array_merge($metaData, ['cover_art_path' => $coverPath])]);
-                                }
-                            }
-                        }
-                    } else {
-                        $uniqueFileName = $this->generateUniqueFileName($directoryPath, $originalName);
-
-                        $filePath = $this->fileStorer->store(
-                            path: $directoryPath,
-                            file: $file,
-                            fileName: $uniqueFileName,
-                            options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
-                        );
-
-                        $localFilePath = $file->getRealPath();
-                        $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
-
-                        $asset = Asset::create([
-                            'file_name' => $uniqueFileName,
-                            'file_type' => AssetHelper::getFileType($file),
-                            'file_size' => $file->getSize(),
-                            'mime_type' => $file->getMimeType(),
-                            'extension' => $file->getClientOriginalExtension(),
-                            'path'      => $filePath,
-                            'meta_data' => $metaData,
-                        ]);
-
-                        if (str_starts_with($file->getMimeType() ?? '', 'audio/') && $localFilePath && file_exists($localFilePath)) {
-                            $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
-                            if ($coverData) {
-                                $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
-                                if ($coverPath) {
-                                    $asset->update(['meta_data' => array_merge($metaData, ['cover_art_path' => $coverPath])]);
-                                }
-                            }
-                        }
-                    }
-
-                    // Only queue new assets for directory association; overwrites are already linked.
-                    if (! $isOverwrite) {
-                        $assetIds[] = $asset->id;
-                    }
-                    array_push($uploadFiles, $asset);
+                if (! $file instanceof UploadedFile) {
+                    continue;
                 }
+
+                $extension = strtolower($file->getClientOriginalExtension());
+                $mimeType = $file->getMimeType();
+
+                if (AssetHelper::isForbiddenFile($extension, $mimeType)) {
+                    throw new \Exception(trans('dam::app.admin.dam.index.directory.not-allowed'));
+                }
+
+                $originalName = $file->getClientOriginalName();
+                $existingPath = $directoryPath.'/'.$originalName;
+                $existingAsset = $existingByPath->get($existingPath);
+                $isOverwrite = (bool) $existingAsset;
+
+                if ($isOverwrite) {
+                    Storage::disk($disk)->delete($existingAsset->path);
+                    $this->clearAssetCache($existingAsset->path, $disk, $existingAsset->id);
+                    $fileName = $originalName;
+                } else {
+                    $fileName = $this->generateUniqueFileName($directoryPath, $originalName);
+                }
+
+                $filePath = $this->fileStorer->store(
+                    path: $directoryPath,
+                    file: $file,
+                    fileName: $fileName,
+                    options: [FileStorer::HASHED_FOLDER_NAME_KEY => false, 'disk' => $disk]
+                );
+
+                $localFilePath = $file->getRealPath();
+                $metaData = $this->metadataExtractionService->extractMetadata($localFilePath, disk: 'local', originalFileName: $originalName);
+
+                $payload = [
+                    'file_name' => $fileName,
+                    'file_type' => AssetHelper::getFileType($file),
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'extension' => $file->getClientOriginalExtension(),
+                    'path'      => $filePath,
+                    'meta_data' => $metaData,
+                ];
+
+                if ($isOverwrite) {
+                    $existingAsset->update($payload);
+                    $asset = $existingAsset;
+                } else {
+                    $asset = Asset::create($payload);
+                    $assetIds[] = $asset->id;
+                }
+
+                $this->attachAudioCoverArt($asset, $localFilePath, $mimeType, $metaData, $disk);
+
+                $uploadFiles[] = $asset;
             }
 
-            if ($request->has('directory_id')) {
-                $this->mappedWithDirectory($assetIds, $request->get('directory_id'));
-            }
+            $this->mappedWithDirectory($assetIds, $directoryId);
 
             return response()->json([
                 'success' => true,
                 'files'   => $uploadFiles,
-                'message' => count($files) > 1 ? trans('dam::app.admin.dam.asset.datagrid.files-upload-success') : trans('dam::app.admin.dam.asset.datagrid.file-upload-success'),
+                'message' => count($uploadFiles) > 1
+                    ? trans('dam::app.admin.dam.asset.datagrid.files-upload-success')
+                    : trans('dam::app.admin.dam.asset.datagrid.file-upload-success'),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -335,6 +315,34 @@ class AssetController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * For audio assets, extract embedded cover art and attach its storage path
+     * to the asset's meta_data. No-op for non-audio mime types or when no
+     * embedded artwork is found.
+     */
+    private function attachAudioCoverArt(Asset $asset, ?string $localFilePath, ?string $mimeType, array $metaData, string $disk): void
+    {
+        if (! str_starts_with($mimeType ?? '', 'audio/')) {
+            return;
+        }
+
+        if (! $localFilePath || ! file_exists($localFilePath)) {
+            return;
+        }
+
+        $coverData = $this->metadataExtractionService->extractCoverArtData($localFilePath);
+        if (! $coverData) {
+            return;
+        }
+
+        $coverPath = $this->metadataExtractionService->storeCoverArt($coverData, $asset->id, $disk);
+        if (! $coverPath) {
+            return;
+        }
+
+        $asset->update(['meta_data' => array_merge($metaData, ['cover_art_path' => $coverPath])]);
     }
 
     /**
