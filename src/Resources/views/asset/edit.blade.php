@@ -296,12 +296,16 @@
 
             @if($asset->previousAssetId)
                 <button class="secondary-button" title="{{ trans('dam::app.admin.dam.asset.edit.previous') }}"
+                 :disabled="isLocked"
+                 :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
                  @click="goToPreviousAsset('{{ route('admin.dam.assets.edit', $asset->previousAssetId) }}{{ $queryString }}')">
                     <span class="text-2xl">&larr;</span>
                 </button>
             @endif
             @if($asset->nextAssetId)
                 <button class="secondary-button"  title="{{ trans('dam::app.admin.dam.asset.edit.next') }}"
+                    :disabled="isLocked"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
                     @click="goToNextAsset('{{ route('admin.dam.assets.edit', $asset->nextAssetId) }}{{ $queryString }}')">
 
                     <span class="text-2xl">&rarr;</span>
@@ -309,21 +313,30 @@
             @endif
 
             @if (bouncer()->hasPermission('dam.asset.download'))
-                
+
                 @if($asset->extension ==='svg')
-                <button class="secondary-button" @click="svgDownloadModel">
+                <button class="secondary-button"
+                    :disabled="isLocked"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                    @click="svgDownloadModel">
                     <span class="text-xl text-violet-700 icon-dam-download"></span>
-                    <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>    
+                    <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>
                 </button>
                 @elseif ($asset->file_type === 'image')
-                    <button class="secondary-button" @click="customDownloadModel">
+                    <button class="secondary-button"
+                        :disabled="isLocked"
+                        :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                        @click="customDownloadModel">
                         <span class="text-xl text-violet-700 icon-dam-download"></span>
-                        <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>    
+                        <span>@lang('dam::app.admin.dam.asset.edit.button.custom_download')</span>
                     </button>
                 @else
-                    <button class="secondary-button" @click="downloadItem">
+                    <button class="secondary-button"
+                        :disabled="isLocked"
+                        :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                        @click="downloadItem">
                         <span class="text-xl text-violet-700 icon-dam-download"></span>
-                        <span>@lang('dam::app.admin.dam.asset.edit.button.download')</span>    
+                        <span>@lang('dam::app.admin.dam.asset.edit.button.download')</span>
                     </button>
                 @endif
             @endif
@@ -517,6 +530,8 @@
                     const selectedItem = @json($asset);
                     return {
                         selectedItem: selectedItem,
+                        isLocked: false,
+                        onLockChange: null,
                         supportedExtensionTypes: [{
                                 label: "@lang('dam::app.admin.dam.asset.edit.custom-download.extension-types.original')",
                                 value: selectedItem?.extension,
@@ -544,13 +559,24 @@
                         selectedItemHeight: selectedItem?.height ?? 0,
                     };
                 },
+                mounted() {
+                    this.onLockChange = (locked) => { this.isLocked = !!locked; };
+                    this.$emitter.on('dam-asset-action-locked', this.onLockChange);
+                },
+                unmounted() {
+                    if (this.onLockChange) {
+                        this.$emitter.off('dam-asset-action-locked', this.onLockChange);
+                    }
+                },
                 methods: {
 
                     goToPreviousAsset(url) {
+                        if (this.isLocked) return;
                         window.location.href = url;
                     },
 
                     goToNextAsset(url) {
+                        if (this.isLocked) return;
                         window.location.href = url;
                     },
 
@@ -622,8 +648,11 @@
             id="v-rename-asset-template"
         >
             @if (bouncer()->hasPermission('dam.asset.rename'))
-                <button class="secondary-button" @click="renameItem">
-                    <span class="text-xl text-violet-700 icon-dam-rename"></span>    
+                <button class="secondary-button"
+                    :disabled="isLocked"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                    @click="renameItem">
+                    <span class="text-xl text-violet-700 icon-dam-rename"></span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.rename')</span>
                 </button>
             @endif
@@ -702,11 +731,23 @@
                 template: '#v-rename-asset-template',
                 data: function() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isLocked: false,
+                        onLockChange: null,
                     };
+                },
+                mounted() {
+                    this.onLockChange = (locked) => { this.isLocked = !!locked; };
+                    this.$emitter.on('dam-asset-action-locked', this.onLockChange);
+                },
+                unmounted() {
+                    if (this.onLockChange) {
+                        this.$emitter.off('dam-asset-action-locked', this.onLockChange);
+                    }
                 },
                 methods: {
                     renameItem() {
+                        if (this.isLocked) return;
                         this.$refs.assetRenameModal.toggle();
                     },
                     focusNameInput() {
@@ -852,6 +893,7 @@
                     handleFileUpload(formData) {
                         this.isUploading = true;
                         this.abortController = new AbortController();
+                        this.$emitter.emit('dam-asset-action-locked', true);
 
                         this.$axios.post("{{ route('admin.dam.assets.re_upload') }}", formData, {
                             headers: {
@@ -887,6 +929,7 @@
                         }).finally(() => {
                             this.isUploading = false;
                             this.abortController = null;
+                            this.$emitter.emit('dam-asset-action-locked', false);
                         });
                     }
                 }
@@ -899,7 +942,10 @@
             id="v-delete-asset-template"
         >
             @if (bouncer()->hasPermission('dam.asset.delete'))
-                <button class="secondary-button" @click="deleteFile"> 
+                <button class="secondary-button"
+                    :disabled="isLocked"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                    @click="deleteFile">
                     <span class="text-xl text-violet-700 icon-dam-delete"></span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.delete')</span>
                 </button>
@@ -911,11 +957,23 @@
                 template: '#v-delete-asset-template',
                 data() {
                     return {
-                        selectedItem: @json($asset)
+                        selectedItem: @json($asset),
+                        isLocked: false,
+                        onLockChange: null,
                     };
+                },
+                mounted() {
+                    this.onLockChange = (locked) => { this.isLocked = !!locked; };
+                    this.$emitter.on('dam-asset-action-locked', this.onLockChange);
+                },
+                unmounted() {
+                    if (this.onLockChange) {
+                        this.$emitter.off('dam-asset-action-locked', this.onLockChange);
+                    }
                 },
                 methods: {
                     deleteFile() {
+                        if (this.isLocked) return;
                         this.$emitter.emit('open-delete-modal', {
                             agree: () => {
                                 this.$axios.delete(
