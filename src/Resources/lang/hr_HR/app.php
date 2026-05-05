@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Izvor slike nije čitljiv',
                     'failed-to-read'            => 'Nije uspjelo čitanje meta podataka slike :exception',
                     'file-re-upload-success'    => 'Datoteke su uspješno ponovno prenesene.',
+                    'image-processing-failed' => 'Obrada slike nije uspjela: :message',
 
                     'image-editor' => [
                         'title'                      => 'Uređivač slika',

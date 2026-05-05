@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Hindi mabasa ang pinagmulan ng larawan',
                     'failed-to-read'            => 'Nabigong basahin ang metadata ng larawan :exception',
                     'file-re-upload-success'    => 'Matagumpay na Muling Na-upload ang mga File.',
+                    'image-processing-failed' => 'Nabigo ang pagproseso ng imahe: :message',
 
                     'image-editor' => [
                         'title'                      => 'Editor ng Larawan',

@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Kuvan lähdettä ei voi lukea',
                     'failed-to-read'            => 'Kuvan metatietojen lukeminen epäonnistui :exception',
                     'file-re-upload-success'    => 'Tiedostot lähetetty uudelleen onnistuneesti.',
+                    'image-processing-failed' => 'Kuvan käsittely epäonnistui: :message',
 
                     'image-editor' => [
                         'title'                      => 'Kuvaeditori',

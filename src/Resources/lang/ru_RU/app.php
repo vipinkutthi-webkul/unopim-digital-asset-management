@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Источник изображения не читаем',
                     'failed-to-read'            => 'Не удалось прочитать метаданные изображения :exception',
                     'file-re-upload-success'    => 'Файлы успешно загружены повторно.',
+                    'image-processing-failed' => 'Не удалось обработать изображение: :message',
 
                     'image-editor' => [
                         'title'                      => 'Редактор изображений',

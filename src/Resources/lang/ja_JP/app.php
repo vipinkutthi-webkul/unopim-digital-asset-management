@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => '画像ソースは読み取れません',
                     'failed-to-read'            => '画像のメタデータの読み取りに失敗しました :exception',
                     'file-re-upload-success'    => 'ファイルが再アップロードされました。',
+                    'image-processing-failed' => '画像処理に失敗しました: :message',
 
                     'image-editor' => [
                         'title'                      => '画像エディター',

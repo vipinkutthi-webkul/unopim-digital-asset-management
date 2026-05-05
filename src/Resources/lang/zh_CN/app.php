@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => '无法读取图像源',
                     'failed-to-read'            => '无法读取图像元数据 :exception',
                     'file-re-upload-success'    => '文件重新上传成功。',
+                    'image-processing-failed' => '图像处理失败：:message',
 
                     'image-editor' => [
                         'title'                      => '图像编辑器',

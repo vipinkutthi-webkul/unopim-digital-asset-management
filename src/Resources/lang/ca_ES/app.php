@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Font de la imatge no llegible',
                     'failed-to-read'            => 'No s\'han pogut llegir les metadades de la imatge :exception',
                     'file-re-upload-success'    => 'Fitxers tornats a pujar correctament.',
+                    'image-processing-failed' => 'El processament de la imatge ha fallat: :message',
 
                     'image-editor' => [
                         'title'                      => 'Editor d\'imatges',

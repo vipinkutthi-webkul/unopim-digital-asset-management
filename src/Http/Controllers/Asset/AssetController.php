@@ -743,7 +743,7 @@ class AssetController extends Controller
                 return response()->download($tempFilePath, $fileName)->deleteFileAfterSend(true);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Image processing failed: '.$e->getMessage(),
+                    'message' => trans('dam::app.admin.dam.asset.edit.image-processing-failed', ['message' => $e->getMessage()]),
                 ], 500);
             }
         }

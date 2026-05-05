@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => '이미지 소스를 읽을 수 없습니다',
                     'failed-to-read'            => '이미지 메타데이터를 읽지 못했습니다 :exception',
                     'file-re-upload-success'    => '파일이 성공적으로 재업로드되었습니다.',
+                    'image-processing-failed' => '이미지 처리 실패: :message',
 
                     'image-editor' => [
                         'title'                      => '이미지 편집기',

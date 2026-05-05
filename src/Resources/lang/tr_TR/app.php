@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Görüntü kaynağı okunamıyor',
                     'failed-to-read'            => 'Görüntü meta verileri okunamadı :exception',
                     'file-re-upload-success'    => 'Dosyalar başarıyla yeniden yüklendi.',
+                    'image-processing-failed' => 'Görüntü işleme başarısız: :message',
 
                     'image-editor' => [
                         'title'                      => 'Görsel Düzenleyici',

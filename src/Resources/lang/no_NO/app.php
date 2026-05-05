@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Bildekilden kan ikke leses',
                     'failed-to-read'            => 'Kunne ikke lese bildets metadata :exception',
                     'file-re-upload-success'    => 'Filene ble lastet opp på nytt.',
+                    'image-processing-failed' => 'Bildebehandling mislyktes: :message',
 
                     'image-editor' => [
                         'title'                      => 'Bilderedigerer',

@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Sursa imaginii nu poate fi citită',
                     'failed-to-read'            => 'Citirea metadatelor imaginii a eșuat :exception',
                     'file-re-upload-success'    => 'Fișierele au fost reîncărcate cu succes.',
+                    'image-processing-failed' => 'Procesarea imaginii a eșuat: :message',
 
                     'image-editor' => [
                         'title'                      => 'Editor de imagini',

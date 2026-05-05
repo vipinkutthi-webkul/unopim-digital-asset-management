@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Afbeeldingsbron niet leesbaar',
                     'failed-to-read'            => 'Het lezen van de afbeelding is mislukt :exception',
                     'file-re-upload-success'    => 'Bestanden succesvol opnieuw geüpload.',
+                    'image-processing-failed' => 'Afbeeldingsverwerking mislukt: :message',
 
                     'image-editor' => [
                         'title'                      => 'Afbeeldingseditor',

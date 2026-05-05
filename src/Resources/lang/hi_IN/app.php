@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'चित्र स्रोत पढ़ा नहीं जा सका',
                     'failed-to-read'            => 'चित्र मेटाडेटा पढ़ने में विफल :exception',
                     'file-re-upload-success'    => 'फाइलें सफलतापूर्वक फिर से अपलोड की गईं।',
+                    'image-processing-failed' => 'छवि प्रसंस्करण विफल: :message',
 
                     'image-editor' => [
                         'title'                      => 'छवि संपादक',

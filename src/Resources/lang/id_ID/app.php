@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Sumber gambar tidak dapat dibaca',
                     'failed-to-read'            => 'Gagal membaca metadata gambar :exception',
                     'file-re-upload-success'    => 'File berhasil diunggah ulang.',
+                    'image-processing-failed' => 'Pemrosesan gambar gagal: :message',
 
                     'image-editor' => [
                         'title'                      => 'Editor Gambar',

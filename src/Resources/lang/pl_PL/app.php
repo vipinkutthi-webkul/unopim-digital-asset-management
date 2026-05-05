@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Źródło obrazu jest nieczytelne',
                     'failed-to-read'            => 'Nie udało się odczytać metadanych obrazu :exception',
                     'file-re-upload-success'    => 'Pliki zostały pomyślnie przesłane ponownie.',
+                    'image-processing-failed' => 'Przetwarzanie obrazu nie powiodło się: :message',
 
                     'image-editor' => [
                         'title'                      => 'Edytor obrazów',

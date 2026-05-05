@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Không thể đọc nguồn hình ảnh',
                     'failed-to-read'            => 'Không thể đọc siêu dữ liệu hình ảnh :exception',
                     'file-re-upload-success'    => 'Tệp đã được tải lên lại thành công.',
+                    'image-processing-failed' => 'Xử lý hình ảnh thất bại: :message',
 
                     'image-editor' => [
                         'title'                      => 'Trình chỉnh sửa ảnh',

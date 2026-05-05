@@ -257,6 +257,7 @@ return [
                     'image-source-not-readable' => 'Fuente de la imagen no legible',
                     'failed-to-read'            => 'No se pudieron leer los metadatos de la imagen :exception',
                     'file-re-upload-success'    => 'Archivos vueltos a subir exitosamente.',
+                    'image-processing-failed' => 'El procesamiento de la imagen falló: :message',
 
                     'image-editor' => [
                         'title'                      => 'Editor de imágenes',
