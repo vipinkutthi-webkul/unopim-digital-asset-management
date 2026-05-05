@@ -643,7 +643,7 @@
                             <p
                                 class="text-lg text-gray-800 dark:text-white font-bold"
                             >
-                                @lang('Rename')
+                                @lang('dam::app.admin.dam.asset.edit.button.rename')
                             </p>
                         </x-slot>
 
@@ -660,7 +660,7 @@
                             <!-- name -->
                             <x-admin::form.control-group>
                                 <x-admin::form.control-group.label class="required">
-                                    @lang('File Name')
+                                    @lang('dam::app.admin.dam.asset.edit.file-name')
                                 </x-admin::form.control-group.label>
 
                                 <x-admin::form.control-group.control
@@ -670,8 +670,8 @@
                                     :value="old('file_name')"
                                     v-model="selectedItem.file_name"
                                     ref="fileName"
-                                    :label="trans('File Name')"
-                                    :placeholder="trans('File Name')"
+                                    :label="trans('dam::app.admin.dam.asset.edit.file-name')"
+                                    :placeholder="trans('dam::app.admin.dam.asset.edit.file-name')"
                                 />
 
                                 <x-admin::form.control-group.error control-name="file_name" />
@@ -687,7 +687,7 @@
                                     type="submit"
                                     class="primary-button"
                                 >
-                                    @lang('Save')
+                                    @lang('dam::app.admin.dam.asset.edit.save-btn')
                                 </button>
                             </div>
                         </x-slot>
