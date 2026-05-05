@@ -271,7 +271,7 @@ return [
                     'image-source-not-readable' => 'المصدر غير قابل للقراءة',
                     'failed-to-read'            => 'فشل في قراءة بيانات الصورة: :exception',
                     'file-re-upload-success'    => 'تمت إعادة تحميل الملفات بنجاح.',
-                    'image-processing-failed' => 'فشل معالجة الصورة: :message',
+                    'image-processing-failed'   => 'فشل معالجة الصورة: :message',
 
                     'image-editor' => [
                         'title'                      => 'محرر الصور',

@@ -271,7 +271,7 @@ return [
                     'image-source-not-readable' => 'Source de l\'image non lisible',
                     'failed-to-read'            => 'Échec de la lecture des métadonnées de l\'image :exception',
                     'file-re-upload-success'    => 'Fichiers re-téléchargés avec succès.',
-                    'image-processing-failed' => 'Échec du traitement de l\'image : :message',
+                    'image-processing-failed'   => 'Échec du traitement de l\'image : :message',
 
                     'image-editor' => [
                         'title'                      => 'Éditeur d\'images',

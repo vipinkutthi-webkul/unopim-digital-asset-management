@@ -271,7 +271,7 @@ return [
                     'image-source-not-readable' => 'Зураг эх сурвалжийг уншиж чадахгүй',
                     'failed-to-read'            => 'Зурагны мета мэдээллийг уншихад алдаа гарлаа :exception',
                     'file-re-upload-success'    => 'Файлуудыг дахин амжилттай ачаалсан.',
-                    'image-processing-failed' => 'Зураг боловсруулалт амжилтгүй: :message',
+                    'image-processing-failed'   => 'Зураг боловсруулалт амжилтгүй: :message',
 
                     'image-editor' => [
                         'title'                      => 'Зургийн засварлагч',

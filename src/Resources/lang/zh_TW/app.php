@@ -271,7 +271,7 @@ return [
                     'image-source-not-readable' => '無法讀取影像來源',
                     'failed-to-read'            => '讀取影像中繼資料失敗 :exception',
                     'file-re-upload-success'    => '檔案重新上傳成功。',
-                    'image-processing-failed' => '圖像處理失敗：:message',
+                    'image-processing-failed'   => '圖像處理失敗：:message',
 
                     'image-editor' => [
                         'title'                      => '圖像編輯器',

@@ -271,7 +271,7 @@ return [
                     'image-source-not-readable' => 'Image source not readable',
                     'failed-to-read'            => 'Failed to read image metadata :exception',
                     'file-re-upload-success'    => 'Files re-uploaded successfully',
-                    'image-processing-failed' => 'Image processing failed: :message',
+                    'image-processing-failed'   => 'Image processing failed: :message',
 
                     'image-editor' => [
                         'title'                      => 'Image Editor',
