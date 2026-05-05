@@ -152,8 +152,8 @@
 
                 @if (bouncer()->hasPermission('dam.asset.view'))
                     <div
-                        :class="{ 'pointer-events-none opacity-60': treeBusy }"
-                        :aria-busy="treeBusy"
+                        :class="{ 'pointer-events-none opacity-60': isUploading || treeBusy }"
+                        :aria-busy="isUploading || treeBusy"
                     >
                         <x-dam::datagrid.dam
                             :src="route('admin.dam.assets.index')"
