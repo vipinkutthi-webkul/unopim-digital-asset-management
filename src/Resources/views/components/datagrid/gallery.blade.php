@@ -86,23 +86,32 @@
                                 <!-- ########### -->
                                 <div class="flex gap-2 items-center mt-2.5">
                                     <!-- Mass Actions -->
-                                    <p v-if="$parent.available.massActions.length">
-                                        <label :for="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`">
-                                            <input
-                                                type="checkbox"
-                                                class="peer hidden"
-                                                :name="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`"
-                                                :value="record[$parent.available.meta.primary_column]"
-                                                :id="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`"
-                                                v-model="$parent.applied.massActions.indices"
-                                                @change="$parent.setCurrentSelectionMode"
-                                            >
+                                    <label
+                                        v-if="$parent.available.massActions.length"
+                                        :for="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`"
+                                        class="flex gap-2 items-center cursor-pointer overflow-hidden"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="peer hidden"
+                                            :name="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`"
+                                            :value="record[$parent.available.meta.primary_column]"
+                                            :id="`mass_action_select_record_${record[$parent.available.meta.primary_column]}`"
+                                            v-model="$parent.applied.massActions.indices"
+                                            @change="$parent.setCurrentSelectionMode"
+                                        >
 
-                                            <span class="icon-checkbox-normal peer-checked:icon-checkbox-check peer-checked:text-violet-700 cursor-pointer rounded-md text-2xl">
-                                            </span>
-                                        </label>
-                                    </p>
-                                    <h2 class="text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-800 dark:hover:text-white overflow-hidden" v-text="record.file_name"></h2>
+                                        <span class="icon-checkbox-normal peer-checked:icon-checkbox-check peer-checked:text-violet-700 rounded-md text-2xl shrink-0">
+                                        </span>
+
+                                        <h2 class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white overflow-hidden" v-text="record.file_name"></h2>
+                                    </label>
+
+                                    <h2
+                                        v-else
+                                        class="text-sm text-gray-600 dark:text-gray-300 overflow-hidden"
+                                        v-text="record.file_name"
+                                    ></h2>
                                 </div>
                             </div>
                         </template>
