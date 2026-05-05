@@ -46,6 +46,11 @@ return [
                     'processing' => '正在處理 :count 個資產…',
                 ],
 
+                'move' => [
+                    'directory' => '正在移動目錄 ":name"…',
+                    'asset'     => '正在移動資產 ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => '目錄',
                     'create'       => [

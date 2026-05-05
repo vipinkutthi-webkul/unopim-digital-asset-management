@@ -46,6 +46,11 @@ return [
                     'processing' => 'Verarbeite :count Assets…',
                 ],
 
+                'move' => [
+                    'directory' => 'Verschiebe Verzeichnis ":name"…',
+                    'asset'     => 'Verschiebe Asset ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Verzeichnis',
                     'create'       => [

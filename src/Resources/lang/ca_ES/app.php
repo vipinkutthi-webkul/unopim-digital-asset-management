@@ -46,6 +46,11 @@ return [
                     'processing' => 'S\'estan processant :count actius…',
                 ],
 
+                'move' => [
+                    'directory' => 'Movent el directori ":name"…',
+                    'asset'     => 'Movent l\'actiu ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directori',
                     'create'       => [

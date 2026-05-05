@@ -46,6 +46,11 @@ return [
                     'processing' => 'Pinoproseso ang :count mga asset…',
                 ],
 
+                'move' => [
+                    'directory' => 'Inilipat ang direktoryo na ":name"…',
+                    'asset'     => 'Inilipat ang asset na ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktoryo',
                     'create'       => [

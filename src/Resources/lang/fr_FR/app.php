@@ -46,6 +46,11 @@ return [
                     'processing' => 'Traitement de :count ressources…',
                 ],
 
+                'move' => [
+                    'directory' => 'Déplacement du répertoire ":name"…',
+                    'asset'     => 'Déplacement de la ressource ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Répertoire',
                     'create'       => [

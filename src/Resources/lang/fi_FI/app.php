@@ -46,6 +46,11 @@ return [
                     'processing' => 'Käsitellään :count kohdetta…',
                 ],
 
+                'move' => [
+                    'directory' => 'Siirretään hakemistoa ":name"…',
+                    'asset'     => 'Siirretään kohdetta ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Hakemisto',
                     'create'       => [

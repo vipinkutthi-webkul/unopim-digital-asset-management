@@ -46,6 +46,11 @@ return [
                     'processing' => 'Memproses :count aset…',
                 ],
 
+                'move' => [
+                    'directory' => 'Memindahkan direktori ":name"…',
+                    'asset'     => 'Memindahkan aset ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktori',
                     'create'       => [

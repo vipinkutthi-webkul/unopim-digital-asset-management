@@ -46,6 +46,11 @@ return [
                     'processing' => ':count assets verwerken…',
                 ],
 
+                'move' => [
+                    'directory' => 'Map ":name" wordt verplaatst…',
+                    'asset'     => 'Asset ":name" wordt verplaatst…',
+                ],
+
                 'directory' => [
                     'title'        => 'Map',
                     'create'       => [

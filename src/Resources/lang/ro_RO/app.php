@@ -46,6 +46,11 @@ return [
                     'processing' => 'Se procesează :count active…',
                 ],
 
+                'move' => [
+                    'directory' => 'Se mută directorul ":name"…',
+                    'asset'     => 'Se mută activul ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Director',
                     'create'       => [

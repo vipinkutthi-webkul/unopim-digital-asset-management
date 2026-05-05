@@ -46,6 +46,11 @@ return [
                     'processing' => 'Processando :count ativos…',
                 ],
 
+                'move' => [
+                    'directory' => 'Movendo o diretório ":name"…',
+                    'asset'     => 'Movendo o ativo ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Diretório',
                     'create'       => [

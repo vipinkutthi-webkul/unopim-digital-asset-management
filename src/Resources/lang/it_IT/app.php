@@ -46,6 +46,11 @@ return [
                     'processing' => 'Elaborazione di :count risorse…',
                 ],
 
+                'move' => [
+                    'directory' => 'Spostamento della directory ":name" in corso…',
+                    'asset'     => 'Spostamento della risorsa ":name" in corso…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directory',
                     'create'       => [

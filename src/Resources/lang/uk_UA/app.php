@@ -46,6 +46,11 @@ return [
                     'processing' => 'Обробка :count активів…',
                 ],
 
+                'move' => [
+                    'directory' => 'Переміщення каталогу ":name"…',
+                    'asset'     => 'Переміщення активу ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Каталог',
                     'create'       => [

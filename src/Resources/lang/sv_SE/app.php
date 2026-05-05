@@ -46,6 +46,11 @@ return [
                     'processing' => 'Bearbetar :count tillgångar…',
                 ],
 
+                'move' => [
+                    'directory' => 'Flyttar katalog ":name"…',
+                    'asset'     => 'Flyttar tillgång ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Katalog',
                     'create'       => [

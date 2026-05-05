@@ -46,6 +46,11 @@ return [
                     'processing' => ':count varlık işleniyor…',
                 ],
 
+                'move' => [
+                    'directory' => '":name" dizini taşınıyor…',
+                    'asset'     => '":name" varlığı taşınıyor…',
+                ],
+
                 'directory' => [
                     'title'        => 'Dizin',
                     'create'       => [

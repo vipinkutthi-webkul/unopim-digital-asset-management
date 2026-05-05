@@ -46,6 +46,11 @@ return [
                     'processing' => 'Đang xử lý :count tài sản…',
                 ],
 
+                'move' => [
+                    'directory' => 'Đang di chuyển thư mục ":name"…',
+                    'asset'     => 'Đang di chuyển tài sản ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Thư mục',
                     'create'       => [

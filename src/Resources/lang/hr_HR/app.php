@@ -46,6 +46,11 @@ return [
                     'processing' => 'Obrada :count stavki…',
                 ],
 
+                'move' => [
+                    'directory' => 'Premještanje direktorija ":name"…',
+                    'asset'     => 'Premještanje stavke ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktorij',
                     'create'       => [

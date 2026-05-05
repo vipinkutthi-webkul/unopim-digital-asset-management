@@ -46,6 +46,11 @@ return [
                     'processing' => 'Обработка :count объектов…',
                 ],
 
+                'move' => [
+                    'directory' => 'Перемещение каталога ":name"…',
+                    'asset'     => 'Перемещение объекта ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Директория',
                     'create'       => [

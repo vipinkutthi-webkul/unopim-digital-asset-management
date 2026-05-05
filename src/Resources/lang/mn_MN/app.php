@@ -46,6 +46,11 @@ return [
                     'processing' => ':count хөрөнгө боловсруулж байна…',
                 ],
 
+                'move' => [
+                    'directory' => 'Лавлах ":name"-ыг шилжүүлж байна…',
+                    'asset'     => 'Хөрөнгө ":name"-ыг шилжүүлж байна…',
+                ],
+
                 'directory' => [
                     'title'        => 'Директор',
                     'create'       => [

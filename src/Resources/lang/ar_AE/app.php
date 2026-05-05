@@ -46,6 +46,11 @@ return [
                     'processing' => 'جاري معالجة :count عناصر…',
                 ],
 
+                'move' => [
+                    'directory' => 'جاري نقل المجلد ":name"…',
+                    'asset'     => 'جاري نقل العنصر ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'الدليل',
                     'create'       => [

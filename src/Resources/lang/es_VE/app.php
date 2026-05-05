@@ -46,6 +46,11 @@ return [
                     'processing' => 'Procesando :count activos…',
                 ],
 
+                'move' => [
+                    'directory' => 'Moviendo el directorio ":name"…',
+                    'asset'     => 'Moviendo el activo ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directorio',
                     'create'       => [

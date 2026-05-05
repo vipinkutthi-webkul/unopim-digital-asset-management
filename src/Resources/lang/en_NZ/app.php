@@ -46,6 +46,11 @@ return [
                     'processing' => 'Processing :count assets…',
                 ],
 
+                'move' => [
+                    'directory' => 'Moving directory ":name"…',
+                    'asset'     => 'Moving asset ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directory',
                     'create'       => [

@@ -46,6 +46,11 @@ return [
                     'processing' => '正在处理 :count 个资产…',
                 ],
 
+                'move' => [
+                    'directory' => '正在移动目录 ":name"…',
+                    'asset'     => '正在移动资产 ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => '目录',
                     'create'       => [

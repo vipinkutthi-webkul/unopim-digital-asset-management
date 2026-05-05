@@ -46,6 +46,11 @@ return [
                     'processing' => 'Behandler :count ressurser…',
                 ],
 
+                'move' => [
+                    'directory' => 'Flytter mappe ":name"…',
+                    'asset'     => 'Flytter ressurs ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Mappe',
                     'create'       => [

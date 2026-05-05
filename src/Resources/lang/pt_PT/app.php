@@ -46,6 +46,11 @@ return [
                     'processing' => 'A processar :count recursos…',
                 ],
 
+                'move' => [
+                    'directory' => 'A mover o diretório ":name"…',
+                    'asset'     => 'A mover o recurso ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Diretório',
                     'create'       => [

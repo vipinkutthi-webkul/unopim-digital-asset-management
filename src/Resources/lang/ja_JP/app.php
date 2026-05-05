@@ -46,6 +46,11 @@ return [
                     'processing' => ':count 件のアセットを処理中…',
                 ],
 
+                'move' => [
+                    'directory' => 'ディレクトリ「:name」を移動中…',
+                    'asset'     => 'アセット「:name」を移動中…',
+                ],
+
                 'directory' => [
                     'title'        => 'ディレクトリ',
                     'create'       => [

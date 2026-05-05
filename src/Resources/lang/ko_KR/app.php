@@ -46,6 +46,11 @@ return [
                     'processing' => ':count개 자산 처리 중…',
                 ],
 
+                'move' => [
+                    'directory' => '디렉터리 ":name" 이동 중…',
+                    'asset'     => '자산 ":name" 이동 중…',
+                ],
+
                 'directory' => [
                     'title'        => '디렉터리',
                     'create'       => [

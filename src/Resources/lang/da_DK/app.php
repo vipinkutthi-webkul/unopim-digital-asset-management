@@ -46,6 +46,11 @@ return [
                     'processing' => 'Behandler :count aktiver…',
                 ],
 
+                'move' => [
+                    'directory' => 'Flytter mappen ":name"…',
+                    'asset'     => 'Flytter aktivet ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Mappe',
                     'create'       => [

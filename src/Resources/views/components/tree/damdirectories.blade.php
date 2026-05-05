@@ -470,11 +470,30 @@
     });
 </script>
 <script type="text/x-template" id="v-tree-view-template">
-    <div 
-            class="relative" 
+    <div
+            class="relative"
             ref="treeContainer"
             v-if="formattedItems"
         >
+            <!-- Move-in-flight overlay (directory or asset drag-move) -->
+            <div
+                v-if="moveStatusLabel"
+                class="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+                style="z-index: 99998;"
+                role="status"
+                aria-live="polite"
+            >
+                <div
+                    class="flex flex-col items-center gap-4 bg-white dark:bg-cherry-800 rounded-xl px-12 py-8 shadow-2xl border border-gray-200 dark:border-cherry-600 w-96 max-w-[90vw] relative"
+                    style="min-width: 360px; z-index: 99999;"
+                >
+                    <svg class="animate-spin h-12 w-12 text-violet-600 dark:text-violet-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    <span class="text-base font-semibold text-gray-900 dark:text-white text-center break-words" v-text="moveStatusLabel"></span>
+                </div>
+            </div>
             <div
                 class="tree-container text-nowrap overflow-hidden text-ellipsis"
                 :class="treeBusy ? 'cursor-not-allowed' : ''"
@@ -887,6 +906,7 @@
                 deletingDirectoryId: null,
                 copyingDirectoryId: null,
                 gridBusy: false,
+                moveStatusLabel: '',
             };
         },
 
@@ -1343,6 +1363,12 @@
                 this.isLoading = true;
                 this.actionStatus = 'pending';
 
+                const itemName = type == 'directory' ? (item.name ?? '') : (item.file_name ?? '');
+                const labelTemplate = type == 'directory'
+                    ? `@lang('dam::app.admin.dam.index.move.directory')`
+                    : `@lang('dam::app.admin.dam.index.move.asset')`;
+                this.moveStatusLabel = labelTemplate.replace(':name', itemName);
+
                 if (type == 'directory') {
                     this.movingDirectoryId = item.id;
                 }
@@ -1364,6 +1390,7 @@
                         } else {
                             this.isLoading = false;
                             this.actionStatus = null;
+                            this.moveStatusLabel = '';
                             // Asset drag-move — refresh source and target asset
                             // caches; tree structure unchanged so no need to
                             // reload the directory list.
@@ -1374,6 +1401,7 @@
                         this.isLoading = false;
                         this.actionStatus = null;
                         this.movingDirectoryId = null;
+                        this.moveStatusLabel = '';
                         this.$emitter.emit('add-flash', {
                             type: 'error',
                             message: error.response.data.message
@@ -1547,6 +1575,7 @@
 
                         if (action == 'move_directory_structure') {
                             this.movingDirectoryId = null;
+                            this.moveStatusLabel = '';
                         }
 
                         if (action == 'delete_directory') {
@@ -1599,6 +1628,7 @@
                             this.isLoading = false;
                             if (action == 'move_directory_structure') {
                                 this.movingDirectoryId = null;
+                                this.moveStatusLabel = '';
                             }
 
                             if (action == 'delete_directory') {
@@ -1620,6 +1650,7 @@
                         this.isLoading = false;
                         if (action == 'move_directory_structure') {
                             this.movingDirectoryId = null;
+                            this.moveStatusLabel = '';
                         }
 
                         if (action == 'delete_directory') {

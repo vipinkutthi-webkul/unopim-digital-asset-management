@@ -46,6 +46,11 @@ return [
                     'processing' => 'Przetwarzanie :count zasobów…',
                 ],
 
+                'move' => [
+                    'directory' => 'Przenoszenie katalogu ":name"…',
+                    'asset'     => 'Przenoszenie zasobu ":name"…',
+                ],
+
                 'directory' => [
                     'title'        => 'Katalog',
                     'create'       => [
