@@ -41,6 +41,11 @@ return [
                     'size'           => 'Laki',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Tinatanggal ang :count mga asset…',
+                    'processing' => 'Pinoproseso ang :count mga asset…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktoryo',
                     'create'       => [

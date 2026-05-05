@@ -41,6 +41,11 @@ return [
                     'size'           => 'Rozmiar',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Usuwanie :count zasobów…',
+                    'processing' => 'Przetwarzanie :count zasobów…',
+                ],
+
                 'directory' => [
                     'title'        => 'Katalog',
                     'create'       => [

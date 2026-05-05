@@ -41,6 +41,11 @@ return [
                     'size'           => 'Tamaño',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Eliminando :count activos…',
+                    'processing' => 'Procesando :count activos…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directorio',
                     'create'       => [

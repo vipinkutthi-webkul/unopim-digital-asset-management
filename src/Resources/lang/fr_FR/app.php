@@ -41,6 +41,11 @@ return [
                     'size'           => 'Taille',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Suppression de :count ressources…',
+                    'processing' => 'Traitement de :count ressources…',
+                ],
+
                 'directory' => [
                     'title'        => 'Répertoire',
                     'create'       => [

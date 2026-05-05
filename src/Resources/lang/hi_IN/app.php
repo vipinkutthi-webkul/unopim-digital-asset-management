@@ -41,6 +41,11 @@ return [
                     'size'           => 'आकार',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count एसेट हटाए जा रहे हैं…',
+                    'processing' => ':count एसेट प्रोसेस हो रहे हैं…',
+                ],
+
                 'directory' => [
                     'title'        => 'निर्देशिका',
                     'create'       => [

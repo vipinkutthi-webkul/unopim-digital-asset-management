@@ -41,6 +41,11 @@ return [
                     'size'           => 'Size',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Deleting :count assets…',
+                    'processing' => 'Processing :count assets…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directory',
                     'create'       => [

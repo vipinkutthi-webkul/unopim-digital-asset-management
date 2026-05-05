@@ -41,6 +41,11 @@ return [
                     'size'           => '크기',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count개 자산 삭제 중…',
+                    'processing' => ':count개 자산 처리 중…',
+                ],
+
                 'directory' => [
                     'title'        => '디렉터리',
                     'create'       => [

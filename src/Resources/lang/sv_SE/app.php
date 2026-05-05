@@ -41,6 +41,11 @@ return [
                     'size'           => 'Storlek',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Tar bort :count tillgångar…',
+                    'processing' => 'Bearbetar :count tillgångar…',
+                ],
+
                 'directory' => [
                     'title'        => 'Katalog',
                     'create'       => [

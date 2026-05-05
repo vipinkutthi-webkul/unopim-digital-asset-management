@@ -41,6 +41,11 @@ return [
                     'size'           => 'Koko',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Poistetaan :count kohdetta…',
+                    'processing' => 'Käsitellään :count kohdetta…',
+                ],
+
                 'directory' => [
                     'title'        => 'Hakemisto',
                     'create'       => [

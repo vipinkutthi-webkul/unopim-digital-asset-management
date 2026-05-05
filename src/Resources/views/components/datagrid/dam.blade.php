@@ -11,7 +11,30 @@
         type="text/x-template"
         id="v-datagrid-template"
     >
-        <div>
+        <div
+            :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': gridLocked }"
+            :aria-busy="gridLocked"
+        >
+            <!-- Action-in-flight overlay (mass delete / mass action) -->
+            <div
+                v-if="actionInFlight"
+                class="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+                style="z-index: 99998;"
+                role="status"
+                aria-live="polite"
+            >
+                <div
+                    class="flex flex-col items-center gap-4 bg-white dark:bg-cherry-800 rounded-xl px-12 py-8 shadow-2xl border border-gray-200 dark:border-cherry-600 w-96 max-w-[90vw] relative"
+                    style="min-width: 360px; z-index: 99999;"
+                >
+                    <svg class="animate-spin h-12 w-12 text-violet-600 dark:text-violet-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    <span class="text-base font-semibold text-gray-900 dark:text-white text-center" v-text="actionStatusLabel"></span>
+                </div>
+            </div>
+
             <x-dam::datagrid.toolbar />
 
             <div class="flex mt-4">
@@ -64,6 +87,8 @@
                 return {
                     isLoading: false,
                     actionInFlight: false,
+                    actionStatusLabel: '',
+                    treeBusy: false,
 
                     available: {
                         id: null,
@@ -124,6 +149,13 @@
                 gridBusy() {
                     return !! this.actionInFlight;
                 },
+                // Visual lock for the grid surface — true while this side is
+                // mutating OR the tree side is mid-mutation. Keeps grid UI
+                // non-interactive during in-flight mass-delete/mass-action,
+                // matching the tree's own lockout.
+                gridLocked() {
+                    return this.actionInFlight || this.treeBusy;
+                },
             },
 
             watch: {
@@ -150,6 +182,10 @@
 
                     this.get();
                 })
+
+                this.$emitter.on('dam:tree-busy', (busy) => {
+                    this.treeBusy = !! busy;
+                });
 
                 this.boot();
             },
@@ -677,13 +713,27 @@
                     const method = action.method.toLowerCase();
                     const actionType = action?.options?.actionType?.toLowerCase() ?? '';
 
+                    const selectedCount = this.applied.massActions.indices.length;
+                    const startStatus = (label) => {
+                        this.actionStatusLabel = label.replace(':count', selectedCount);
+                        this.actionInFlight = true;
+                    };
+                    const stopStatus = () => {
+                        this.actionInFlight = false;
+                        this.actionStatusLabel = '';
+                    };
+
                     this.$emitter.emit('delete' === actionType ? 'open-delete-modal': 'open-confirm-modal', {
                         agree: () => {
+                            const statusLabel = 'delete' === actionType
+                                ? `@lang('dam::app.admin.dam.index.mass-action.deleting')`
+                                : `@lang('dam::app.admin.dam.index.mass-action.processing')`;
+
                             switch (method) {
                                 case 'post':
                                 case 'put':
                                 case 'patch':
-                                    this.actionInFlight = true;
+                                    startStatus(statusLabel);
                                     this.$axios[method](action.url, {
                                             indices: this.applied.massActions.indices,
                                             value: this.applied.massActions.value,
@@ -705,13 +755,13 @@
                                             });
                                         })
                                         .finally(() => {
-                                            this.actionInFlight = false;
+                                            stopStatus();
                                         });
 
                                     break;
 
                                 case 'delete':
-                                    this.actionInFlight = true;
+                                    startStatus(statusLabel);
                                     this.$axios[method](action.url, {
                                             indices: this.applied.massActions.indices
                                         })
@@ -730,7 +780,7 @@
                                             });
                                         })
                                         .finally(() => {
-                                            this.actionInFlight = false;
+                                            stopStatus();
                                         });
 
                                     break;

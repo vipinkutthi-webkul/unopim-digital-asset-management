@@ -41,6 +41,11 @@ return [
                     'size'           => 'サイズ',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count 件のアセットを削除中…',
+                    'processing' => ':count 件のアセットを処理中…',
+                ],
+
                 'directory' => [
                     'title'        => 'ディレクトリ',
                     'create'       => [

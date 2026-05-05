@@ -41,6 +41,11 @@ return [
                     'size'           => 'Размер',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Удаление :count объектов…',
+                    'processing' => 'Обработка :count объектов…',
+                ],
+
                 'directory' => [
                     'title'        => 'Директория',
                     'create'       => [

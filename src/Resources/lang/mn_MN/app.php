@@ -41,6 +41,11 @@ return [
                     'size'           => 'Хэмжээ',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count хөрөнгө устгаж байна…',
+                    'processing' => ':count хөрөнгө боловсруулж байна…',
+                ],
+
                 'directory' => [
                     'title'        => 'Директор',
                     'create'       => [

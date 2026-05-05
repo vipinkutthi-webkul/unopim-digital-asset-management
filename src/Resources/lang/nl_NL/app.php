@@ -41,6 +41,11 @@ return [
                     'size'           => 'Grootte',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count assets verwijderen…',
+                    'processing' => ':count assets verwerken…',
+                ],
+
                 'directory' => [
                     'title'        => 'Map',
                     'create'       => [

@@ -41,6 +41,11 @@ return [
                     'size'           => 'Größe',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Lösche :count Assets…',
+                    'processing' => 'Verarbeite :count Assets…',
+                ],
+
                 'directory' => [
                     'title'        => 'Verzeichnis',
                     'create'       => [

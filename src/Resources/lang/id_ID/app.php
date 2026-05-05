@@ -41,6 +41,11 @@ return [
                     'size'           => 'Ukuran',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Menghapus :count aset…',
+                    'processing' => 'Memproses :count aset…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktori',
                     'create'       => [

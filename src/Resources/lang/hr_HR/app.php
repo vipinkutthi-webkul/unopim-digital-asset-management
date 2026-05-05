@@ -41,6 +41,11 @@ return [
                     'size'           => 'Veličina',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Brisanje :count stavki…',
+                    'processing' => 'Obrada :count stavki…',
+                ],
+
                 'directory' => [
                     'title'        => 'Direktorij',
                     'create'       => [

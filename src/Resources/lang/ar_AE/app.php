@@ -41,6 +41,11 @@ return [
                     'size'           => 'الحجم',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'جاري حذف :count عناصر…',
+                    'processing' => 'جاري معالجة :count عناصر…',
+                ],
+
                 'directory' => [
                     'title'        => 'الدليل',
                     'create'       => [

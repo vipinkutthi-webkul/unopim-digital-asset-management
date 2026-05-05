@@ -41,6 +41,11 @@ return [
                     'size'           => 'Mida',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'S\'estan eliminant :count actius…',
+                    'processing' => 'S\'estan processant :count actius…',
+                ],
+
                 'directory' => [
                     'title'        => 'Directori',
                     'create'       => [

@@ -41,6 +41,11 @@ return [
                     'size'           => 'Boyut',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => ':count varlık siliniyor…',
+                    'processing' => ':count varlık işleniyor…',
+                ],
+
                 'directory' => [
                     'title'        => 'Dizin',
                     'create'       => [

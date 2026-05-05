@@ -41,6 +41,11 @@ return [
                     'size'           => 'Kích thước',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Đang xóa :count tài sản…',
+                    'processing' => 'Đang xử lý :count tài sản…',
+                ],
+
                 'directory' => [
                     'title'        => 'Thư mục',
                     'create'       => [

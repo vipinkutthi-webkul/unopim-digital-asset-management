@@ -41,6 +41,11 @@ return [
                     'size'           => 'Størrelse',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Sletter :count ressurser…',
+                    'processing' => 'Behandler :count ressurser…',
+                ],
+
                 'directory' => [
                     'title'        => 'Mappe',
                     'create'       => [

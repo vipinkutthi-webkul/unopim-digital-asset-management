@@ -41,6 +41,11 @@ return [
                     'size'           => 'Розмір',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Видалення :count активів…',
+                    'processing' => 'Обробка :count активів…',
+                ],
+
                 'directory' => [
                     'title'        => 'Каталог',
                     'create'       => [

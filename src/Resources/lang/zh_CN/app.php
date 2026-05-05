@@ -41,6 +41,11 @@ return [
                     'size'           => '大小',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => '正在删除 :count 个资产…',
+                    'processing' => '正在处理 :count 个资产…',
+                ],
+
                 'directory' => [
                     'title'        => '目录',
                     'create'       => [

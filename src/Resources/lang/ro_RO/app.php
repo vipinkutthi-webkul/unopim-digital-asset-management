@@ -41,6 +41,11 @@ return [
                     'size'           => 'Dimensiune',
                 ],
 
+                'mass-action' => [
+                    'deleting'   => 'Se șterg :count active…',
+                    'processing' => 'Se procesează :count active…',
+                ],
+
                 'directory' => [
                     'title'        => 'Director',
                     'create'       => [
