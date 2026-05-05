@@ -58,7 +58,7 @@ class Asset extends Model implements AssetContract, HistoryAuditable
     {
         return $this->hasMany(AssetComments::class, 'dam_asset_id')
             ->whereNull('parent_id')
-            ->with(['children']);
+            ->with(['admin', 'children.admin']);
     }
 
     public function resources()
