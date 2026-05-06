@@ -1,4 +1,7 @@
-<v-tree-view>
+<v-tree-view
+    :acl-bypass="{{ dam_acl_bypass() ? 'true' : 'false' }}"
+    :accessible-ids='@json(dam_accessible_dir_ids())'
+>
     <x-admin::shimmer.tree />
 </v-tree-view>
 
@@ -584,10 +587,10 @@
             >
                 <div>
                     @if (bouncer()->hasPermission('dam.asset.upload'))
-                     <div 
-                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300" 
+                     <div
+                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300"
                         @click="uploadFile"
-                        v-if="requestType != 'asset'"
+                        v-if="requestType != 'asset' && canAccessSelected()"
                     >
                         <i class="icon-dam-upload text-sm text-zinc-600 dark:text-white"></i>
                         <input 
@@ -603,10 +606,10 @@
                     @endif
 
                     @if (bouncer()->hasPermission('dam.directory.store'))
-                        <div 
-                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 !leading-normal dark:text-slate-300" 
+                        <div
+                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 !leading-normal dark:text-slate-300"
                             @click="createDirectory"
-                            v-if="requestType != 'asset'"
+                            v-if="requestType != 'asset' && canAccessSelected()"
                         >
                             <i class="icon-dam-add-folder text-sm text-zinc-600 dark:text-white"></i>
                             <span class="text-sm text-zinc-600 dark:text-white"> @lang('dam::app.admin.dam.index.directory.actions.add-directory') </span>
@@ -627,10 +630,10 @@
                     </div> -->
 
                     @if (bouncer()->hasPermission('dam.directory.rename'))
-                    <div 
-                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300" 
+                    <div
+                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300"
                         @click="renameItem"
-                        v-if="requestType == 'directory'"
+                        v-if="requestType == 'directory' && canAccessSelected()"
                     >
                         <i class="icon-dam-rename"></i>
                         <span class="text-sm text-zinc-600 dark:text-white">@lang('dam::app.admin.dam.index.directory.actions.rename')</span>
@@ -649,10 +652,10 @@
                     @endif
 
                     @if (bouncer()->hasPermission('dam.directory.destroy'))
-                    <div 
-                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300" 
+                    <div
+                        class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300"
                         @click="deleteItem"
-                        v-if="requestType == 'directory'"
+                        v-if="requestType == 'directory' && canAccessSelected()"
                     >
                         <i class="icon-dam-delete"></i>
                         <span class="text-sm text-zinc-600 dark:text-white">@lang('dam::app.admin.dam.index.directory.actions.delete')</span>
@@ -671,10 +674,10 @@
                     @endif
 
                     @if (bouncer()->hasPermission('dam.directory.copy_structure'))
-                        <div 
-                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300" 
+                        <div
+                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300"
                             @click="copyDirectory"
-                            v-if="requestType != 'asset'"
+                            v-if="requestType != 'asset' && canAccessSelected()"
                         >
                             <i class="icon-dam-directory"></i>
                             <span class="text-sm text-zinc-600 dark:text-white text-nowrap">@lang('dam::app.admin.dam.index.directory.actions.copy-directory-structured')</span>
@@ -682,10 +685,10 @@
                     @endif
 
                     @if (bouncer()->hasPermission('dam.directory.download_zip'))
-                        <div 
-                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300" 
+                        <div
+                            class="flex items-center justify-start rounded-md p-1.5 gap-2 cursor-pointer text-sm text-zinc-600 dark:text-white !leading-normal dark:text-slate-300"
                             @click="downloadItem('directory')"
-                            v-if="requestType != 'asset'"
+                            v-if="requestType != 'asset' && canAccessSelected()"
                         >
                             <i class="icon-dam-zip"></i>
                             <span class="text-sm text-zinc-600  dark:text-white text-nowrap">@lang('dam::app.admin.dam.index.directory.actions.download-zip')</span>
@@ -880,7 +883,20 @@
 <script type="module">
     app.component('v-tree-view', {
         template: '#v-tree-view-template',
-        props: ['src'],
+        props: {
+            src: {
+                type: String,
+                default: null,
+            },
+            aclBypass: {
+                type: Boolean,
+                default: false,
+            },
+            accessibleIds: {
+                type: Array,
+                default: () => [],
+            },
+        },
         data() {
             return {
                 formattedItems: null,
@@ -960,6 +976,17 @@
         },
 
         methods: {
+            // Whether the currently right-clicked dir is directly granted to
+            // the admin's role. Bypass roles (all/anonymous/API) always pass.
+            // Used to hide upload/create/rename/delete/copy/zip context-menu
+            // entries on ancestors that are tree-visible only.
+            canAccessSelected() {
+                if (this.aclBypass) return true;
+                if (! this.selectedItem || this.selectedItem.id == null) return false;
+
+                return this.accessibleIds.map(Number).includes(Number(this.selectedItem.id));
+            },
+
             focusNameInput() {
                 this.$nextTick(() => {
                     if (this.$refs.nameInput) {

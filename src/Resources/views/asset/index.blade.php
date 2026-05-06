@@ -26,12 +26,23 @@
                             
                                 {!! view_render_event('dam.admin.main.form.directory.before') !!}
                                 <div class="flex flex-col gap-2">
-                                    <p class="text-xl text-zinc-800 dark:text-slate-50 font-bold !leading-normal">
-                                        @lang('dam::app.admin.dam.index.title')
-                                    </p>
+                                    <div class="flex justify-between items-center gap-2">
+                                        <p class="text-xl text-zinc-800 dark:text-slate-50 font-bold !leading-normal">
+                                            @lang('dam::app.admin.dam.index.title')
+                                        </p>
+                                        @if (bouncer()->hasPermission('dam.directory_permissions'))
+                                            <a
+                                                href="{{ route('admin.dam.directory_permissions.index') }}"
+                                                class="text-sm text-violet-700 dark:text-violet-400 hover:underline whitespace-nowrap !leading-normal"
+                                                title="@lang('dam::app.admin.permissions.title')"
+                                            >
+                                                @lang('dam::app.admin.permissions.title')
+                                            </a>
+                                        @endif
+                                    </div>
                                     <p class="text-sm text-zinc-600 !leading-normal dark:text-slate-300">
                                         @lang('dam::app.admin.dam.index.description')
-                                    </p>    
+                                    </p>
                                 </div>
 
                                 <div class="dark:bg-cherry-700 border-b dark:border-cherry-800"></div>
@@ -50,7 +61,10 @@
                         <!-- right sub-component -->
                         <div class="flex flex-col gap-2 flex-1 max-xl:flex-auto p-4 bg-white dark:bg-cherry-900 rounded-lg box-shadow">
                             {!! view_render_event('dam.admin.main.form.grid.before') !!}
-                            <v-dam-upload></v-dam-upload> 
+                            <v-dam-upload
+                        :acl-bypass="{{ dam_acl_bypass() ? 'true' : 'false' }}"
+                        :accessible-ids='@json(dam_accessible_dir_ids())'
+                    ></v-dam-upload>
                             {!! view_render_event('dam.admin.main.form.grid.before') !!}
                         </div>
                     </div>
@@ -93,7 +107,7 @@
                         @lang('dam::app.admin.dam.index.root')
                     </p>
                     @if (bouncer()->hasPermission('dam.asset.upload') && bouncer()->hasPermission('dam.directory.index'))
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2" v-if="canUploadHere">
                             <input type="file"
                                 multiple="multiple"
                                 name="files[]"
@@ -173,6 +187,17 @@
         app.component('v-dam-upload', {
             template: '#v-dam-upload-template',
 
+            props: {
+                aclBypass: {
+                    type: Boolean,
+                    default: false,
+                },
+                accessibleIds: {
+                    type: Array,
+                    default: () => [],
+                },
+            },
+
             data() {
                 return {
                     currentDirectory: null,
@@ -180,6 +205,18 @@
                     abortController: null,
                     treeBusy: false,
                 }
+            },
+
+            computed: {
+                // Upload button shows only when the currently-selected directory
+                // is directly granted to the admin's role. Bypass roles (all /
+                // anonymous / API) keep the original behaviour.
+                canUploadHere() {
+                    if (this.aclBypass) return true;
+                    if (! this.currentDirectory) return false;
+
+                    return this.accessibleIds.map(Number).includes(Number(this.currentDirectory.id));
+                },
             },
 
             mounted() {
