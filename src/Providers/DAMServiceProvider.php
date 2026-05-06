@@ -72,6 +72,14 @@ class DAMServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // Load DAM-only global helper functions (dam_can_view_dir, etc.).
+        // Loaded here rather than via composer.json `autoload.files` so DAM
+        // stays self-contained without touching the root composer.json.
+        $helpers = __DIR__.'/../Http/helpers.php';
+        if (file_exists($helpers)) {
+            require_once $helpers;
+        }
+
         $this->mergeConfigFrom(dirname(__DIR__).'/Config/menu.php', 'menu.admin');
 
         $this->mergeConfigFrom(dirname(__DIR__).'/Config/acl.php', 'acl');
