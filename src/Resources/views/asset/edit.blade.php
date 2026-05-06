@@ -715,7 +715,31 @@
                                 <button
                                     type="submit"
                                     class="primary-button"
+                                    :disabled="isRenaming"
+                                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isRenaming }"
                                 >
+                                    <svg
+                                        v-if="isRenaming"
+                                        class="align-center inline-block animate-spin h-4 w-4 mr-2 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
                                     @lang('dam::app.admin.dam.asset.edit.save-btn')
                                 </button>
                             </div>
@@ -734,6 +758,7 @@
                         selectedItem: @json($asset),
                         isLocked: false,
                         onLockChange: null,
+                        isRenaming: false,
                     };
                 },
                 mounted() {
@@ -761,6 +786,10 @@
                         resetForm,
                         setErrors
                     }) {
+                        if (this.isRenaming) return;
+
+                        this.isRenaming = true;
+
                         let formData = new FormData(this.$refs.assetRenameForm);
 
                         this.$axios.post("{{ route('admin.dam.assets.rename') }}", formData)
@@ -783,6 +812,9 @@
                                     type: 'error',
                                     message: error.response.data.message
                                 });
+                            })
+                            .finally(() => {
+                                this.isRenaming = false;
                             });
                     },
                 }
@@ -943,10 +975,32 @@
         >
             @if (bouncer()->hasPermission('dam.asset.delete'))
                 <button class="secondary-button"
-                    :disabled="isLocked"
-                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked }"
+                    :disabled="isLocked || isDeleting"
+                    :class="{ 'opacity-60 pointer-events-none cursor-not-allowed': isLocked || isDeleting }"
                     @click="deleteFile">
-                    <span class="text-xl text-violet-700 icon-dam-delete"></span>
+                    <svg
+                        v-if="isDeleting"
+                        class="align-center inline-block animate-spin h-5 w-5 text-violet-700"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="#8A2BE2"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    <span v-else class="text-xl text-violet-700 icon-dam-delete"></span>
                     <span>@lang('dam::app.admin.dam.asset.edit.button.delete')</span>
                 </button>
             @endif
@@ -960,6 +1014,7 @@
                         selectedItem: @json($asset),
                         isLocked: false,
                         onLockChange: null,
+                        isDeleting: false,
                     };
                 },
                 mounted() {
@@ -973,9 +1028,11 @@
                 },
                 methods: {
                     deleteFile() {
-                        if (this.isLocked) return;
+                        if (this.isLocked || this.isDeleting) return;
                         this.$emitter.emit('open-delete-modal', {
                             agree: () => {
+                                this.isDeleting = true;
+
                                 this.$axios.delete(
                                         `{{ route('admin.dam.assets.destroy', ':id') }}`.replace(':id', this.selectedItem.id)
                                     )
@@ -992,6 +1049,9 @@
                                             type: 'error',
                                             message: error.response.data.message
                                         });
+                                    })
+                                    .finally(() => {
+                                        this.isDeleting = false;
                                     });
                             }
                         });
