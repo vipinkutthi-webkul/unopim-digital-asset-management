@@ -57,7 +57,7 @@ it('should return local thumbnail url when disk is private', function () {
     expect($url)->toContain('/file/thumbnail');
 });
 
-it('should return s3 url when disk is aws', function () {
+it('should return thumbnail route url when disk is aws', function () {
     Config::set('filesystems.default', Directory::ASSETS_DISK_AWS);
     Storage::fake(Directory::ASSETS_DISK_AWS);
 
@@ -71,6 +71,26 @@ it('should return s3 url when disk is aws', function () {
     $response->assertOk();
     $url = $response->json('0.url');
 
-    expect($url)->not->toContain('admin.dam.file.thumbnail');
-    expect($url)->not->toContain(route('admin.dam.file.thumbnail', ['path' => urlencode($path)]));
+    expect($url)->toContain('/admin/dam/file/thumbnail');
+    expect($url)->toBe(route('admin.dam.file.thumbnail', ['path' => urlencode($path)]));
+});
+
+it('should return thumbnail route url for audio asset so cover art is served', function () {
+    Config::set('filesystems.default', Directory::ASSETS_DISK_PRIVATE);
+
+    $path = 'assets/Root/track-'.uniqid().'.mp3';
+    $asset = Asset::factory()->create([
+        'path'      => $path,
+        'file_type' => 'audio',
+        'extension' => 'mp3',
+        'mime_type' => 'audio/mpeg',
+        'meta_data' => ['cover_art_path' => 'covers/'.uniqid().'.jpg'],
+    ]);
+
+    $response = $this->getJson(route('admin.dam.asset_picker.get_assets', ['assetIds' => (string) $asset->id]));
+
+    $response->assertOk();
+    $url = $response->json('0.url');
+
+    expect($url)->toBe(route('admin.dam.file.thumbnail', ['path' => urlencode($path)]));
 });
