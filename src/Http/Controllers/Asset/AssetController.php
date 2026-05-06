@@ -21,6 +21,7 @@ use Webkul\DAM\Models\Directory;
 use Webkul\DAM\Repositories\AssetRepository;
 use Webkul\DAM\Repositories\AssetTagRepository;
 use Webkul\DAM\Repositories\DirectoryRepository;
+use Webkul\DAM\Services\DirectoryPermissionService;
 use Webkul\DAM\Services\MetadataExtractionService;
 use Webkul\DAM\Traits\Directory as DirectoryTrait;
 use ZipArchive;
@@ -37,8 +38,45 @@ class AssetController extends Controller
         protected AssetTagRepository $assetTagRepository,
         protected FileStorer $fileStorer,
         protected DirectoryRepository $directoryRepository,
-        protected MetadataExtractionService $metadataExtractionService
+        protected MetadataExtractionService $metadataExtractionService,
+        protected DirectoryPermissionService $permissionService,
     ) {}
+
+    /**
+     * Resolve the directory id an asset belongs to. Assets are linked through
+     * the dam_asset_directory pivot; an asset typically lives in exactly one
+     * directory.
+     */
+    protected function assetDirectoryId(?Asset $asset): ?int
+    {
+        if (! $asset) {
+            return null;
+        }
+
+        $dirId = $asset->directories()->value('dam_directories.id');
+
+        return $dirId ? (int) $dirId : null;
+    }
+
+    /**
+     * Returns true when the current admin can act on this asset based on its
+     * containing directory. Strict (directly-granted only) — ancestors that are
+     * tree-visible via expansion don't count.
+     */
+    protected function canActOnAsset(?Asset $asset): bool
+    {
+        if ($this->permissionService->bypass()) {
+            return true;
+        }
+
+        $dirId = $this->assetDirectoryId($asset);
+
+        if ($dirId === null) {
+            return false;
+        }
+
+        return $this->permissionService->canAccess($dirId);
+    }
 
     /**
      * Main route
@@ -66,6 +104,8 @@ class AssetController extends Controller
         if (! $asset) {
             abort(404);
         }
+
+        abort_unless($this->canActOnAsset($asset), 403, trans('dam::app.admin.permissions.unauthorized'));
 
         $asset->previewPath = AssetHelper::getPreviewUrl(
             $asset->path,
@@ -208,6 +248,13 @@ class AssetController extends Controller
 
         $files = $request->file('files');
         $directoryId = $request->get('directory_id');
+
+        if (! $this->permissionService->canAccess((int) $directoryId)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
 
         $directory = $this->directoryRepository->find($directoryId);
         $directoryPath = sprintf('%s/%s', Directory::ASSETS_DIRECTORY, $directory->generatePath());
@@ -380,6 +427,13 @@ class AssetController extends Controller
             ], 404);
         }
 
+        if (! $this->canActOnAsset($asset)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         $directoryId = $asset?->directories()?->get()[0]?->id;
         $directory = $this->directoryRepository->find($directoryId);
         $directoryPath = sprintf('%s/%s', Directory::ASSETS_DIRECTORY, $directory->generatePath());
@@ -465,6 +519,13 @@ class AssetController extends Controller
             ], 404);
         }
 
+        if (! $this->canActOnAsset($asset)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         return response()->json([
             'success' => true,
             'asset'   => $asset,
@@ -486,6 +547,13 @@ class AssetController extends Controller
                 'success' => false,
                 'message' => trans('dam::app.admin.dam.asset.datagrid.not-found-to-update'),
             ], 404);
+        }
+
+        if (! $this->canActOnAsset($asset)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
         }
 
         $request->validate([
@@ -521,6 +589,13 @@ class AssetController extends Controller
                 'success' => false,
                 'message' => trans('dam::app.admin.dam.asset.datagrid.not-found-to-destroy'), // Asset not found to destroy
             ], 404);
+        }
+
+        if (! $this->canActOnAsset($asset)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
         }
 
         if ($asset->resources()->get()->count()) {
@@ -644,6 +719,8 @@ class AssetController extends Controller
             abort(404);
         }
 
+        abort_unless($this->canActOnAsset($asset), 403, trans('dam::app.admin.permissions.unauthorized'));
+
         if ($disk === Directory::ASSETS_DISK_AWS) {
             try {
                 $url = Storage::disk($disk)->temporaryUrl(
@@ -672,6 +749,8 @@ class AssetController extends Controller
         if (! $asset || ! Storage::disk($disk)->exists($asset->path)) {
             abort(404);
         }
+
+        abort_unless($this->canActOnAsset($asset), 403, trans('dam::app.admin.permissions.unauthorized'));
 
         $baseName = pathinfo($asset->file_name, PATHINFO_FILENAME);
         $zipFileName = $baseName.'_'.uniqid().'.zip';
@@ -711,6 +790,13 @@ class AssetController extends Controller
                 'success' => false,
                 'message' => trans('dam::app.admin.dam.asset.datagrid.not-found-to-download'),
             ], 404);
+        }
+
+        if (! $this->canActOnAsset($asset)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
         }
 
         // Svg Image Download
@@ -778,6 +864,12 @@ class AssetController extends Controller
             ], 404);
         }
 
+        if (! $this->canActOnAsset($asset)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         try {
             $name = $request->input('file_name');
             $oldPath = $asset->path;
@@ -843,10 +935,24 @@ class AssetController extends Controller
     {
         $id = $request->input('move_item_id');
         $asset = Asset::find($id);
+
+        if (! $asset || ! $this->canActOnAsset($asset)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
+        $newParentId = (int) $request->input('new_parent_id');
+        if (! $this->permissionService->canAccess($newParentId)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         $oldDirectory = $asset->directories()->first();
         $oldPath = sprintf('%s/%s', $oldDirectory->generatePath(), $asset->file_name);
 
-        $directory = $this->directoryRepository->find($request->input('new_parent_id'));
+        $directory = $this->directoryRepository->find($newParentId);
 
         $directoryPath = sprintf('%s/%s', Directory::ASSETS_DIRECTORY, $directory->generatePath());
 

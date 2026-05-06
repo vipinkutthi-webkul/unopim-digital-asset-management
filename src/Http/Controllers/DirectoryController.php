@@ -13,6 +13,7 @@ use Webkul\DAM\Jobs\MoveDirectoryStructure as MoveDirectoryStructureJob;
 use Webkul\DAM\Jobs\RenameDirectory as RenameDirectoryJob;
 use Webkul\DAM\Models\Directory;
 use Webkul\DAM\Repositories\DirectoryRepository;
+use Webkul\DAM\Services\DirectoryPermissionService;
 use Webkul\DAM\Traits\ActionRequest as ActionRequestTrait;
 use ZipArchive;
 
@@ -20,7 +21,10 @@ class DirectoryController
 {
     use ActionRequestTrait;
 
-    public function __construct(protected DirectoryRepository $directoryRepository) {}
+    public function __construct(
+        protected DirectoryRepository $directoryRepository,
+        protected DirectoryPermissionService $permissionService,
+    ) {}
 
     /**
      * Get the directory
@@ -45,7 +49,13 @@ class DirectoryController
      */
     public function childrenDirectory(int $id): JsonResponse
     {
-        $directory = $this->directoryRepository->getDirectoryTree($id)->first();
+        if (! $this->permissionService->canView($id)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
+        $directory = $this->directoryRepository->getDirectoryTree($id)?->first();
 
         if (! $directory) {
             return new JsonResponse([
@@ -63,6 +73,13 @@ class DirectoryController
      */
     public function directoryAssets(int $id): JsonResponse
     {
+        // Asset listing: strict access (ancestors via expansion don't count).
+        if (! $this->permissionService->canAccess($id)) {
+            return new JsonResponse([
+                'data' => [],
+            ]);
+        }
+
         // `getDirectoryTree($id)` returns a single Directory model (or null) when
         // an id is supplied — calling `->first()` on it proxied to a fresh query
         // and silently returned the table's first row, which is the wrong
@@ -89,6 +106,12 @@ class DirectoryController
     {
         $parentDirectoryId = $request->input('parent_id', 1); // default to root directory
 
+        if (! $this->permissionService->canAccess((int) $parentDirectoryId)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         try {
             $newDirectory = $this->directoryRepository->create([
                 'name'      => $request->input('name'),
@@ -112,6 +135,12 @@ class DirectoryController
     public function update(DirectoryRequest $request): JsonResponse
     {
         $id = $request->input('id'); // default to root directory
+
+        if (! $this->permissionService->canAccess((int) $id)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
 
         try {
             $directory = $this->directoryRepository->find($id);
@@ -148,6 +177,12 @@ class DirectoryController
      */
     public function destroy(int $id): JsonResponse
     {
+        if (! $this->permissionService->canAccess($id)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         $directory = $this->directoryRepository->find($id);
 
         if (! $directory) {
@@ -208,6 +243,12 @@ class DirectoryController
 
         $copyId = $request->input('id', 1);
 
+        if (! $this->permissionService->canAccess((int) $copyId)) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         $directory = $this->directoryRepository->find($copyId);
 
         if (! $directory) {
@@ -247,6 +288,17 @@ class DirectoryController
             'new_parent_id' => 'required|integer',
         ]);
 
+        $moveId = (int) $request->input('move_item_id');
+        $newParentId = (int) $request->input('new_parent_id');
+
+        if (! $this->permissionService->canAccess($moveId)
+            || ! $this->permissionService->canAccess($newParentId)
+        ) {
+            return new JsonResponse([
+                'message' => trans('dam::app.admin.permissions.unauthorized'),
+            ], 403);
+        }
+
         try {
             $requestAction = $this->start(EventType::MOVE_DIRECTORY_STRUCTURE->value);
 
@@ -267,6 +319,10 @@ class DirectoryController
      */
     public function downloadArchive(int $id)
     {
+        if (! $this->permissionService->canAccess($id)) {
+            abort(403, trans('dam::app.admin.permissions.unauthorized'));
+        }
+
         $directory = $this->directoryRepository->findOrFail($id);
 
         $folderPath = sprintf('%s/%s', Directory::ASSETS_DIRECTORY, $directory->generatePath());

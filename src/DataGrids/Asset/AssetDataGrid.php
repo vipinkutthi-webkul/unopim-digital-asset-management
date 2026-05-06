@@ -5,6 +5,7 @@ namespace Webkul\DAM\DataGrids\Asset;
 use Illuminate\Support\Facades\DB;
 use Webkul\DAM\Helpers\AssetHelper;
 use Webkul\DAM\Http\Controllers\FileController;
+use Webkul\DAM\Services\DirectoryPermissionService;
 use Webkul\DataGrid\DataGrid;
 use Webkul\DataGrid\Enums\ColumnTypeEnum;
 
@@ -69,6 +70,21 @@ class AssetDataGrid extends DataGrid
             'directory_asset_id' => 'dam_asset_directory.asset_id',
             'directory_id'       => 'dam_directories.id',
         ];
+
+        $service = app(DirectoryPermissionService::class);
+
+        if (! $service->bypass()) {
+            // Strict: only assets in directly-granted dirs. Ancestor dirs
+            // visible in the tree (via canView expansion) must not leak their
+            // assets here.
+            $allowedIds = $service->directlyGrantedIds();
+
+            if (empty($allowedIds)) {
+                $queryBuilder->whereRaw('1 = 0');
+            } else {
+                $queryBuilder->whereIn('dam_directories.id', $allowedIds);
+            }
+        }
 
         return $queryBuilder;
     }

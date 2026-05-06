@@ -5,6 +5,7 @@ namespace Webkul\DAM\Repositories;
 use Illuminate\Support\Facades\Storage;
 use Webkul\Core\Eloquent\Repository;
 use Webkul\DAM\Models\Directory;
+use Webkul\DAM\Services\DirectoryPermissionService;
 
 class DirectoryRepository extends Repository
 {
@@ -196,9 +197,27 @@ class DirectoryRepository extends Repository
      */
     public function getDirectoryTree($id = null)
     {
-        return $id
-            ? $this->model->with(['assets', 'assets.directories', 'children'])->where('id', $id)->first()
-            : $this->model->with(['assets', 'assets.directories'])->get()->toTree();
+        $service = app(DirectoryPermissionService::class);
+        $applyFilter = ! $service->bypass();
+        $allowedIds = $applyFilter ? $service->viewableIds() : null;
+
+        if ($id !== null) {
+            if ($applyFilter && ! in_array((int) $id, $allowedIds, true)) {
+                return null;
+            }
+
+            return $this->model->with(['assets', 'assets.directories', 'children'])
+                ->where('id', $id)
+                ->first();
+        }
+
+        $query = $this->model->with(['assets', 'assets.directories']);
+
+        if ($applyFilter) {
+            $query->whereIn('id', $allowedIds);
+        }
+
+        return $query->get()->toTree();
     }
 
     /**
@@ -210,9 +229,27 @@ class DirectoryRepository extends Repository
      */
     public function getDirectoryTreeOnly()
     {
+        $service = app(DirectoryPermissionService::class);
+        $query = $this->model->withCount('assets');
+
+        if (! $service->bypass()) {
+            $query->whereIn('id', $service->viewableIds());
+        }
+
         // `withCount('assets')` adds an `assets_count` column without loading
         // the actual asset rows. The tree uses this to render the expand
         // chevron on directories that have assets but no child directories.
+        return $query->get()->toTree();
+    }
+
+    /**
+     * Full directory tree without ACL filtering. Used by the directory
+     * permission manager UI, which must always show every directory so an
+     * admin can grant access to any of them. Callers must enforce their own
+     * authorization before invoking this.
+     */
+    public function getFullDirectoryTreeOnly()
+    {
         return $this->model->withCount('assets')->get()->toTree();
     }
 

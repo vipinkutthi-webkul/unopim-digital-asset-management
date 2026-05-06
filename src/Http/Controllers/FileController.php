@@ -16,6 +16,7 @@ use Intervention\Image\ImageManager;
 use Webkul\DAM\Helpers\AssetHelper;
 use Webkul\DAM\Models\Asset;
 use Webkul\DAM\Models\Directory;
+use Webkul\DAM\Services\DirectoryPermissionService;
 
 /**
  * Class FileController
@@ -28,6 +29,58 @@ use Webkul\DAM\Models\Directory;
  */
 class FileController
 {
+    /**
+     * Resolve the underlying asset path from a thumbnail/preview path, if any.
+     * thumbnails/{path}                   ⇒ {path}
+     * preview/{size}/{path}               ⇒ {path}
+     * other                               ⇒ original
+     */
+    protected function resolveOriginalAssetPath(string $path): string
+    {
+        if (Str::startsWith($path, 'thumbnails/')) {
+            return Str::after($path, 'thumbnails/');
+        }
+
+        if (Str::startsWith($path, 'preview/')) {
+            $rest = Str::after($path, 'preview/');
+            // strip "{size}/"
+            $slash = strpos($rest, '/');
+
+            return $slash === false ? $rest : substr($rest, $slash + 1);
+        }
+
+        return $path;
+    }
+
+    /**
+     * If the given path corresponds to a known DAM asset, deny access when the
+     * current admin cannot view that asset's directory. Returns null when allowed,
+     * a JsonResponse otherwise. Paths that don't match a known asset (covers,
+     * unrelated private files) fall through unchanged.
+     */
+    protected function assertPathAllowed(string $path)
+    {
+        $service = app(DirectoryPermissionService::class);
+        if ($service->bypass()) {
+            return null;
+        }
+
+        $original = $this->resolveOriginalAssetPath($path);
+        $asset = Asset::where('path', $original)->first();
+
+        if (! $asset) {
+            return null;
+        }
+
+        $dirId = (int) ($asset->directories()->value('dam_directories.id') ?? 0);
+
+        if (! $dirId || ! $service->canAccess($dirId)) {
+            return abort(403, trans('dam::app.admin.permissions.unauthorized'));
+        }
+
+        return null;
+    }
+
     /**
      * Create a new file in the private storage.
      *
@@ -95,6 +148,8 @@ class FileController
      */
     public function fetchFile(string $path)
     {
+        $this->assertPathAllowed($path);
+
         $disk = Directory::getAssetDisk();
         if (Storage::disk($disk)->exists($path)) {
             $mimeType = Storage::disk($disk)->mimeType($path);
@@ -121,6 +176,7 @@ class FileController
         }
 
         $path = urldecode(request()->path);
+        $this->assertPathAllowed($path);
 
         $asset = Asset::where('path', $path)->first();
         if ($asset && $asset->file_type === 'audio') {
@@ -265,6 +321,7 @@ class FileController
         }
 
         $path = urldecode(request()->path);
+        $this->assertPathAllowed($path);
         $customSize = intval(request()->get('size'));
 
         $maxSize = 1920;
@@ -356,6 +413,14 @@ class FileController
 
         if (! $asset) {
             return abort(404);
+        }
+
+        $service = app(DirectoryPermissionService::class);
+        if (! $service->bypass()) {
+            $dirId = (int) ($asset->directories()->value('dam_directories.id') ?? 0);
+            if (! $dirId || ! $service->canAccess($dirId)) {
+                return abort(403, trans('dam::app.admin.permissions.unauthorized'));
+            }
         }
 
         $path = $asset->meta_data['cover_art_path'] ?? null;

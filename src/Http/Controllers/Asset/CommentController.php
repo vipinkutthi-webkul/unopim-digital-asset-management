@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Auth;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\DAM\Repositories\AssetCommentsRepository;
 use Webkul\DAM\Repositories\AssetRepository;
+use Webkul\DAM\Traits\AssetAccessControl;
 use Webkul\User\Repositories\AdminRepository;
 
 class CommentController extends Controller
 {
+    use AssetAccessControl;
+
     /**
      *  Create instance
      */
@@ -25,6 +28,8 @@ class CommentController extends Controller
      */
     public function comments($id)
     {
+        $this->damAuthorizeAsset((int) $id);
+
         $property = $this->assetCommentRepository->findOrFail($id);
 
         return new JsonResponse($property);
@@ -69,6 +74,8 @@ class CommentController extends Controller
      */
     public function commentCreate($id)
     {
+        $this->damAuthorizeAsset((int) $id);
+
         $messages = [
             'comments.required' => trans('dam::app.admin.validation.comment.required'),
         ];
@@ -106,6 +113,8 @@ class CommentController extends Controller
         $id = request('id');
         $comment = $this->assetCommentRepository->findOrFail($id);
 
+        $this->damAuthorizeAsset((int) $comment->dam_asset_id);
+
         if ($comment->admin_id !== Auth::id()) {
             return new JsonResponse([
                 'message' => trans('dam::app.admin.dam.asset.comments.update-failed'),
@@ -134,6 +143,8 @@ class CommentController extends Controller
                 'message' => trans('dam::app.admin.dam.asset.comments.delete-failed'),
             ], 404);
         }
+
+        $this->damAuthorizeAsset((int) $comment->dam_asset_id);
 
         if ($comment->admin_id !== Auth::id()) {
             return new JsonResponse([

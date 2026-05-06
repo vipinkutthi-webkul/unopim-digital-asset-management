@@ -10,6 +10,7 @@ use Webkul\DAM\Http\Controllers\Asset\TagController;
 use Webkul\DAM\Http\Controllers\AssetPickerController;
 use Webkul\DAM\Http\Controllers\DAMController;
 use Webkul\DAM\Http\Controllers\DirectoryController;
+use Webkul\DAM\Http\Controllers\DirectoryPermissionController;
 use Webkul\DAM\Http\Controllers\FileController;
 use Webkul\DAM\Http\Controllers\ImageEditController;
 
@@ -114,5 +115,11 @@ Route::group([
         Route::get('', 'index')->name('admin.dam.asset_picker.index');
 
         Route::get('/get', 'fetchAssets')->name('admin.dam.asset_picker.get_assets');
+    });
+
+    Route::controller(DirectoryPermissionController::class)->prefix('permissions')->group(function () {
+        Route::get('', 'index')->name('admin.dam.directory_permissions.index');
+        Route::get('/{roleId}', 'show')->name('admin.dam.directory_permissions.show')->where('roleId', '[0-9]+');
+        Route::post('/update', 'update')->name('admin.dam.directory_permissions.update');
     });
 });
